@@ -320,7 +320,9 @@ The missing historical source remains only **08_MASTERY_SYSTEM.md v1.0**.
 
 ## 8. Current status
 
-**Reconciliation is in progress.**
+**Reconciliation is complete.**
+
+Canonical `docs/01–09` files have been created and cross-document consistency verification is complete. Repository QA passed on run #27 (`35645899211`). PR #3 remains open pending review/merge.
 
 Canonical `docs/01–09` files have been created on this branch. Document 07 is normalized as Task Generator v1.2. Document 08 is a reconstructed canonical Mastery contract and is explicitly distinguished from historical wording. Document 09 remains the Adaptive Engine baseline.
 
