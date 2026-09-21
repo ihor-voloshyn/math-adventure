@@ -68,7 +68,7 @@ class RuleBasedAdaptiveEngineTest {
             "p1",
             listOf(
                 SkillState("NUM_COMPARE", mastery = 3),
-                SkillState("ADD_BASIC", mastery = 3)
+                SkillState("ADD_BASIC", mastery = 2)
             ),
             setOf("ADD_CROSS_TEN", "ADD_BASIC")
         )
