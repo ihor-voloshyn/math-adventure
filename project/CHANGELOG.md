@@ -9,4 +9,5 @@
 - Started Phase 1 with domain boundaries, math-task pipeline, validation, offline-first persistence contracts and ADRs.
 - Merged Phase 1 architecture contracts into `main`.
 - Started Phase 2 with a platform-independent Kotlin core foundation for Mastery, Adaptive, Task Generation and Validation contracts.
+- Added the initial Curriculum / Skill Graph foundation and Math Engine interface; concrete mathematical evaluation remains next.
 - Completed final cross-document consistency pass and Repository QA; PR #3 remains open pending review/merge.
