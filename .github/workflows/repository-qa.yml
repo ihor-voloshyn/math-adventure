@@ -1,0 +1,43 @@
+name: Repository QA
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  repository-integrity:
+    name: Repository integrity checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify required project foundations
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f AGENTS.md
+          test -f README.md
+          test -f docs/README.md
+          test -f architecture/README.md
+          test -f agents/repository-qa/AGENT.md
+          test -f agents/repository-qa/CHECKLIST.md
+          test -f agents/repository-qa/DEFINITION_OF_DONE.md
+
+      - name: Verify no accidental empty authoritative docs directory
+        shell: bash
+        run: |
+          set -euo pipefail
+          find docs -maxdepth 1 -type f -print | sort
+          find agents/repository-qa -maxdepth 1 -type f -print | sort
+
+      - name: Markdown sanity
+        shell: bash
+        run: |
+          set -euo pipefail
+          ! grep -RInE '<<<<<<<|=======|>>>>>>>' --include='*.md' . --exclude-dir=.git
