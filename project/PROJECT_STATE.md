@@ -29,9 +29,9 @@ Documentation reconciliation and project foundation.
 - Math Engine / Mastery / Adaptive / Task Generator responsibility boundaries documented.
 
 ## Current work
-1. Review PR #3 before merge.
-
-Repository QA: **passed** on run #27 (`35645899211`).
+1. Review Phase 1 architecture contracts.
+2. Run Repository QA.
+3. Prepare Phase 1 PR for merge.
 
 ## Canonical responsibility chain
 `Curriculum / Skill Graph → Math Engine → Mastery System → Adaptive Engine → Task Generator → Validation → Game Engine → Reward / Persistence`
