@@ -40,6 +40,9 @@ XP is a game-progression concern. It must not be added to the mathematical Rewar
 
 Mastery remains owned exclusively by `MasterySystem`. Math Engine remains the source of mathematical truth. Persistence stores derived state and does not decide domain semantics.
 
+## Product decisions recorded
+- Mastery Progression v1.0 is approved: evidence-based 0–5 progression, diversified evidence for high mastery, delayed verification for Mastery 5, controlled demotion, neutral SKIPPED, hint-aware evidence, offline-first and idempotent attempt processing.
+
 ## Next logical stage
 1. Define the Mastery progression algorithm and review/forgetting policy.
 2. Define the Game Engine progression event boundary for XP/Coins/Loot.

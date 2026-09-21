@@ -43,3 +43,10 @@ MVP rules:
 ## Potential PO decisions
 
 No new product decision is required merely to continue reconciliation. A PO decision should be requested only if recovery of an approved source fails or if two genuinely authoritative decisions remain contradictory after source/date/approval precedence is established.
+
+
+## R-018 — Mastery progression algorithm
+
+**Status:** Approved by Product Owner delegation ("делай на свое усмотрение").
+
+MVP Mastery is evidence-based and uses a 0–5 state machine. Promotion is gradual; one correct answer cannot create Mastery 5; one error cannot reset Mastery. Mastery 4/5 requires evidence diversity and appropriate difficulty. Mastery 5 requires delayed verification. SKIPPED is neutral. Hints are not errors. Time is not a mastery requirement. Demotion is controlled and requires sustained negative evidence. Mastery policy is configurable, offline-first and idempotent by attemptId. RPG Level, XP and Game Engine do not modify Mastery.
