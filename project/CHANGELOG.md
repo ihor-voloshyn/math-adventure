@@ -10,4 +10,7 @@
 - Merged Phase 1 architecture contracts into `main`.
 - Started Phase 2 with a platform-independent Kotlin core foundation for Mastery, Adaptive, Task Generation and Validation contracts.
 - Added the initial Curriculum / Skill Graph foundation and Math Engine interface; concrete mathematical evaluation remains next.
-- Completed final cross-document consistency pass and Repository QA; PR #3 remains open pending review/merge.
+- Completed final cross-document consistency pass and Repository QA; PR #3 merged into `main`.
+- Restored canonical `PRODUCT_VISION.md` to `docs/` and merged PR #7.
+- Merged Phase 2 core foundation PR #5 into `main`.
+- Opened PR #6 for Curriculum / Skill Graph and Math Engine foundation.
