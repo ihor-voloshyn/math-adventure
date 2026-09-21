@@ -9,8 +9,9 @@ Phase 2 — Core Implementation.
 ## Product decisions recorded
 - XP, Coins, and mathematical Mastery are independent MVP systems.
 - RPG Level 1–30 is approved for MVP.
-- XP Progression v1.0 is approved: XP rewards meaningful game achievements, not individual math answers; cumulative level threshold is `50 × (Level - 1)²`; repeated completed content is anti-farmed; XP events are idempotent and offline-first.
-- Mastery remains the educational progression gate and is never bypassed by RPG Level.
+- XP Progression v1.0 is approved: XP rewards meaningful game achievements, not individual math answers; cumulative level threshold is 50 × (Level - 1)²; repeated completed content is anti-farmed; XP events are idempotent and offline-first.
+- Mastery Progression v1.0 is approved: evidence-based 0–5 progression, diversified evidence for high mastery, delayed verification for Mastery 5, controlled demotion, neutral SKIPPED, hint-aware evidence, offline-first and idempotent attempt processing.
+- Game Engine Progression v1.0 is approved: validated game events own XP/Coins/Loot progression; reward calculation and RPG Level calculation are separate from Math/Mastery; progression commits are atomic and idempotent.
 
 ## Current work
 The project is moving from the core learning vertical slice into explicit game-progression semantics. Mathematical learning remains separated from RPG progression.
@@ -18,33 +19,31 @@ The project is moving from the core learning vertical slice into explicit game-p
 ## Completed
 - Repository foundation and QA workflow.
 - Incoming documents preserved and reconciled.
-- Canonical documents 01–09 established; document 08 is explicitly reconstructed.
+- Canonical documents 01–13 established; document 08 is explicitly reconstructed.
 - Domain ownership, math-task pipeline, validation and offline-first contracts established.
 - Curriculum / Skill Graph foundation implemented.
 - Math Engine mathematical validation foundation implemented.
-- Mastery runtime boundary implemented with injected policy; no unapproved Mastery algorithm invented.
+- Mastery runtime boundary implemented with injected policy.
 - Adaptive runtime boundary implemented with injected policy.
 - Deterministic Task Generator implemented for the current supported task slice.
 - Structural → logical → mathematical validation pipeline implemented.
 - End-to-end learning flow implemented: Adaptive → Blueprint → Generator → Validation → Math Engine → Mastery.
-- Progression boundary implemented: validated learning result → injected RewardPolicy → single ProgressionStore commit boundary.
+- Progression boundary implemented for the mathematical learning flow with explicit RewardPolicy and ProgressionStore extension points.
 - RPG Level 1–30 product progression approved.
 - XP/RPG Level progression policy approved.
+- Mastery progression policy approved.
+- Game Engine progression boundary approved.
 
 ## Current implementation boundary
-`CoreProgressionFlow` composes the existing learning flow with two explicit extension points:
-- `RewardPolicy` owns reward calculation; no reward formula is hard-coded here.
-- `ProgressionStore` owns durable atomic commit mechanics; no storage technology or schema is hard-coded here.
+Core mathematical progression remains separate from game progression.
 
-XP is a game-progression concern. It must not be added to the mathematical RewardPolicy merely because a math answer was submitted. A future game-event progression flow should own XP events and RPG Level calculation.
+The existing CoreProgressionFlow handles validated learning results and its reward extension point; it must not become the source of XP merely because a math answer was submitted.
 
-Mastery remains owned exclusively by `MasterySystem`. Math Engine remains the source of mathematical truth. Persistence stores derived state and does not decide domain semantics.
+The new Game Engine progression flow will own validated Game Events, RewardBundle calculation, XP/RPG Level calculation, game unlocks and atomic/idempotent progression commits.
 
-## Product decisions recorded
-- Mastery Progression v1.0 is approved: evidence-based 0–5 progression, diversified evidence for high mastery, delayed verification for Mastery 5, controlled demotion, neutral SKIPPED, hint-aware evidence, offline-first and idempotent attempt processing.
+Mastery remains owned exclusively by MasterySystem. Math Engine remains the source of mathematical truth. Persistence stores derived state and does not decide domain semantics.
 
 ## Next logical stage
-1. Define the Mastery progression algorithm and review/forgetting policy.
-2. Define the Game Engine progression event boundary for XP/Coins/Loot.
-3. Implement XP/RPG Level contracts independently from the math-answer reward path.
-4. Continue Game Engine boundary and integration tests without moving mathematical or Mastery ownership into gameplay code.
+1. Implement Game Engine progression contracts and tests independently from the math-answer reward path.
+2. Define Combat semantics using the Game Progression boundary.
+3. Continue with Items/Equipment, Pet, Home/Territory, Quests and World/Story.

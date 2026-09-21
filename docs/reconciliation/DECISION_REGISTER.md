@@ -35,18 +35,26 @@ MVP rules:
 - Main sources: quests, combat victories, first-time exploration/discovery, puzzles, story milestones, and home/territory milestones.
 - Repeating completed content does not provide full XP again; improvement can provide a limited bonus.
 - Wrong math answers and math hints do not directly reduce XP.
-- Cumulative XP threshold is `50 × (Level - 1)²` for Levels 1–30.
+- Cumulative XP threshold is 50 × (Level - 1)² for Levels 1–30.
 - XP events are idempotent by unique eventId.
 - XP works offline and is later server-validatable.
 - RPG Level never bypasses Mastery or mathematical prerequisites.
-
-## Potential PO decisions
-
-No new product decision is required merely to continue reconciliation. A PO decision should be requested only if recovery of an approved source fails or if two genuinely authoritative decisions remain contradictory after source/date/approval precedence is established.
-
 
 ## R-018 — Mastery progression algorithm
 
 **Status:** Approved by Product Owner delegation ("делай на свое усмотрение").
 
 MVP Mastery is evidence-based and uses a 0–5 state machine. Promotion is gradual; one correct answer cannot create Mastery 5; one error cannot reset Mastery. Mastery 4/5 requires evidence diversity and appropriate difficulty. Mastery 5 requires delayed verification. SKIPPED is neutral. Hints are not errors. Time is not a mastery requirement. Demotion is controlled and requires sustained negative evidence. Mastery policy is configurable, offline-first and idempotent by attemptId. RPG Level, XP and Game Engine do not modify Mastery.
+
+## R-019 — Game Engine progression boundary
+
+**Status:** Approved by Product Owner delegation ("делай на свое усмотрение").
+
+MVP rules:
+- Game events are the source events for XP, Coins and Loot; individual math answers do not directly grant XP.
+- A validated game event passes eligibility/repeat policy, reward policy, RPG level calculation and unlock calculation before one atomic progression commit.
+- eventId provides idempotency; retries must not duplicate rewards.
+- First completion may receive the full eligible reward; repeats without best-result improvement do not grant XP; improvement may grant limited bonus XP.
+- Defeat never removes confirmed XP, RPG Level, Mastery or confirmed rewards; current uncommitted run rewards may be lost.
+- RPG Level 1–30 remains separate from Mastery and cannot bypass mathematical prerequisites.
+- Progression is offline-first and designed for later server validation.
