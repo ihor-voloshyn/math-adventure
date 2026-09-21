@@ -66,7 +66,7 @@ class RuleBasedAdaptiveEngineTest {
         val engine = RuleBasedAdaptiveEngine(curriculum, policy)
         val decision = engine.decideNext(
             "p1",
-            listOf(SkillState("ADD_BASIC", mastery = 5)),
+            listOf(SkillState("ADD_BASIC", mastery = 0)),
             setOf("ADD_CROSS_TEN", "ADD_BASIC")
         )
         assertEquals("ADD_CROSS_TEN", decision.skillId)
