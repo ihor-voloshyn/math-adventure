@@ -4,6 +4,7 @@
 **Date:** 2026-09-21
 
 | Canonical document | Intended status | Preserved evidence | Reconciliation status |
+| `PRODUCT_VISION.md` | Approved v1.0 | project baseline; referenced by 01 | Restored as canonical top-level product vision |
 |---|---|---|---|
 | 01_PRODUCT_REQUIREMENTS.md | Approved v1.0 | incoming + backup 01 | Recoverable |
 | 02_GAME_DESIGN.md | Approved v1.0 | incoming + backup 02 | Recoverable |
