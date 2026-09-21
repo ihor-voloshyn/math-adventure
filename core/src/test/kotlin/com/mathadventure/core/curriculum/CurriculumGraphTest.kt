@@ -7,23 +7,41 @@ import kotlin.test.assertFailsWith
 class CurriculumGraphTest {
     @Test
     fun canonicalFoundationDependenciesArePresent() {
-        assertEquals(setOf("numbers"), InitialCurriculum.graph.prerequisitesOf("addition"))
+        val curriculum = Curriculum.mvp()
+
+        assertEquals(listOf("NUM_COUNT_FORWARD"), curriculum.requiredPrerequisites("NUM_COMPARE"))
+        assertEquals(listOf("NUM_COMPARE"), curriculum.requiredPrerequisites("ADD_BASIC"))
         assertEquals(
-            setOf("addition", "subtraction"),
-            InitialCurriculum.graph.prerequisitesOf("multiplication")
-        )
-        assertEquals(
-            setOf("multiplication", "subtraction"),
-            InitialCurriculum.graph.prerequisitesOf("division")
+            listOf("ADD_BASIC", "SUB_BASIC"),
+            curriculum.requiredPrerequisites("WORD_ONE_STEP")
         )
     }
 
     @Test
-    fun unknownPrerequisiteIsRejected() {
+    fun unknownSkillDependencyIsRejected() {
         assertFailsWith<IllegalArgumentException> {
-            CurriculumGraph(
-                listOf(
-                    SkillDefinition("a", "numbers", setOf("missing"))
+            Curriculum(
+                skills = listOf(
+                    SkillDefinition("A", SkillDomain.NUMBERS, "A")
+                ),
+                dependencies = listOf(
+                    SkillDependency("A", "MISSING", DependencyType.REQUIRED)
+                )
+            )
+        }
+    }
+
+    @Test
+    fun requiredDependencyCycleIsRejected() {
+        assertFailsWith<IllegalArgumentException> {
+            Curriculum(
+                skills = listOf(
+                    SkillDefinition("A", SkillDomain.NUMBERS, "A"),
+                    SkillDefinition("B", SkillDomain.NUMBERS, "B")
+                ),
+                dependencies = listOf(
+                    SkillDependency("A", "B", DependencyType.REQUIRED),
+                    SkillDependency("B", "A", DependencyType.REQUIRED)
                 )
             )
         }
