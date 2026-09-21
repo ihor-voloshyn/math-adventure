@@ -15,6 +15,7 @@
 | R-009 | Input | Numeric answers use numeric input; non-numeric answers use selection; arbitrary free-text math input is not MVP scope. |
 | R-010 | New mechanics | New mechanics are introduced through dedicated instruction windows. |
 | R-015 | XP / Coins / Mastery | MVP keeps XP, Coins, and mathematical Mastery as three independent systems. XP represents RPG/character progression; Coins are the game currency; Mastery represents mathematical learning progress and controls access to mathematically dependent progression. RPG Level must not replace or override Mastery as the educational progression gate. |
+| R-016 | RPG Level progression | MVP uses RPG Level 1–30. Every level provides a game-progression reward or unlock; every fifth level is a major milestone. RPG Level develops the hero, world, home, and pet. RPG Level must not replace or bypass Mastery. |
 
 ## Recovery items — investigation required before asking PO
 
@@ -25,11 +26,19 @@
 | R-013 | Document 09 | Staged 09 is Adaptive Engine v1.1 approved. | Freeze as current Adaptive baseline. |
 | R-014 | Source of Truth | Project knowledge must not depend on chat-history reconstruction. | Resolved: GitHub is the Source of Truth; chat is the working interface. Project state is partitioned under project/, with domain truth in docs/, architecture in architecture/, and QA in qa/. |
 
-## R-016 — RPG Level progression
+## R-017 — XP and RPG Level progression
 
-**Status:** Approved by Product Owner.
+**Status:** Approved by Product Owner delegation ("делай на свое усмотрение"). The success criteria are child engagement and real learning progress.
 
-MVP uses RPG Level 1–30. Every level provides a game-progression reward or unlock; every fifth level is a major milestone. RPG Level develops the hero, world, home, and pet. RPG Level must not replace or bypass Mastery. XP thresholds and exact reward formulas remain separate future decisions.
+MVP rules:
+- XP rewards meaningful game achievements, not individual math answers.
+- Main sources: quests, combat victories, first-time exploration/discovery, puzzles, story milestones, and home/territory milestones.
+- Repeating completed content does not provide full XP again; improvement can provide a limited bonus.
+- Wrong math answers and math hints do not directly reduce XP.
+- Cumulative XP threshold is `50 × (Level - 1)²` for Levels 1–30.
+- XP events are idempotent by unique eventId.
+- XP works offline and is later server-validatable.
+- RPG Level never bypasses Mastery or mathematical prerequisites.
 
 ## Potential PO decisions
 
