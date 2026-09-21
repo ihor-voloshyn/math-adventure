@@ -58,3 +58,18 @@ MVP rules:
 - Defeat never removes confirmed XP, RPG Level, Mastery or confirmed rewards; current uncommitted run rewards may be lost.
 - RPG Level 1–30 remains separate from Mastery and cannot bypass mathematical prerequisites.
 - Progression is offline-first and designed for later server validation.
+
+## R-020 — Combat system
+
+**Status:** Approved by Product Owner delegation ("делай на свое усмотрение").
+
+MVP rules:
+- Combat is turn-based and the player acts first.
+- Math Engine is the sole authority for mathematical correctness; Combat consumes validated attempt results.
+- Incorrect answers can cause missed/failed actions but do not automatically cause defeat or reset Mastery.
+- SKIPPED is distinct from INCORRECT.
+- Victory creates a COMBAT_VICTORY Game Event; rewards are calculated by Game Progression, not Combat.
+- Defeat preserves confirmed XP, RPG Level, Mastery and confirmed rewards; current uncommitted run rewards may be lost.
+- RPG Level and equipment may affect game combat parameters but cannot bypass required mathematical prerequisites.
+- Combat difficulty and Math Difficulty are separate concepts.
+- No real-time response speed requirement is used as a mathematical competence gate.
