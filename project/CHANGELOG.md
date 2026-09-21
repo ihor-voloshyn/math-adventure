@@ -6,4 +6,5 @@
 - Canonicalized document identity for 07 Task Generator.
 - Added reconstructed 08 Mastery System contract.
 - Preserved reconciliation and recovery evidence separately from authoritative documentation.
+- Started Phase 1 with domain boundaries, math-task pipeline, validation, offline-first persistence contracts and ADRs.
 - Completed final cross-document consistency pass and Repository QA; PR #3 remains open pending review/merge.
