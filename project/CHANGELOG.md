@@ -18,9 +18,10 @@
 ## 2026-09-22
 - Recorded the Product Owner decision that XP, Coins, and mathematical Mastery are independent MVP systems.
 - Approved RPG Progression v1.0: RPG Level 1–30 with major milestones at Levels 5, 10, 15, 20, 25, and 30. RPG Level develops the hero, world, home, and pet.
-- Approved XP & RPG Level Progression v1.0: XP rewards meaningful game achievements rather than individual math answers; repeated completed content is anti-farmed; cumulative XP thresholds use `50 × (Level - 1)²`; XP events are idempotent and offline-first; RPG Level never bypasses Mastery.
+- Approved XP & RPG Level Progression v1.0: XP rewards meaningful game achievements rather than individual math answers; repeated completed content is anti-farmed; cumulative XP thresholds use 50 × (Level - 1)²; XP events are idempotent and offline-first; RPG Level never bypasses Mastery.
+- Approved Mastery Progression v1.0: evidence-based 0–5 progression with diversified evidence, delayed verification, controlled demotion, neutral SKIPPED, hint-aware evidence and idempotent offline-first processing.
+- Approved Game Engine Progression v1.0: validated Game Events drive XP/Coins/Loot through an atomic and idempotent progression commit; math answers do not directly grant XP; RPG Level remains separate from Mastery.
 
 ## Next
-- Define the Mastery progression algorithm and review/forgetting model.
-- Define the Game Engine progression event boundary for XP/Coins/Loot.
-- Implement XP/RPG Level contracts independently from the math-answer reward path.
+- Implement Game Engine progression contracts and tests.
+- Define Combat semantics using the approved progression boundary.
