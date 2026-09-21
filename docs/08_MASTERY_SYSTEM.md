@@ -1,7 +1,11 @@
 # 08_MASTERY_SYSTEM.md
 
-**Status:** Reconstruction draft — **not recovered historical approved v1.0**  
-**
+**Version:** 1.0  
+**Status:** APPROVED — reconstructed canonical specification  
+**Date:** 2026-09-21
+
+**Note:** This is a reconstructed canonical contract. It is not represented as recovery of the missing historical wording.
+
 ## 1. Why this reconstruction exists
 
 The preserved snapshot contains no recoverable file whose identity is the intended:
