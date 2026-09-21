@@ -311,6 +311,13 @@ Math Engine uses a confidence field and language such as â€œincrease confidenceâ
 Resolution: do not promote confidence as a canonical public field until the Mastery System specification defines it. The reconstruction draft deliberately leaves the formula and storage semantics open.
 
 
+
+### Document 07 recovery result
+
+The preserved staged Task Generation document is explicitly **v1.2 / APPROVED** and defines the canonical Task Generator responsibility and pipeline. This is sufficient evidence to resolve the earlier identity mismatch: the content is the expected canonical **07_TASK_GENERATOR.md v1.2**, currently stored under the wrong staged number/name. A separate historical 07 source is therefore not required for recovery.
+
+The missing historical source remains only **08_MASTERY_SYSTEM.md v1.0**.
+
 ## 8. Current status
 
 **Reconciliation is in progress.**
