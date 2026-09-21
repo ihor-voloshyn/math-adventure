@@ -5,11 +5,23 @@ import com.mathadventure.core.model.TaskInstance
 
 class BasicMathEngine : MathEngine {
     override fun validateTask(task: TaskInstance): MathematicalValidation {
-        if (task.taskId.isBlank()) return MathematicalValidation(false, "MISSING_TASK_ID")
-        if (task.skillId.isBlank()) return MathematicalValidation(false, "MISSING_SKILL_ID")
-        if (task.prompt.isBlank()) return MathematicalValidation(false, "MISSING_PROMPT")
-        if (task.answerSpec.isBlank()) return MathematicalValidation(false, "MISSING_ANSWER_SPEC")
-        if (task.difficulty < 1) return MathematicalValidation(false, "INVALID_DIFFICULTY")
+        if (task.taskId.isBlank()) return invalid("MISSING_TASK_ID")
+        if (task.skillId.isBlank()) return invalid("MISSING_SKILL_ID")
+        if (task.prompt.isBlank()) return invalid("MISSING_PROMPT")
+        if (task.answerSpec.isBlank()) return invalid("MISSING_ANSWER_SPEC")
+        if (task.difficulty < 1) return invalid("INVALID_DIFFICULTY")
+
+        val addition = ADDITION_PATTERN.matchEntire(task.prompt.trim())
+            ?: return invalid("UNSUPPORTED_MATHEMATICAL_FORM")
+        val left = addition.groupValues[1].toLongOrNull()
+            ?: return invalid("INVALID_LEFT_OPERAND")
+        val right = addition.groupValues[2].toLongOrNull()
+            ?: return invalid("INVALID_RIGHT_OPERAND")
+        val expected = (left + right).toString()
+
+        if (task.answerSpec.trim() != expected) {
+            return invalid("INCORRECT_EXPECTED_ANSWER")
+        }
         return MathematicalValidation(true)
     }
 
@@ -24,5 +36,11 @@ class BasicMathEngine : MathEngine {
                 "contextType" to task.contextType
             )
         )
+    }
+
+    private fun invalid(reason: String) = MathematicalValidation(false, reason)
+
+    private companion object {
+        val ADDITION_PATTERN = Regex("""(-?\\d+)\\s*\\+\\s*(-?\\d+)\\s*=\\s*\\?""")
     }
 }
