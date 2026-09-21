@@ -128,6 +128,7 @@ class CoreLearningFlowTest {
         assertEquals(AnswerResult.INCORRECT, answered.evaluation.result)
         assertEquals(1, answered.mastery.attempts)
         assertEquals(1, answered.mastery.incorrectAttempts)
+        assertEquals("ADD_BASIC", answered.mastery.skillId)
         assertEquals(0, answered.mastery.mastery)
     }
 }
