@@ -9,11 +9,11 @@ Phase 2 — Core Implementation.
 **Current implementation slice:** Curriculum / Skill Graph + Math Engine foundation.
 
 ## Current branch / PR
-- Branch: `implementation/phase-2-core-foundation`
+- Open PR: #6 — `implementation/curriculum-math-engine`
 - Target: `main`
 
 ## Authoritative structure
-- `docs/` — approved/canonical product and system specifications
+- `docs/` — approved/canonical product and system specifications, including `PRODUCT_VISION.md`
 - `architecture/` — technical architecture and ADRs
 - `project/` — current project state, roadmap, open questions and changelog
 - `qa/` — QA strategy and acceptance artifacts
@@ -29,11 +29,20 @@ Phase 2 — Core Implementation.
 - Canonical document 08 created as a reconstructed Mastery System v1.0 contract.
 - Canonical document 09 frozen as Adaptive Engine baseline.
 - Math Engine / Mastery / Adaptive / Task Generator responsibility boundaries documented.
+- Phase 1 architecture contracts merged into `main`.
+- Phase 2 core Kotlin domain foundation merged into `main`.
+- Canonical Product Vision restored to `docs/PRODUCT_VISION.md` and merged via PR #7.
 
-## Current work
-1. Review the Phase 2 core foundation.
-2. Run Repository QA.
-3. Prepare the Phase 2 foundation PR for merge.
+## Current implementation
+PR #6 implements the next Phase 2 slice:
+- Curriculum / Skill Graph foundation.
+- Stable skill IDs and dependency validation.
+- Required prerequisite and related-skill queries.
+- Math Engine task validation foundation.
+- Basic answer evaluation foundation.
+- Automated tests for curriculum and Math Engine boundaries.
+
+This is a foundation slice, not the complete 1–4 grade curriculum or complete mathematical solver/generator.
 
 ## Canonical responsibility chain
 `Curriculum / Skill Graph → Math Engine → Mastery System → Adaptive Engine → Task Generator → Validation → Game Engine → Reward / Persistence`
@@ -49,4 +58,8 @@ Phase 2 — Core Implementation.
 - Chat discussion may explain or propose changes, but a rule becomes project truth only when recorded in the appropriate GitHub artifact.
 
 ## Next logical stage
-Complete the core domain foundation, then implement Curriculum/Skill Graph, Math Engine, Mastery, Adaptive, Task Generator and validation layers.
+1. Complete and QA PR #6.
+2. After merge, implement the Mastery System runtime foundation.
+3. Implement Adaptive Engine against the Mastery contract.
+4. Implement Task Generator and the validation pipeline.
+5. Build the first end-to-end mathematical gameplay vertical slice.
