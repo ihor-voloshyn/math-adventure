@@ -1768,10 +1768,9 @@ Math Engine должен быть построен так, чтобы его м�
 
 Документ является архитектурной основой для следующих документов:
 
-- `07_ADAPTIVE_ENGINE.md`
-- `08_TASK_GENERATION.md`
-- `09_MATH_CONTENT_MODEL.md`
-- `10_MATH_QA.md`
+- `08_MASTERY_SYSTEM.md`
+- `09_ADAPTIVE_ENGINE.md`
+- `07_TASK_GENERATOR.md`
 
 Главное правило:
 
