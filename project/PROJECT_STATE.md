@@ -7,44 +7,47 @@
 Phase 2 — Core Implementation.
 
 ## Current branch / PR
-- Branch: `implementation/phase-2-core-foundation`
-- Target: `main`
-
-## Authoritative structure
-- `docs/` — approved/canonical product and system specifications
-- `architecture/` — technical architecture and ADRs
-- `project/` — current project state, roadmap, open questions and changelog
-- `qa/` — QA strategy and acceptance artifacts
-- `incoming-docs/` — staging only; never authoritative
-- `backups/` — preserved snapshots; never authoritative
+- Last merged implementation: PR #13, feat: add deterministic task generator and validation foundation.
+- Merge commit: f5b259f4fde19f989d1515750b48f34eec25d3c9.
+- Working baseline: main.
 
 ## Completed
-- Repository foundation established.
-- Repository QA agent and workflow established.
-- Incoming documents preserved.
-- Initial reconciliation artifacts created.
-- Canonical document 07 normalized as Task Generator v1.2.
-- Canonical document 08 created as a reconstructed Mastery System v1.0 contract.
-- Canonical document 09 frozen as Adaptive Engine baseline.
-- Math Engine / Mastery / Adaptive / Task Generator responsibility boundaries documented.
+- Repository foundation and QA workflow.
+- Incoming documents preserved and reconciled.
+- Canonical documents 01–09 established; document 08 is explicitly reconstructed.
+- Domain ownership, math-task pipeline, validation and offline-first contracts established.
+- Curriculum / Skill Graph foundation implemented.
+- Math Engine mathematical validation foundation implemented.
+- Mastery runtime boundary implemented with injected policy; no unapproved Mastery algorithm invented.
+- Adaptive runtime boundary implemented with injected policy.
+- Deterministic Task Generator implemented for the current supported task slice.
+- Structural → logical → mathematical validation pipeline implemented.
+- Generated-task and mathematical validation tests added.
+- PR #13 merged after Repository QA and Core Domain QA passed.
 
 ## Current work
-1. Review the Phase 2 core foundation.
-2. Run Repository QA.
-3. Prepare the Phase 2 foundation PR for merge.
+Build the first end-to-end domain vertical slice:
+1. Adaptive decision
+2. Task blueprint
+3. Deterministic task generation
+4. Structural/logical/mathematical validation
+5. Player answer evaluation
+6. Mastery update through the injected policy boundary
+7. Adaptive consumption of updated state
+
+The exact Mastery promotion/demotion algorithm remains a Product Owner decision and must stay policy-injected.
 
 ## Canonical responsibility chain
-`Curriculum / Skill Graph → Math Engine → Mastery System → Adaptive Engine → Task Generator → Validation → Game Engine → Reward / Persistence`
+Curriculum / Skill Graph → Math Engine → Mastery System → Adaptive Engine → Task Generator → Validation → Game Engine → Reward / Persistence
 
 ## Important rules
 - Product Owner decisions are authoritative.
 - Do not silently change approved requirements.
-- When sources conflict, resolve by approved decision/source precedence; ask the Product Owner only when no authoritative resolution exists.
 - Adaptive Engine does not optimize difficulty for rewards.
 - Mastery System is the sole owner of Mastery updates.
 - Math Engine is the source of mathematical truth and validation.
 - Task Generator instantiates concrete tasks from Adaptive decisions.
-- Chat discussion may explain or propose changes, but a rule becomes project truth only when recorded in the appropriate GitHub artifact.
+- Chat discussion becomes project truth only when recorded in the appropriate GitHub artifact.
 
 ## Next logical stage
-Complete the core domain foundation, then implement Curriculum/Skill Graph, Math Engine, Mastery, Adaptive, Task Generator and validation layers.
+Implement and test the first end-to-end core-domain vertical slice without introducing game/economy persistence prematurely.
