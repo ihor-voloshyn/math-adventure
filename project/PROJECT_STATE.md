@@ -6,10 +6,8 @@
 ## Current phase
 Phase 2 — Core Implementation.
 
-## Current branch / PR
-- Last merged implementation: PR #13, feat: add deterministic task generator and validation foundation.
-- Merge commit: f5b259f4fde19f989d1515750b48f34eec25d3c9.
-- Working baseline: main.
+## Current work
+The first core-domain vertical slice is complete. The next slice establishes the boundary from validated learning results into game rewards and durable progression without inventing an unapproved reward formula or storage schema.
 
 ## Completed
 - Repository foundation and QA workflow.
@@ -22,32 +20,15 @@ Phase 2 — Core Implementation.
 - Adaptive runtime boundary implemented with injected policy.
 - Deterministic Task Generator implemented for the current supported task slice.
 - Structural → logical → mathematical validation pipeline implemented.
-- Generated-task and mathematical validation tests added.
-- PR #13 merged after Repository QA and Core Domain QA passed.
+- End-to-end learning flow implemented: Adaptive → Blueprint → Generator → Validation → Math Engine → Mastery.
+- Progression boundary implemented: validated learning result → injected RewardPolicy → single ProgressionStore commit boundary.
 
-## Current work
-Build the first end-to-end domain vertical slice:
-1. Adaptive decision
-2. Task blueprint
-3. Deterministic task generation
-4. Structural/logical/mathematical validation
-5. Player answer evaluation
-6. Mastery update through the injected policy boundary
-7. Adaptive consumption of updated state
+## Current implementation boundary
+`CoreProgressionFlow` composes the existing learning flow with two explicit extension points:
+- `RewardPolicy` owns reward calculation; no reward formula is hard-coded here.
+- `ProgressionStore` owns durable atomic commit mechanics; no storage technology or schema is hard-coded here.
 
-The exact Mastery promotion/demotion algorithm remains a Product Owner decision and must stay policy-injected.
-
-## Canonical responsibility chain
-Curriculum / Skill Graph → Math Engine → Mastery System → Adaptive Engine → Task Generator → Validation → Game Engine → Reward / Persistence
-
-## Important rules
-- Product Owner decisions are authoritative.
-- Do not silently change approved requirements.
-- Adaptive Engine does not optimize difficulty for rewards.
-- Mastery System is the sole owner of Mastery updates.
-- Math Engine is the source of mathematical truth and validation.
-- Task Generator instantiates concrete tasks from Adaptive decisions.
-- Chat discussion becomes project truth only when recorded in the appropriate GitHub artifact.
+Mastery remains owned exclusively by `MasterySystem`. Math Engine remains the source of mathematical truth. Persistence stores derived state and does not decide domain semantics.
 
 ## Next logical stage
-Implement and test the first end-to-end core-domain vertical slice without introducing game/economy persistence prematurely.
+Implement concrete offline persistence only after the durable schema/technology boundary is explicitly selected. In parallel, continue the Game Engine boundary and integration tests without moving mathematical or Mastery ownership into gameplay code.
