@@ -8,6 +8,7 @@ Phase 2 — Core Implementation.
 
 ## Product decisions recorded
 - XP, Coins, and mathematical Mastery are independent MVP systems. XP drives RPG/character progression; Coins are the game currency; Mastery remains the educational progression gate.
+- RPG Level 1–30 is approved for MVP. Every fifth level is a major milestone; RPG Level develops the hero, world, home, and pet without replacing or bypassing Mastery. XP thresholds and exact level rewards remain separate decisions.
 
 ## Current work
 The first core-domain vertical slice is complete. The next slice establishes the boundary from validated learning results into game rewards and durable progression without inventing an unapproved reward formula or storage schema.
