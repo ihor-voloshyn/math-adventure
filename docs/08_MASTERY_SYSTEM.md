@@ -344,7 +344,7 @@ These are specification gaps, not automatically new PO decisions:
 - exact persistence schema;
 - exact diagnostic policy.
 
-They should be resolved when the authoritative `08_MASTERY_SYSTEM.md` is recreated/approved.
+They should be resolved through an explicit future specification/architecture decision before implementation depends on them. They are not assumptions and are not grounds for inventing an algorithm.
 
 ---
 
