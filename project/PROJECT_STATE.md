@@ -30,10 +30,8 @@ Documentation reconciliation and project foundation.
 - Math Engine / Mastery / Adaptive / Task Generator responsibility boundaries documented.
 
 ## Current work
-1. Normalize cross-document wording and references.
-2. Finalize reconciliation artifacts.
-3. Run repository QA against the reconciled set.
-4. Review PR #3 before merge.
+1. Run final Repository QA against the reconciled set.
+2. Review PR #3 before merge.
 
 ## Canonical responsibility chain
 `Curriculum / Skill Graph → Math Engine → Mastery System → Adaptive Engine → Task Generator → Validation → Game Engine → Reward / Persistence`
