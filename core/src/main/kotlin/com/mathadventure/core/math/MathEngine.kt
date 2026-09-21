@@ -20,7 +20,7 @@ interface MathEngine {
 
 class BasicMathEngine : MathEngine {
     override fun validateTask(task: TaskInstance): MathematicalValidation {
-        if (task.taskId.isBlank() || task.skillId.isBlank() || task.prompt.isBlank()) {
+        if (task.taskId.isBlank() || task.skillId.isBlank() || task.prompt.isBlank() || task.answerSpec.isBlank()) {
             return MathematicalValidation(false, "Task identity and prompt are required")
         }
         if (task.difficulty < 1) {
