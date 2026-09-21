@@ -5,7 +5,7 @@
 - [x] Source-preservation / incoming staging
 - [x] Initial reconciliation artifacts
 - [x] Final cross-document reconciliation
-- [ ] Repository QA on reconciled documentation
+- [x] Repository QA on reconciled documentation
 - [ ] Merge reconciliation PR
 
 ## Phase 1 — Architecture contracts
