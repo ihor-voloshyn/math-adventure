@@ -25,3 +25,12 @@
 ## Next
 - Implement Game Engine progression contracts and tests.
 - Define Combat semantics using the approved progression boundary.
+
+## 2026-09-22
+- Approved Combat System v1.0: turn-based player-first combat, math-result-driven actions, explicit Victory/Defeat boundaries, and separation from Math/Mastery/Adaptive/Reward ownership.
+
+## Next
+- Define Items/Equipment semantics.
+- Define Pet progression and bonuses.
+- Define Home/Territory progression.
+- Define Quests and World/Story integration.
