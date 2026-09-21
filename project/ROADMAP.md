@@ -6,7 +6,7 @@
 - [x] Initial reconciliation artifacts
 - [x] Final cross-document reconciliation
 - [x] Repository QA on reconciled documentation
-- [ ] Merge reconciliation PR
+- [x] Merge reconciliation PR
 
 ## Phase 1 — Architecture contracts
 - [x] Finalize domain boundaries
@@ -16,7 +16,7 @@
 - [x] Define validation pipeline contracts
 
 ## Phase 2 — Core implementation
-- [ ] Project skeleton
+- [x] Project skeleton
 - [ ] Curriculum / Skill Graph
 - [ ] Math Engine
 - [ ] Mastery System
