@@ -19,11 +19,11 @@
 
 | ID | Topic | Current evidence | Action |
 |---|---|---|---|
-| R-011 | Document 07 | Staged 07 is Adaptive Engine, but expected canonical 07 is Task Generator v1.2. | Search repository history/branches and preserved project artifacts. |
-| R-012 | Document 08 | Staged 08 is Task Generation; expected canonical 08 is Mastery System v1.0. | Search repository history/branches and preserved project artifacts. |
+| R-011 | Document 07 | Staged 07 is Adaptive Engine, but expected canonical 07 is Task Generator v1.2. | Resolved: staged Task Generation v1.2 is explicitly APPROVED and is canonical 07 content; normalize identity during promotion. |
+| R-012 | Document 08 | Historical approved wording was not recoverable from preserved artifacts. | Resolved by creating a reconstructed canonical 08 contract, explicitly labeled as reconstruction rather than historical recovery. |
 | R-013 | Document 09 | Staged 09 is Adaptive Engine v1.1 approved. | Freeze as current Adaptive baseline. |
 
-## Potential PO decisions
+| R-014 | Source of Truth | Project knowledge must not depend on chat-history reconstruction. | Resolved: GitHub is the Source of Truth; chat is the working interface. Project state is partitioned under `project/`, with domain truth in `docs/`, architecture in `architecture/`, and QA in `qa/`. |\n\n## Potential PO decisions
 
 At this stage, no new product decision is required merely to continue reconciliation.
 
