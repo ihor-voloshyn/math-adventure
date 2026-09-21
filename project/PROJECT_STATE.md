@@ -47,4 +47,4 @@ Documentation reconciliation and project foundation.
 - Chat discussion may explain or propose changes, but a rule becomes project truth only when recorded in the appropriate GitHub artifact.
 
 ## Next logical stage
-Complete consistency verification of `docs/01–09`, then QA and PR review.
+Complete Phase 1 architecture contracts, QA, and PR review; then begin core implementation planning.
