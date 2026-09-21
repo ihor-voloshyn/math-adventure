@@ -1579,8 +1579,9 @@ Math Adventure не должна превращаться в:
 Этот документ является базой для:
 
 - `06_MATH_ENGINE.md`;
-- `07_ADAPTIVE_ENGINE.md`;
-- `08_TASK_GENERATION.md`;
+- `09_ADAPTIVE_ENGINE.md`;
+- `07_TASK_GENERATOR.md`;
+- `08_MASTERY_SYSTEM.md`;
 - математического контента уровней;
 - QA математической системы;
 - родительского математического отчёта.
