@@ -47,3 +47,12 @@ Mastery remains owned exclusively by MasterySystem. Math Engine remains the sour
 1. Implement Game Engine progression contracts and tests independently from the math-answer reward path.
 2. Define Combat semantics using the Game Progression boundary.
 3. Continue with Items/Equipment, Pet, Home/Territory, Quests and World/Story.
+
+## Product decisions recorded
+- Combat System v1.0 is approved: turn-based, player-first combat; validated math results resolve actions; Victory emits Game Progression events; Defeat preserves confirmed progress; Combat does not own Math/Mastery/Adaptive/Reward policy.
+
+## Next logical stage
+1. Define Items/Equipment semantics.
+2. Define Pet progression and bonuses.
+3. Define Home/Territory progression.
+4. Define Quests and World/Story integration.
