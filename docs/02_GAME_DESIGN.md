@@ -6,7 +6,7 @@
 **Версия:** 1.0  
 **Тип:** Game Design Document  
 **Связанные документы:**  
-- `00_PRODUCT_VISION.md`
+- `PRODUCT_VISION.md`
 - `01_PRODUCT_REQUIREMENTS.md`
 
 ---
