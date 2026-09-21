@@ -7,13 +7,25 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class GeneratedTaskValidationTest {
-    @Test fun generatedAdditionTaskPassesAllLayers() {
-        val task = DeterministicTaskGenerator().generate(TaskBlueprint("ADD_CROSS_TEN", TaskMode.DIRECT, 3, "SHOP", InputType.NUMERIC))
-        assertEquals(ValidationResult.Valid, TaskValidationPipeline(StructuralTaskValidator(), LogicalTaskValidator(), TaskValidator { ValidationResult.Valid }).validate(task))
+    private val mathematicalPass: TaskValidator = object : TaskValidator {
+        override fun validate(task: TaskInstance): ValidationResult = ValidationResult.Valid
     }
-    @Test fun malformedTaskStopsAtStructuralLayer() {
+
+    @Test
+    fun generatedAdditionTaskPassesAllLayers() {
+        val task = DeterministicTaskGenerator().generate(
+            TaskBlueprint("ADD_CROSS_TEN", TaskMode.DIRECT, 3, "SHOP", InputType.NUMERIC)
+        )
+        assertEquals(
+            ValidationResult.Valid,
+            TaskValidationPipeline(StructuralTaskValidator(), LogicalTaskValidator(), mathematicalPass).validate(task)
+        )
+    }
+
+    @Test
+    fun malformedTaskStopsAtStructuralLayer() {
         val task = TaskInstance("", "ADD_BASIC", TaskMode.DIRECT, 1, "TEST", "2+3=?", InputType.NUMERIC, "5")
-        val result = TaskValidationPipeline(StructuralTaskValidator(), LogicalTaskValidator(), TaskValidator { ValidationResult.Valid }).validate(task)
+        val result = TaskValidationPipeline(StructuralTaskValidator(), LogicalTaskValidator(), mathematicalPass).validate(task)
         assertEquals(ValidationLayer.STRUCTURAL, (result as ValidationResult.Invalid).layer)
     }
 }
