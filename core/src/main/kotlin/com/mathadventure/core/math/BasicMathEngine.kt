@@ -41,6 +41,6 @@ class BasicMathEngine : MathEngine {
     private fun invalid(reason: String) = MathematicalValidation(false, reason)
 
     private companion object {
-        val ADDITION_PATTERN = Regex("""(-?\\d+)\\s*\\+\\s*(-?\\d+)\\s*=\\s*\\?""")
+        val ADDITION_PATTERN = Regex("""(-?\d+)\s*\+\s*(-?\d+)\s*=\s*\?""")
     }
 }
