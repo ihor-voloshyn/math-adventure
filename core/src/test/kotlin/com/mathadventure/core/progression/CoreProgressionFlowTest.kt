@@ -17,7 +17,7 @@ import com.mathadventure.core.validation.TaskValidationPipeline
 class CoreProgressionFlowTest {
     fun correctAnswerProducesOneAtomicProgressionCommit() {
         val skillId = Curriculum.mvp().skills.first().id
-        val adaptive = AdaptiveEngine { _, _, _ ->
+        val adaptive = object : AdaptiveEngine {\n            override fun decideNext(\n                playerId: String,\n                skillStates: List<SkillState>,\n                availableSkills: Set<String>\n            ): AdaptiveDecision {
             AdaptiveDecision(
                 skillId = skillId,
                 mode = TaskMode.DIRECT,
