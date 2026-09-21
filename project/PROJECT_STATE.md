@@ -6,6 +6,8 @@
 ## Current phase
 Phase 2 — Core Implementation.
 
+**Current implementation slice:** Curriculum / Skill Graph + Math Engine foundation.
+
 ## Current branch / PR
 - Branch: `implementation/phase-2-core-foundation`
 - Target: `main`
