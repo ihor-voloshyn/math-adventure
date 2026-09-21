@@ -7,8 +7,7 @@
 Documentation reconciliation and project foundation.
 
 ## Current branch / PR
-- Branch: `docs/reconciliation-01-09`
-- PR: #3 — initial reconciliation report for documents 01–09
+- Branch: `architecture/phase-1-contracts`
 - Target: `main`
 
 ## Authoritative structure
