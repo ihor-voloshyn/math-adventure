@@ -25,6 +25,12 @@
 | R-013 | Document 09 | Staged 09 is Adaptive Engine v1.1 approved. | Freeze as current Adaptive baseline. |
 | R-014 | Source of Truth | Project knowledge must not depend on chat-history reconstruction. | Resolved: GitHub is the Source of Truth; chat is the working interface. Project state is partitioned under project/, with domain truth in docs/, architecture in architecture/, and QA in qa/. |
 
+## R-016 — RPG Level progression
+
+**Status:** Approved by Product Owner.
+
+MVP uses RPG Level 1–30. Every level provides a game-progression reward or unlock; every fifth level is a major milestone. RPG Level develops the hero, world, home, and pet. RPG Level must not replace or bypass Mastery. XP thresholds and exact reward formulas remain separate future decisions.
+
 ## Potential PO decisions
 
 No new product decision is required merely to continue reconciliation. A PO decision should be requested only if recovery of an approved source fails or if two genuinely authoritative decisions remain contradictory after source/date/approval precedence is established.
