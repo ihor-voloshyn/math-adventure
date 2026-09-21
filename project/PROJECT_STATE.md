@@ -4,7 +4,7 @@
 **Role of chat:** working interface for the project; chat history is not normative.
 
 ## Current phase
-Documentation reconciliation and project foundation.
+Phase 1 — Architecture Contracts.
 
 ## Current branch / PR
 - Branch: `architecture/phase-1-contracts`
