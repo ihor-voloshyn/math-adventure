@@ -1,7 +1,7 @@
 # Math Adventure Documentation
 
 ## Authority and status
-`01_PRODUCT_REQUIREMENTS.md` is the highest product-level authority. Specific system documents refine it. Architecture decisions are recorded separately under `architecture/decisions/`.
+`PRODUCT_VISION.md` defines the product vision and direction. `01_PRODUCT_REQUIREMENTS.md` is the highest detailed product-requirements authority. Specific system documents refine it. Architecture decisions are recorded separately under `architecture/decisions/`.
 
 Current approved baseline: documents 01–09, covering product requirements, game/world/gameplay design, mathematics curriculum, Math Engine, Task Generator, Mastery System, and Adaptive Engine.
 
