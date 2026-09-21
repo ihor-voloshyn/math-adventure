@@ -244,10 +244,77 @@ These boundaries should be preserved during reconciliation.
 8. Promote only the reconciled documents into `docs/`.
 9. Run Repository QA against the promoted set.
 
-## 5. Current status
+
+---
+
+## 6. Detailed Mastery reconstruction findings
+
+A dedicated reconstruction specification has now been added at docs/reconciliation/MASTERY_SYSTEM_RECONSTRUCTION.md.
+
+The distributed evidence is sufficiently consistent to reconstruct the following with high confidence:
+
+- Mastery is per Skill and uses a 0–5 scale.
+- Mastery is not a raw accuracy percentage.
+- One correct answer or repeated identical templates cannot establish Mastery 5.
+- Evidence diversity and delayed verification are required for stable mastery.
+- One isolated error cannot reset confirmed Mastery.
+- Sustained evidence can lower Mastery, but the exact downgrade algorithm is not recoverable.
+- SKIPPED is neutral evidence.
+- Hints are recorded, do not block educational progress, and do not reduce MVP game rewards.
+- Mastery is learner runtime state, not content.
+- Mastery System updates Mastery; Adaptive Engine consumes it.
+- MVP Mastery must work offline and remain consistent with saved attempt/progress state.
+
+### Important unresolved implementation details
+
+The snapshot does not contain enough authoritative information to reconstruct:
+
+- promotion/demotion formulas;
+- confidence weighting;
+- exact diversity scoring;
+- exact review intervals;
+- exact diagnostic scoring;
+- whether updates are per-attempt or batched.
+
+These must remain explicit specification gaps rather than invented rules.
+
+---
+
+## 7. Additional boundary conflicts discovered
+
+### MAJOR — Math Engine API wording vs Adaptive ownership
+
+06_MATH_ENGINE.md contains an older conceptual API in which generateTask(context) exists and a later section says that Math Engine itself can choose a suitable mathematical skill.
+
+This conflicts with the newer canonical architecture in which:
+
+- Adaptive Engine chooses Skill + Mode + Difficulty;
+- Task Generator creates the concrete task;
+- Math Engine provides mathematical truth and validates the result.
+
+Resolution: the older generateTask(context) / “Math Engine chooses skill” wording must be treated as legacy conceptual material and normalized during promotion. It must not be implemented as Math Engine ownership of adaptive selection.
+
+PO input required: NO — the newer responsibility matrix and document 09 establish the intended boundary.
+
+### MAJOR — MathResult exposes masteryAfter while Mastery owns updates
+
+06_MATH_ENGINE.md defines a conceptual MathResult containing masteryBefore and masteryAfter, while document 09 explicitly states that Adaptive Engine does not change Mastery and the architecture assigns Mastery update responsibility to the Mastery System.
+
+Resolution: the final contract should not make Math Engine the owner of Mastery mutation. A mathematical result may carry a snapshot/reference to learner state for integration purposes, but the authoritative update operation belongs to Mastery System.
+
+PO input required: NO.
+
+### MINOR — confidence terminology
+
+Math Engine uses a confidence field and language such as “increase confidence” without defining whether confidence is a persisted learner-state field, an internal intermediate metric, or merely descriptive wording.
+
+Resolution: do not promote confidence as a canonical public field until the Mastery System specification defines it. The reconstruction draft deliberately leaves the formula and storage semantics open.
+
+
+## 8. Current status
 
 **Reconciliation is in progress.**
 
 No authoritative document has been overwritten or promoted yet.
 
-The incoming snapshot remains the source-preservation layer. This report is analysis only and does not alter product requirements.
+The incoming snapshot remains the source-preservation layer. The Mastery reconstruction is explicitly labeled as a reconstruction draft, not recovered historical v1.0.
