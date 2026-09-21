@@ -1,13 +1,13 @@
 # Math Adventure — Reconciliation Report for Documents 01–09
 
-**Status:** Draft reconciliation report  
+**Status:** Reconciliation report — promotion performed; final consistency/QA pending  
 **Source:** `incoming-docs/` snapshot on `main`  
 **Date:** 2026-09-21  
 **Authority:** Approved Product Owner decisions and approved project direction recorded in project memory
 
 ## 1. Executive result
 
-The staged documents contain a coherent core architecture, but they are **not yet safe to promote as the authoritative `docs/01–09` set**.
+The staged documents contained a coherent core architecture. The document identity issue has been resolved for 07 and 08, and canonical `docs/01–09` files have been created on this reconciliation branch; final cross-document consistency and QA remain pending.
 
 The most important findings are:
 
@@ -322,6 +322,6 @@ The missing historical source remains only **08_MASTERY_SYSTEM.md v1.0**.
 
 **Reconciliation is in progress.**
 
-No authoritative document has been overwritten or promoted yet.
+Canonical `docs/01–09` files have been created on this branch. Document 07 is normalized as Task Generator v1.2. Document 08 is a reconstructed canonical Mastery contract and is explicitly distinguished from historical wording. Document 09 remains the Adaptive Engine baseline.
 
-The incoming snapshot remains the source-preservation layer. The Mastery reconstruction is explicitly labeled as a reconstruction draft, not recovered historical v1.0.
+The incoming snapshot and backups remain source-preservation/evidence layers, not authoritative project state. Final cross-document consistency verification and Repository QA are still pending.
