@@ -9,11 +9,11 @@
 - [ ] Merge reconciliation PR
 
 ## Phase 1 — Architecture contracts
-- [ ] Finalize domain boundaries
-- [ ] Define authoritative contracts/interfaces
-- [ ] Create ADRs for non-obvious architectural decisions
-- [ ] Define persistence/offline-first boundaries
-- [ ] Define validation pipeline contracts
+- [x] Finalize domain boundaries
+- [x] Define authoritative contracts/interfaces
+- [x] Create ADRs for non-obvious architectural decisions
+- [x] Define persistence/offline-first boundaries
+- [x] Define validation pipeline contracts
 
 ## Phase 2 — Core implementation
 - [ ] Project skeleton
