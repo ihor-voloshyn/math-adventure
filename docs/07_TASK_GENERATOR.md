@@ -1,7 +1,7 @@
-# 08_TASK_GENERATION.md
+# 07_TASK_GENERATOR.md
 
 **Проект:** Math Adventure  
-**Документ:** Task Generation — генерация математических заданий  
+**Документ:** Task Generator — генерация математических заданий  
 **Версия:** 1.2  
 **Статус:** APPROVED  
 **Дата:** 2026-09-21
