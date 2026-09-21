@@ -1,0 +1,33 @@
+# Android / Gradle
+.gradle/
+build/
+*/build/
+local.properties
+*.iml
+.idea/
+
+# Kotlin / Java
+*.class
+out/
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets / credentials
+.env
+.env.*
+!.env.example
+*.jks
+*.keystore
+
+google-services.json
+coverage/
+test-results/
+allure-results/
+*.tmp
+*.log
+agent-tmp/
