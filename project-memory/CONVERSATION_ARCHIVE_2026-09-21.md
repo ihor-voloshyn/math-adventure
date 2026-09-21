@@ -131,8 +131,20 @@ These are to be reconciled against the latest Product Owner answers and approved
 - Recommended hierarchy: Architect Agent → specialized agents → QA.
 - Human Product Owner remains the final authority on product decisions.
 
-## Current staging state
-At the time of this snapshot, `incoming-docs/09_ADAPTIVE_ENGINE.md` is present as an approved v1.1 document. The exact Git snapshot is preserved by the backup branch.
+## Snapshot verification
+The backup directory `backups/2026-09-21-initial-documents/` contains the complete 10-document snapshot:
+- PRODUCT_VISION.md
+- 01_PRODUCT_REQUIREMENTS.md
+- 02_GAME_DESIGN.md
+- 03_WORLD_DESIGN.md
+- 04_GAMEPLAY_SYSTEMS.md
+- 05_MATH_CURRICULUM.md
+- 06_MATH_ENGINE.md
+- 07_ADAPTIVE_ENGINE.md
+- 08_TASK_GENERATION.md
+- 09_ADAPTIVE_ENGINE.md
+
+The backup file blob SHAs were verified against the corresponding files in `incoming-docs/` and match exactly. The backup therefore preserves the source contents byte-for-byte at the Git blob level, while using normalized backup filenames for the staged documents.
 
 ## Important note
 This archive intentionally preserves project decisions and working context available at the snapshot. It is not a verbatim transcript of every chat message. The authoritative source for product requirements remains the approved project documents and explicit Product Owner decisions.
