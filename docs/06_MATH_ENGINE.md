@@ -17,8 +17,8 @@ Math Engine — независимый программный слой Math Adve
 - хранить структуру математических навыков;
 - знать зависимости между навыками;
 - получать информацию о математических попытках ребёнка;
-- обновлять состояние освоения навыков;
-- определять математический контекст следующего задания;
+- предоставлять валидированные математические evidence для Mastery System;
+- проверять математическую корректность Task Instance и результатов попыток;
 - предоставлять Game Engine результат математического действия;
 - работать независимо от конкретного игрового сценария.
 
@@ -1780,3 +1780,8 @@ Math Engine должен быть построен так, чтобы его м�
 ## Reconciliation override
 
 Mastery calculation and Mastery updates are owned exclusively by `08_MASTERY_SYSTEM.md`. Math Engine validates mathematical truth and produces validated attempt evidence; it does not mutate Mastery. Skill selection and pedagogical next-step selection are owned by Adaptive Engine. Task instantiation is owned by Task Generator.
+
+
+## Reconciliation boundary
+
+`08_MASTERY_SYSTEM.md` является единственным владельцем расчёта и изменения Mastery. Math Engine не изменяет Mastery. `09_ADAPTIVE_ENGINE.md` выбирает следующий педагогический шаг, Skill/Mode/Difficulty в пределах ограничений. `07_TASK_GENERATOR.md` создаёт конкретный Task Instance.
