@@ -15,5 +15,8 @@
 - Corrected CI test fixtures and mathematical validation issues; Repository QA and Core Domain QA both passed.
 - Merged PR #13 into main as commit f5b259f4fde19f989d1515750b48f34eec25d3c9.
 
+## 2026-09-22
+- Recorded the Product Owner decision that XP, Coins, and mathematical Mastery are independent MVP systems.
+
 ## Next
 - Implement the first end-to-end core-domain vertical slice while keeping Mastery policy injected and avoiding premature game/economy/persistence coupling.

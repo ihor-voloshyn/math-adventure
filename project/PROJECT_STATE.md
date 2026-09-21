@@ -6,6 +6,9 @@
 ## Current phase
 Phase 2 — Core Implementation.
 
+## Product decisions recorded
+- XP, Coins, and mathematical Mastery are independent MVP systems. XP drives RPG/character progression; Coins are the game currency; Mastery remains the educational progression gate.
+
 ## Current work
 The first core-domain vertical slice is complete. The next slice establishes the boundary from validated learning results into game rewards and durable progression without inventing an unapproved reward formula or storage schema.
 
