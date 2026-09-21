@@ -4,10 +4,10 @@
 **Role of chat:** working interface for the project; chat history is not normative.
 
 ## Current phase
-Phase 1 — Architecture Contracts.
+Phase 2 — Core Implementation.
 
 ## Current branch / PR
-- Branch: `architecture/phase-1-contracts`
+- Branch: `implementation/phase-2-core-foundation`
 - Target: `main`
 
 ## Authoritative structure
@@ -29,9 +29,9 @@ Phase 1 — Architecture Contracts.
 - Math Engine / Mastery / Adaptive / Task Generator responsibility boundaries documented.
 
 ## Current work
-1. Review Phase 1 architecture contracts.
+1. Review the Phase 2 core foundation.
 2. Run Repository QA.
-3. Prepare Phase 1 PR for merge.
+3. Prepare the Phase 2 foundation PR for merge.
 
 ## Canonical responsibility chain
 `Curriculum / Skill Graph → Math Engine → Mastery System → Adaptive Engine → Task Generator → Validation → Game Engine → Reward / Persistence`
@@ -47,4 +47,4 @@ Phase 1 — Architecture Contracts.
 - Chat discussion may explain or propose changes, but a rule becomes project truth only when recorded in the appropriate GitHub artifact.
 
 ## Next logical stage
-Complete Phase 1 architecture contracts, QA, and PR review; then begin core implementation planning.
+Complete the core domain foundation, then implement Curriculum/Skill Graph, Math Engine, Mastery, Adaptive, Task Generator and validation layers.
