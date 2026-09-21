@@ -18,7 +18,8 @@ data class AdaptiveDecision(
     val mode: TaskMode,
     val difficulty: Int,
     val contextType: String,
-    val constraints: Map<String, String> = emptyMap()
+    val constraints: Map<String, String> = emptyMap(),
+    val reason: String
 )
 
 data class TaskBlueprint(
