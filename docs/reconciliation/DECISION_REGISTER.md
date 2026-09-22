@@ -86,3 +86,19 @@ MVP rules:
 - Defeat does not destroy confirmed equipment or inventory.
 - Item acquisition flows through Game Event / Reward / Inventory boundaries and is idempotent.
 - Complex crafting, upgrades and mandatory set bonuses are out of MVP.
+
+
+## R-022 — Pet System
+
+**Status:** Approved by Product Owner delegation ("делай на свое усмотрение").
+
+MVP rules:
+- One active companion: KITTEN or PUPPY.
+- Pet growth is tied to RPG Level, not directly to Mastery.
+- Growth stages are aligned with RPG milestones: 1, 5, 10, 20 and 30, with optional visual changes at intermediate milestones.
+- Pet bonuses are small, game-owned and cannot bypass Mastery, Skill prerequisites or Adaptive decisions.
+- Pet does not solve math, modify Mastery, XP, Coins or mathematical difficulty.
+- PET_ACCESSORY uses the existing Items & Equipment boundary.
+- No mandatory feeding/care/death/decay loop in MVP.
+- Confirmed pet state survives defeat and works offline-first.
+- Future sync is idempotent and server-validatable.
