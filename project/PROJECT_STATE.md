@@ -56,3 +56,11 @@ Mastery remains owned exclusively by MasterySystem. Math Engine remains the sour
 2. Define Pet progression and bonuses.
 3. Define Home/Territory progression.
 4. Define Quests and World/Story integration.
+
+## Product decisions recorded
+- Items & Equipment v1.0 is approved: weightless MVP inventory, fixed equipment slots, visible equipped appearance, RPG-level gates, no direct Mastery gates, atomic item rewards, no permanent equipment loss on defeat.
+
+## Next logical stage
+1. Define Pet progression and bonuses.
+2. Define Home/Territory progression.
+3. Define Quests and World/Story integration.
