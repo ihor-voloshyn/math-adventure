@@ -63,3 +63,9 @@ Status: Approved
 PR #39 connected the Quest System completion boundary to Game Progression. Quest completion is mapped to `QUEST_COMPLETED` events; the Game Reward Policy owns XP/Coins; one-time quests are anti-farmed by stable quest `sourceId`; event IDs remain idempotent. The Android prototype now persists quest state and executes the first Home → Village → Forest → First Battle → Home quest chain. Repeatable quest reward semantics remain explicitly unsupported in the prototype until their economy policy is defined.
 
 PR #39 passed Repository QA, Core Domain QA, and Android Prototype QA and was merged into `main` as `1c227ad6f2b680e741e966e6d465220bc9b43851`.
+
+
+## D-010 — Quest/Game Progression integration coverage
+Status: Approved
+
+PR #40 added a core integration test covering QuestEngine completion → QUEST_COMPLETED event mapping → CoreGameProgressionFlow reward commit, including duplicate event idempotency and persisted XP/Coins state. Repository QA, Core Domain QA, and Android Prototype QA passed. PR #40 was merged into `main` as `622ce9bd63dcef94deb398ba473c301a8783c475`.
