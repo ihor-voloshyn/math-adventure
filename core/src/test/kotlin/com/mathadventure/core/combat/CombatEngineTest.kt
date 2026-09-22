@@ -15,6 +15,15 @@ class CombatEngineTest {
         assertTrue(result.state.playerTurn)
     }
 
+    @Test fun attackUsesResolvedEquipmentDamage() {
+        val state = engine.start("c1", heroHearts = 3, enemyHp = 3)
+        val result = engine.resolveMathAction(state, CombatAction.ATTACK, true, attackDamage = 2)
+
+        assertEquals(1, result.state.enemyHp)
+        assertEquals(2, result.state.heroHearts)
+        assertEquals(CombatResolution.HIT, result.resolution)
+    }
+
     @Test fun incorrectAnswerMissesButDoesNotInstantlyKill() {
         val result = engine.resolveMathAction(engine.start("c1"), CombatAction.ATTACK, false)
         assertEquals(2, result.state.heroHearts)
