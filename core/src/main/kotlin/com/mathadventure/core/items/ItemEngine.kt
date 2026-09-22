@@ -47,13 +47,12 @@ class ItemEngine(
         val slot = getItemDefinition(instance.itemId).equipmentSlot!!
         val current = getEquipment(playerId)
         val previous = current.instanceFor(slot)
-        store.saveEquipment(playerId, current.with(slot, itemInstanceId))
-
         if (previous != null && previous != itemInstanceId) {
             require(store.inventory(playerId).any { it.instanceId == previous }) {
                 "equipped replacement item is not owned: $previous"
             }
         }
+        store.saveEquipment(playerId, current.with(slot, itemInstanceId))
     }
 
     fun unequip(playerId: String, slot: EquipmentSlot) {
