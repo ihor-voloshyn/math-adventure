@@ -18,3 +18,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "math-adventure"
 include(":core")
+include(":app")
