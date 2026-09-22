@@ -64,3 +64,9 @@ Mastery remains owned exclusively by MasterySystem. Math Engine remains the sour
 1. Define Pet progression and bonuses.
 2. Define Home/Territory progression.
 3. Define Quests and World/Story integration.
+
+- Pet System v1.0 is approved: one active kitten/puppy companion, RPG-linked growth, small game-owned bonuses, no math/Mastery bypass, PET_ACCESSORY integration, offline-first persistence and future idempotent sync.
+
+## Next logical stage
+1. Define Home/Territory progression.
+2. Define Quests and World/Story integration.

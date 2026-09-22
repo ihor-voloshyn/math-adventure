@@ -42,3 +42,11 @@
 - Define Pet progression and bonuses.
 - Define Home/Territory progression.
 - Define Quests and World/Story integration.
+
+
+## 2026-09-22
+- Approved Pet System v1.0: one active kitten/puppy companion, RPG-linked visual growth, small game-owned bonuses, PET_ACCESSORY integration, no mathematical authority or progression bypass, no mandatory care loop, defeat-safe offline-first state and future idempotent sync.
+
+## Next
+- Define Home/Territory progression.
+- Define Quests and World/Story integration.
