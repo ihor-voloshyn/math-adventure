@@ -86,3 +86,12 @@ Home/Territory and Visual Style/Asset Specification are approved. The project is
 1. Define Quests and World/Story integration.
 2. Build the first visual asset slice: Hero, Pet, NPC, Enemy, Home, Territory, equipment, UI and VFX.
 3. Assemble the first Playable Prototype and test the core loop with a child before expanding the asset set.
+
+
+## Current implementation boundary
+Quest System v1.0 and World & Story v1.0 are approved. The first world loop is now defined from Home through Village/Forest toward Dungeon, with a gradual Dragon story thread.
+
+## Next logical stage
+1. Implement the first visual asset slice.
+2. Assemble the first Playable Prototype: Home → Village → NPC → exploration → enemy → Math Task → return Home.
+3. Child-test the core loop before expanding the Vertical Slice.

@@ -128,3 +128,46 @@ MVP rules:
 - Visual direction is Stylized 3D Fantasy Adventure: expressive, child-friendly, readable silhouettes, non-gory and mobile-appropriate.
 - Full asset production is deferred until the first child-testable visual prototype validates the direction.
 - Visual assets do not own mathematical progression or Mastery.
+
+## R-025 — Quest System
+
+**Status:** Approved by Product Owner delegation ("делай на свое усмотрение").
+
+MVP rules:
+- Quest is the player's reason for adventure, not the owner of math or progression.
+- First quest chain is linear/lightly branching and child-readable.
+- Quest objectives integrate Home, Exploration, Combat, Discovery and appropriate Math contexts.
+- Quest rewards are resolved by Game Progression/Reward systems.
+- Completion is idempotent and offline-first.
+
+## R-026 — World & Story
+
+**Status:** Approved by Product Owner delegation ("делай на свое усмотрение").
+
+MVP rules:
+- First world includes Home, Village, Forest and a small Dungeon.
+- Dragon is a long-term story antagonist revealed gradually.
+- Story is child-first, short-dialogue, visual and discovery-driven.
+- RPG milestones unlock world opportunities but never bypass Math Mastery prerequisites.
+- First playable world slice is intentionally small and child-testable before full world production.
+
+
+## R-025 — Quest System
+
+**Status:** Approved by Product Owner delegation ("делай на свое усмотрение").
+
+- Quest is the player's reason for adventure, not the owner of math or progression.
+- First quest chain is linear/lightly branching and child-readable.
+- Objectives integrate Home, Exploration, Combat, Discovery and appropriate Math contexts.
+- Rewards are resolved by Game Progression/Reward systems.
+- Completion is idempotent and offline-first.
+
+## R-026 — World & Story
+
+**Status:** Approved by Product Owner delegation ("делай на свое усмотрение").
+
+- First world includes Home, Village, Forest and a small Dungeon.
+- Dragon is a long-term story antagonist revealed gradually.
+- Story is child-first, short-dialogue, visual and discovery-driven.
+- RPG milestones unlock world opportunities but never bypass Math Mastery prerequisites.
+- First playable world slice is intentionally small and child-testable before full world production.
