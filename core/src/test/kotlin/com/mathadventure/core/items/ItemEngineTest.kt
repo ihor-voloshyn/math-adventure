@@ -38,7 +38,7 @@ class ItemEngineTest {
         engine.addItem(ItemInstance("s2", "player", sword.itemId, 1, 4L, "combat"))
 
         assertEquals(3, engine.getInventory("player").first { it.itemId == potion.itemId }.quantity)
-        assertEquals(4, engine.getInventory("player").count { it.itemId == sword.itemId })
+        assertEquals(2, engine.getInventory("player").count { it.itemId == sword.itemId })
     }
 
     @Test
