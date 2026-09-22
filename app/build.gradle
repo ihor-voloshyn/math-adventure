@@ -3,6 +3,10 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
+dependencies {
+    implementation project(':core')
+}
+
 android {
     namespace 'com.ihorvoloshyn.mathadventure'
     compileSdk 35
@@ -23,4 +27,6 @@ android {
     }
 
     kotlinOptions { jvmTarget = '21' }
+
+    namespace 'com.ihorvoloshyn.mathadventure'
 }
