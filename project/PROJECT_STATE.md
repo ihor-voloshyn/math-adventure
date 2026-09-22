@@ -78,3 +78,11 @@ Home/Territory v1.0 is approved. Home/Territory is a persistent visual/gameplay 
 1. Define Quests and World/Story integration.
 2. Define the visual asset/style specification and first playable visual slice.
 3. Begin implementation of the first playable prototype.
+
+## Current implementation boundary
+Home/Territory and Visual Style/Asset Specification are approved. The project is now ready to move from system semantics toward the first visual playable slice.
+
+## Next logical stage
+1. Define Quests and World/Story integration.
+2. Build the first visual asset slice: Hero, Pet, NPC, Enemy, Home, Territory, equipment, UI and VFX.
+3. Assemble the first Playable Prototype and test the core loop with a child before expanding the asset set.
