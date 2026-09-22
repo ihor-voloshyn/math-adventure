@@ -13,7 +13,6 @@ import com.mathadventure.core.adaptive.AdaptiveCandidate
 import com.mathadventure.core.adaptive.AdaptivePolicy
 import com.mathadventure.core.adaptive.AdaptivePriority
 import com.mathadventure.core.adaptive.RuleBasedAdaptiveEngine
-import com.mathadventure.core.contracts.ValidationResult
 import com.mathadventure.core.curriculum.Curriculum
 import com.mathadventure.core.flow.CoreLearningFlow
 import com.mathadventure.core.generator.DeterministicTaskGenerator
@@ -61,7 +60,7 @@ class MainActivity : Activity() {
     private var generated: com.mathadventure.core.flow.GeneratedTask? = null
     private var sessionCorrect = 0
     private var sessionIncorrect = 0
-    private var lastTaskSignature = ""\n    private lateinit var progressStore: PrototypeProgressStore
+    private lateinit var progressStore: PrototypeProgressStore
 
     private lateinit var renderer: AdventureRenderer
     private lateinit var title: TextView
@@ -76,13 +75,20 @@ class MainActivity : Activity() {
         renderer = AdventureRenderer(this)
         root.addView(renderer)
         val hud = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(28, 20, 28, 20) }
-        title = textView(24f); message = textView(17f); hud.addView(title); hud.addView(message)
+        title = textView(24f)
+        message = textView(17f)
+        hud.addView(title)
+        hud.addView(message)
         val bottom = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER; setPadding(28, 8, 28, 22) }
         action = Button(this).apply { setOnClickListener { advance() } }
         bottom.addView(action, LinearLayout.LayoutParams(-1, 62))
         answers = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER; visibility = View.GONE }
         listOf("14", "15", "17", "18").forEach { value ->
-            answers.addView(Button(this).apply { text = value; setTextColor(Color.WHITE); setOnClickListener { submit(value) } }, LinearLayout.LayoutParams(0, 62, 1f))
+            answers.addView(Button(this).apply {
+                text = value
+                setTextColor(Color.WHITE)
+                setOnClickListener { submit(value) }
+            }, LinearLayout.LayoutParams(0, 62, 1f))
         }
         bottom.addView(answers)
         root.addView(hud, FrameLayout.LayoutParams(-1, -2))
@@ -91,10 +97,20 @@ class MainActivity : Activity() {
         renderStage()
     }
 
-    private fun textView(size: Float) = TextView(this).apply { textSize = size; setTextColor(Color.WHITE); setShadowLayer(6f, 2f, 2f, Color.BLACK) }
+    private fun textView(size: Float) = TextView(this).apply {
+        textSize = size
+        setTextColor(Color.WHITE)
+        setShadowLayer(6f, 2f, 2f, Color.BLACK)
+    }
 
     private fun advance() {
-        stage = when (stage) { Stage.HOME -> Stage.VILLAGE; Stage.VILLAGE -> Stage.FOREST; Stage.FOREST -> Stage.COMBAT; Stage.COMBAT -> Stage.COMBAT; Stage.RETURN_HOME -> Stage.HOME }
+        stage = when (stage) {
+            Stage.HOME -> Stage.VILLAGE
+            Stage.VILLAGE -> Stage.FOREST
+            Stage.FOREST -> Stage.COMBAT
+            Stage.COMBAT -> Stage.COMBAT
+            Stage.RETURN_HOME -> Stage.HOME
+        }
         renderStage()
     }
 
@@ -107,7 +123,8 @@ class MainActivity : Activity() {
     private fun submit(value: String) {
         val current = generated ?: return
         val answered = flow.answer(playerId, current, "attempt-" + System.currentTimeMillis(), value, System.currentTimeMillis())
-        if (answered.evaluation.result == AnswerResult.CORRECT) {\n            sessionCorrect++
+        if (answered.evaluation.result == AnswerResult.CORRECT) {
+            sessionCorrect++
             progressStore.recordCorrect()
             stage = Stage.RETURN_HOME
             renderer.setVictory(true)
@@ -116,6 +133,8 @@ class MainActivity : Activity() {
             action.text = "Вернуться домой"
             answers.visibility = View.GONE
         } else {
+            sessionIncorrect++
+            progressStore.recordIncorrect()
             renderer.setVictory(false)
             message.text = "Попробуй ещё раз. Ошибка не сбрасывает прогресс."
         }
@@ -124,11 +143,37 @@ class MainActivity : Activity() {
     private fun renderStage() {
         renderer.setStage(stage.ordinal)
         when (stage) {
-            Stage.HOME -> { title.text = "Дом героя"; message.text = "Питомец ждёт нового приключения."; action.text = "Идти в деревню"; answers.visibility = View.GONE }
-            Stage.VILLAGE -> { title.text = "Деревенская площадь"; message.text = "NPC просит проверить дорогу в лес."; action.text = "Идти в лес"; answers.visibility = View.GONE }
-            Stage.FOREST -> { title.text = "Лес"; message.text = "Впереди маленькое существо."; action.text = "Начать бой"; answers.visibility = View.GONE }
-            Stage.COMBAT -> { generateMathTask(); title.text = "Математическая атака"; message.text = generated?.task?.prompt ?: "Математическая задача"; action.text = "Выбери ответ"; answers.visibility = View.VISIBLE }
-            Stage.RETURN_HOME -> { title.text = "Возвращение"; message.text = "Игровой цикл завершён. Всего правильных ответов: ${progressStore.totalCorrect}."; action.text = "Вернуться домой"; answers.visibility = View.GONE }
+            Stage.HOME -> {
+                title.text = "Дом героя"
+                message.text = "Питомец ждёт нового приключения."
+                action.text = "Идти в деревню"
+                answers.visibility = View.GONE
+            }
+            Stage.VILLAGE -> {
+                title.text = "Деревенская площадь"
+                message.text = "NPC просит проверить дорогу в лес."
+                action.text = "Идти в лес"
+                answers.visibility = View.GONE
+            }
+            Stage.FOREST -> {
+                title.text = "Лес"
+                message.text = "Впереди маленькое существо."
+                action.text = "Начать бой"
+                answers.visibility = View.GONE
+            }
+            Stage.COMBAT -> {
+                generateMathTask()
+                title.text = "Математическая атака"
+                message.text = generated?.task?.prompt ?: "Математическая задача"
+                action.text = "Выбери ответ"
+                answers.visibility = View.VISIBLE
+            }
+            Stage.RETURN_HOME -> {
+                title.text = "Возвращение"
+                message.text = "Игровой цикл завершён. Всего правильных ответов: ${progressStore.totalCorrect}."
+                action.text = "Вернуться домой"
+                answers.visibility = View.GONE
+            }
         }
     }
 }
