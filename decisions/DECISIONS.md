@@ -35,6 +35,12 @@ Status: Approved
 
 Development chats are numbered sequentially because ChatGPT conversations can reach their maximum length. Develop MVP 00, Develop MVP 01, Develop MVP 02, etc. are continuation segments of the same Math Adventure project. A new numbered chat must recover state from GitHub checkpoints and canonical documents rather than starting a new project.
 
+## D-007 — Consolidated combat victory progression
+Status: In review
+
+PR #36 consolidates the previously duplicate PR #33/#35 work. The canonical target is a single COMBAT_VICTORY → CoreGameProgressionFlow integration with prototype XP/Coins reward, idempotent local persistence, and persisted unlock state. Final acceptance depends on QA and merge.
+
 ## Open questions
 
-- PR #33 and PR #35 both appear to implement the COMBAT_VICTORY → Game Progression connection. They must be compared before further implementation.
+- Validate PR #36 build/QA before merge.
+- Final XP/Coins economy values remain intentionally unspecified by the vertical slice.
