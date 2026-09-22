@@ -17,7 +17,7 @@ class AndroidGameProgressionInventoryStore(
     private val definitions: Map<String, ItemDefinition>
 ) : AtomicGameProgressionStore, ItemStore {
     private val preferences = context.getSharedPreferences(
-        "math_adventure_game_state",
+        "math_adventure_game_progression",
         Context.MODE_PRIVATE
     )
 
@@ -97,7 +97,7 @@ class AndroidGameProgressionInventoryStore(
             .commit()
     }
 
-    private fun progressionKey(playerId: String) = "progression:" + playerId
+    private fun progressionKey(playerId: String) = "state:" + playerId
     private fun inventoryKey(playerId: String) = "inventory:" + playerId
     private fun equipmentKey(playerId: String) = "equipment:" + playerId
 
