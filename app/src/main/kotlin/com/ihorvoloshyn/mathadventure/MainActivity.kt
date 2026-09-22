@@ -17,6 +17,7 @@ import com.mathadventure.core.combat.CombatAction
 import com.mathadventure.core.combat.CombatEngine
 import com.mathadventure.core.combat.CombatResolution
 import com.mathadventure.core.combat.CombatState
+import com.mathadventure.core.combat.EquipmentCombatStatsResolver
 import com.mathadventure.core.curriculum.Curriculum
 import com.mathadventure.core.flow.CoreLearningFlow
 import com.mathadventure.core.gameprogression.CoreGameProgressionFlow
@@ -51,6 +52,7 @@ class MainActivity : Activity() {
     private val playerId = "prototype-player"
     private val mathEngine = BasicMathEngine()
     private val combatEngine = CombatEngine()
+    private val equipmentCombatStatsResolver = EquipmentCombatStatsResolver(PrototypeItemCatalog.definitions)
     private lateinit var masteryStore: MasteryStateStore
     private lateinit var masterySystem: PolicyDrivenMasterySystem
     private lateinit var flow: CoreLearningFlow
@@ -216,7 +218,8 @@ class MainActivity : Activity() {
         listOf("ADD_BASIC", "ADD_CROSS_TEN").map { masterySystem.getSkillState(playerId, it) }
 
     private fun startCombat() {
-        combatState = combatEngine.start("forest-encounter-01", heroHearts = 3, enemyHp = 3)
+        val stats = equipmentCombatStatsResolver.resolve(itemEngine.getInventory(playerId), itemEngine.getEquipment(playerId))
+        combatState = combatEngine.start("forest-encounter-01", heroHearts = 3 + stats.hearts, enemyHp = 3)
         stage = Stage.COMBAT
         renderer.setVictory(false)
         generateMathTask()
@@ -283,10 +286,12 @@ class MainActivity : Activity() {
                 "evidenceDiverse" to "false"
             )
         )
+        val stats = equipmentCombatStatsResolver.resolve(itemEngine.getInventory(playerId), itemEngine.getEquipment(playerId))
         val result = combatEngine.resolveMathAction(
             combatState ?: return,
             CombatAction.ATTACK,
-            answered.evaluation.result == AnswerResult.CORRECT
+            answered.evaluation.result == AnswerResult.CORRECT,
+            attackDamage = stats.attackPower
         )
         combatState = result.state
         if (answered.evaluation.result == AnswerResult.CORRECT) progressStore.recordCorrect()
