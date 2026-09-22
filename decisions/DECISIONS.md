@@ -83,3 +83,14 @@ Status: Approved
 PR #43 implemented the approved Items & Equipment domain foundation: item definitions, item instances, weightless inventory, consumable stacking, equipment slots, RPG-level gates, equip/unequip and replacement semantics. The core tests cover ownership, stacking, requirements and equipment state. Repository QA, Core Domain QA and Android Prototype QA passed. PR #43 merged into `main` as `41720bc9acc40f329ae10abc66ab1d2e681a5e3f`.
 
 Loot reward integration, Android persistence/UI and Combat stat consumption remain separate follow-up stages. Items do not own XP/Coins or mathematical authority.
+
+
+## D-013 — Items/Equipment ownership boundary hardening
+Status: Approved
+
+The Items & Equipment integration now treats Inventory + Equipment as the source of owned/equipped item state. Combat receives resolved immutable combat stats and does not mutate item state. An equipped instance must be owned, match its declared equipment slot, be a separate non-stacked instance, and cannot occupy multiple equipment slots. Android local persistence validates these invariants before saving state. This is a prototype local-persistence rule; future server synchronization remains authoritative for production.
+
+## D-014 — Checkpoint 0003 continuation
+Status: Approved
+
+After checkpoint 0003, development resumes by verifying PR #49 CI/QA, merging it only after required checks pass, then completing Android persistence/integration acceptance for Loot → Inventory → Equip → Restart/Load → Combat/Visual. Combat defense remains intentionally unresolved until a deliberate combat-stat design step.
