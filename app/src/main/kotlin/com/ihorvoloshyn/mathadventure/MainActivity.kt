@@ -13,6 +13,10 @@ import com.mathadventure.core.adaptive.AdaptiveCandidate
 import com.mathadventure.core.adaptive.AdaptivePolicy
 import com.mathadventure.core.adaptive.AdaptivePriority
 import com.mathadventure.core.adaptive.RuleBasedAdaptiveEngine
+import com.mathadventure.core.combat.CombatAction
+import com.mathadventure.core.combat.CombatEngine
+import com.mathadventure.core.combat.CombatResolution
+import com.mathadventure.core.combat.CombatState
 import com.mathadventure.core.curriculum.Curriculum
 import com.mathadventure.core.flow.CoreLearningFlow
 import com.mathadventure.core.generator.DeterministicTaskGenerator
@@ -33,6 +37,7 @@ class MainActivity : Activity() {
     private enum class Stage { HOME, VILLAGE, FOREST, COMBAT, RETURN_HOME }
     private val playerId = "prototype-player"
     private val mathEngine = BasicMathEngine()
+    private val combatEngine = CombatEngine()
     private lateinit var masteryStore: MasteryStateStore
     private lateinit var masterySystem: PolicyDrivenMasterySystem
     private lateinit var flow: CoreLearningFlow
@@ -40,6 +45,7 @@ class MainActivity : Activity() {
 
     private var stage = Stage.HOME
     private var generated: com.mathadventure.core.flow.GeneratedTask? = null
+    private var combatState: CombatState? = null
     private var sessionCorrect = 0
     private var sessionIncorrect = 0
 
@@ -84,7 +90,7 @@ class MainActivity : Activity() {
             gravity = Gravity.CENTER
             setPadding(28, 8, 28, 22)
         }
-        action = Button(this).apply { setOnClickListener { advance() } }
+        action = Button(this).apply { setOnClickListener { onPrimaryAction() } }
         bottom.addView(action, LinearLayout.LayoutParams(-1, 62))
 
         answers = LinearLayout(this).apply {
@@ -125,6 +131,14 @@ class MainActivity : Activity() {
 
     private fun skillStates(): List<SkillState> =
         listOf("ADD_BASIC", "ADD_CROSS_TEN").map { masterySystem.getSkillState(playerId, it) }
+
+    private fun startCombat() {
+        combatState = combatEngine.start("forest-encounter-01", heroHearts = 3, enemyHp = 3)
+        stage = Stage.COMBAT
+        renderer.setVictory(false)
+        generateMathTask()
+        renderStage()
+    }
 
     private fun generateMathTask() {
         generated = flow.generateNext(
@@ -173,7 +187,7 @@ class MainActivity : Activity() {
         renderStage()
     }
 
-    private fun submit(value: String) {
+    private fun submitAttack(value: String) {
         val current = generated ?: return
         val answered = flow.answer(
             playerId = playerId,
@@ -183,24 +197,68 @@ class MainActivity : Activity() {
             timestampEpochMillis = System.currentTimeMillis(),
             evidenceMetadata = mapOf(
                 "difficultyBand" to if (current.task.difficulty <= 1) "INTRO" else "NORMAL",
-                "evidenceDiverse" to (current.task.contextType == "BATTLE").toString()
+                "evidenceDiverse" to "false"
             )
         )
+        val result = combatEngine.resolveMathAction(
+            combatState ?: return,
+            CombatAction.ATTACK,
+            answered.evaluation.result == AnswerResult.CORRECT
+        )
+        combatState = result.state
+        if (answered.evaluation.result == AnswerResult.CORRECT) progressStore.recordCorrect()
+        else progressStore.recordIncorrect()
 
-        if (answered.evaluation.result == AnswerResult.CORRECT) {
-            sessionCorrect++
-            progressStore.recordCorrect()
+        when (result.resolution) {
+            CombatResolution.VICTORY -> {
+                renderer.setVictory(true)
+                stage = Stage.RETURN_HOME
+                answers.visibility = View.GONE
+                title.text = "Победа над врагом!"
+                message.text = "Атака успешна. " + answered.generated.task.skillId + ": Mastery " + answered.mastery.mastery + "/5."
+                action.text = "Вернуться домой"
+            }
+            CombatResolution.DEFEAT -> {
+                stage = Stage.RETURN_HOME
+                answers.visibility = View.GONE
+                title.text = "Поражение"
+                message.text = "Ты потерял бой. Подтверждённый прогресс сохранён."
+                action.text = "Вернуться домой"
+            }
+            else -> {
+                message.text = if (answered.evaluation.result == AnswerResult.CORRECT)
+                    "Попадание! Враг: " + combatState!!.enemyHp + "/3 HP. Сердца: " + combatState!!.heroHearts + "/3."
+                else
+                    "Промах. Враг атакует! Сердца: " + combatState!!.heroHearts + "/3."
+                generateMathTask()
+                renderStage()
+            }
+        }
+    }
+
+    private fun defend() {
+        val result = combatEngine.resolveMathAction(combatState ?: return, CombatAction.DEFEND, true)
+        combatState = result.state
+        if (result.resolution == CombatResolution.DEFEAT) {
             stage = Stage.RETURN_HOME
-            renderer.setVictory(true)
-            title.text = "Победа!"
-            message.text = "Правильно. ${answered.generated.task.skillId}: Mastery ${answered.mastery.mastery}/5."
-            action.text = "Вернуться домой"
             answers.visibility = View.GONE
+            title.text = "Поражение"
+            message.text = "Враг оказался сильнее. Подтверждённый прогресс сохранён."
+            action.text = "Вернуться домой"
         } else {
-            sessionIncorrect++
-            progressStore.recordIncorrect()
-            renderer.setVictory(false)
-            message.text = "Попробуй ещё раз. Ошибка не сбрасывает прогресс."
+            generateMathTask()
+            renderStage()
+            message.text = "Ты защищаешься. Сердца: " + combatState!!.heroHearts + "/3. Теперь твой ход."
+        }
+    }
+
+    private fun onPrimaryAction() {
+        when (stage) {
+            Stage.HOME -> { stage = Stage.VILLAGE; renderStage() }
+            Stage.VILLAGE -> { stage = Stage.FOREST; renderStage() }
+            Stage.FOREST -> startCombat()
+            Stage.COMBAT -> defend()
+            Stage.RETURN_HOME -> { stage = Stage.HOME; renderStage() }
         }
     }
 
@@ -226,10 +284,10 @@ class MainActivity : Activity() {
                 answers.visibility = View.GONE
             }
             Stage.COMBAT -> {
-                generateMathTask()
-                title.text = "Математическая атака"
-                message.text = generated?.task?.prompt ?: "Математическая задача"
-                action.text = "Выбери ответ"
+                val state = combatState ?: return
+                title.text = "Бой • Сердца " + state.heroHearts + "/3 • Враг " + state.enemyHp + "/3"
+                message.text = generated?.task?.prompt ?: "Математическая атака"
+                action.text = "Защищаться"
                 answers.visibility = View.VISIBLE
             }
             Stage.RETURN_HOME -> {
