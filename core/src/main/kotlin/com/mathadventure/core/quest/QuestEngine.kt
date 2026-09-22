@@ -62,6 +62,7 @@ class QuestEngine(
     fun completion(playerId: String, questId: String, instanceId: String): QuestCompletion? {
         val instance = store.get(playerId, questId) ?: return null
         if (instance.state != QuestState.COMPLETED) return null
+        require(instance.sessionId == instanceId) { "completion instance does not match stored quest session" }
         return QuestCompletion(
             questId = questId,
             playerId = playerId,
