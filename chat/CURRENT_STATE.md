@@ -3,6 +3,8 @@
 ## Last checkpoint
 2026-09-22 — Develop MVP 01
 
+Quest System foundation merged and QA-validated.
+
 ## Conversation continuity
 
 The project uses sequential numbered development chats because individual ChatGPT chats can reach their conversation limit.
@@ -54,6 +56,10 @@ Full-chat archival is part of the project workflow. Between each pair of «со�
 - The current reward tuning is vertical-slice only: 100 XP and 25 Coins for the first victory for a source; final economy values are not yet approved.
 - Android persistence is a prototype boundary using one JSON document per player in SharedPreferences with idempotent event handling. It is not the final server-of-truth architecture.
 - No unlocks are granted yet by the prototype unlock policy.
+- PR #38 added and QA-validated the Quest System foundation, then merged into `main` as `584c7f21ab4efac4ecdd646fedc482fa864497be`.
+- Quest System foundation now defines quest states, objectives, prerequisites, completion event identity, and the first Home → Village → Forest → First Battle → Home chain.
+- Quest completion currently emits an idempotent event identity boundary but is not yet wired into Game Progression or the Android UI.
+- Quest System does not own Math Engine, Mastery, Adaptive Engine, or RPG rewards.
 
 ## Recovery procedure for a new chat
 
