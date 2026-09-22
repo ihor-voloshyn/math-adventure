@@ -43,9 +43,9 @@ class FirstVerticalSliceAcceptanceTest {
         val coordinator = QuestProgressionCoordinator(MemoryOutbox(), progression)
         val combat = CombatEngine()
 
-        completeObjective(questEngine, playerId, "story_home_to_village", "visit_village", 100L)
+        completeAndReward(questEngine, coordinator, playerId, "story_home_to_village", "visit_village", 100L)
         completeObjective(questEngine, playerId, "story_village_to_forest", "talk_to_npc", 200L)
-        completeObjective(questEngine, playerId, "story_village_to_forest", "reach_forest", 300L)
+        completeAndReward(questEngine, coordinator, playerId, "story_village_to_forest", "reach_forest", 300L)
 
         var state = combat.start("forest-encounter-01", enemyHp = 3)
         repeat(2) {
@@ -57,26 +57,35 @@ class FirstVerticalSliceAcceptanceTest {
         assertEquals(CombatResolution.VICTORY, victory.resolution)
         assertEquals("COMBAT_VICTORY", victory.gameEventType)
 
-        val battleQuest = completeObjective(
-            questEngine, playerId, "story_first_battle", "win_first_battle", 400L
-        )
-        val battleCompletion = questEngine.completion(
-            playerId, "story_first_battle", battleQuest.sessionId!!
-        )!!
-        val battleReward = coordinator.record(
-            QuestProgressionEventMapper.map(
-                battleCompletion,
-                FirstQuestChain.definitions.first { it.id == "story_first_battle" }.repeatability
-            )
+        val battleReward = completeAndReward(
+            questEngine, coordinator, playerId, "story_first_battle", "win_first_battle", 400L
         )
         assertEquals(75L, battleReward!!.reward.xpDelta)
 
-        val homeQuest = completeObjective(
-            questEngine, playerId, "story_return_home", "return_home", 500L
-        )
+        val homeQuest = completeAndReward(
+            questEngine, coordinator, playerId, "story_return_home", "return_home", 500L
+        )!!
         assertEquals(QuestState.COMPLETED, homeQuest.state)
-        assertEquals(75L, progressionStore.state.totalXp)
-        assertEquals(15L, progressionStore.state.coins)
+        assertEquals(300L, progressionStore.state.totalXp)
+        assertEquals(60L, progressionStore.state.coins)
+    }
+
+    private fun completeAndReward(
+        engine: QuestEngine,
+        coordinator: QuestProgressionCoordinator,
+        playerId: String,
+        questId: String,
+        objectiveId: String,
+        time: Long
+    ): ProgressionCommit? {
+        val instance = completeObjective(engine, playerId, questId, objectiveId, time)
+        val completion = engine.completion(playerId, questId, instance.sessionId!!)!!
+        return coordinator.record(
+            QuestProgressionEventMapper.map(
+                completion,
+                FirstQuestChain.definitions.first { it.id == questId }.repeatability
+            )
+        )
     }
 
     private fun completeObjective(
