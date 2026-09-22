@@ -87,19 +87,17 @@ Home/Territory and Visual Style/Asset Specification are approved. The project is
 2. Build the first visual asset slice: Hero, Pet, NPC, Enemy, Home, Territory, equipment, UI and VFX.
 3. Assemble the first Playable Prototype and test the core loop with a child before expanding the asset set.
 
-
 ## Current implementation boundary
 Quest System v1.0 and World & Story v1.0 are approved. The first world loop is now defined from Home through Village/Forest toward Dungeon, with a gradual Dragon story thread.
 
 ## Next logical stage
 1. Implement the first visual asset slice.
 2. Assemble the first Playable Prototype: Home → Village → NPC → exploration → enemy → Math Task → return Home.
-3. Child-test the core loop before expanding the Vertical Slice.
+3. Child-test the core loop before expanding the asset set.
 
 ## Latest implementation checkpoint
 - Android prototype camera now supports direct touch rotation on the 3D scene: horizontal drag rotates yaw; vertical drag adjusts pitch within bounded limits.
 - This implements the first concrete camera requirement from the approved Visual Style & Asset Specification while keeping the renderer platform-independent from game-domain logic.
-
 
 ## Latest implementation boundary — Quest → Game Progression
 Quest completion is now integrated with the Game Progression boundary. Quest remains responsible for objective state and completion identity; Game Progression maps the completion event into XP/Coins rewards and idempotent persistence. The Android prototype persists the first story chain and connects its objectives to the existing Home → Village → Forest → Combat → Home flow.
@@ -108,7 +106,6 @@ Quest completion is now integrated with the Game Progression boundary. Quest rem
 1. Add explicit integration coverage for Quest → Game Progression and the full first story/combat chain.
 2. Verify offline/crash-recovery behavior for combined quest and progression persistence.
 3. Continue the playable vertical slice with the next approved gameplay/content block without moving mathematical or reward ownership into Quest.
-
 
 ## Future commercial and community direction
 A future commercial layer is approved as a planning direction, not as a current product requirement. The MVP remains free/no-ads with monetization scaffold only.
@@ -129,3 +126,58 @@ challenge → submission → product/AI review → prototype → user validation
 Before any paid contributor program launches, the project must define appropriate legal, payment, child-safety, consent, attribution and intellectual-property rules. For child testing, participation and any compensation must be handled through parents/guardians as required.
 
 Final product decisions remain with the Founder/Product Sponsor. External ideas can enter the backlog only through the approved product decision process.
+
+## AI Product Studio — strategic decision
+Math Adventure is formally the **first product of a broader AI Product Studio**, not the studio itself.
+
+The studio is intended to become a reusable product-development ecosystem for Math Adventure and future products. Its shared layer may include AI/agent orchestration, development workflows, QA, documentation and knowledge management, GitHub automation, testing infrastructure, analytics, human-user testing, contributor/idea workflows, CI/CD, security and commercial infrastructure.
+
+The Studio must be built **evolutionarily from the experience of Product #1** rather than attempting to design a complete studio upfront.
+
+Math Adventure therefore serves two roles:
+1. Product #1 — a real standalone product with its own approved scope.
+2. Studio learning ground — a real production environment in which agent roles, prompts, workflows, templates, infrastructure and human-validation processes are tested and refined.
+
+Reusable assets created or validated during Math Adventure should be promoted into the Studio only when they are genuinely reusable beyond this product. Product-specific logic must remain inside Math Adventure.
+
+## Studio learning loop
+For each important development/process decision, the Studio should distinguish between:
+- Math Adventure-specific solution;
+- reusable Studio capability;
+- experiment/lesson that still needs validation.
+
+The intended evolution is:
+
+Idea → AI research → product definition → prototype → AI development → automated QA → real-user testing → usability/attractiveness/value feedback → AI analysis → iteration → validation → launch.
+
+Real users are a required part of product validation, not merely a final beta stage. Human feedback should assess usability, attractiveness/engagement and perceived value in addition to technical correctness.
+
+## Studio OS — target
+The long-term reusable layer is expected to evolve into a Studio Operating System containing:
+- agent architecture and roles;
+- agent permissions and review gates;
+- proven prompts and prompt templates;
+- development and QA workflows;
+- documentation and decision systems;
+- GitHub/project automation;
+- testing infrastructure;
+- human-user testing and feedback workflows;
+- analytics;
+- project/product templates;
+- security and user-safety rules;
+- commercial and contributor workflows.
+
+For future products, the target flow is:
+NEW PRODUCT → Studio Template → requirements → architecture → agents → development → QA → real users → validation → commercialization.
+
+Studio maturity must come from measured experience with real products. Prompts, workflows and infrastructure should be versioned/refined based on observed outcomes rather than treated as permanently correct.
+
+## Human-in-the-loop principle
+AI may generate, implement, test and analyze, but it must not replace real-user validation of usability, attractiveness or product value.
+
+For products involving children, testing and any compensation must follow applicable child-safety, consent and guardian requirements.
+
+## Long-term studio outcome
+The intended outcome is a **project factory**: Product #1 funds and teaches the reusable Studio infrastructure, while later products inherit proven agents, prompts, workflows, templates and human-validation mechanisms.
+
+This direction does not change the approved Math Adventure product requirements or current MVP scope. It is a strategic layer above the product.
