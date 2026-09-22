@@ -70,3 +70,11 @@ Mastery remains owned exclusively by MasterySystem. Math Engine remains the sour
 ## Next logical stage
 1. Define Home/Territory progression.
 2. Define Quests and World/Story integration.
+
+## Current implementation boundary
+Home/Territory v1.0 is approved. Home/Territory is a persistent visual/gameplay hub driven by RPG progression, integrated with Pet and Items/Equipment, and independent from Mastery and mathematical authority.
+
+## Next logical stage
+1. Define Quests and World/Story integration.
+2. Define the visual asset/style specification and first playable visual slice.
+3. Begin implementation of the first playable prototype.

@@ -102,3 +102,18 @@ MVP rules:
 - No mandatory feeding/care/death/decay loop in MVP.
 - Confirmed pet state survives defeat and works offline-first.
 - Future sync is idempotent and server-validatable.
+
+## R-023 — Home & Territory
+
+**Status:** Approved by Product Owner delegation ("делай на свое усмотрение").
+
+MVP rules:
+- Home/Territory is a persistent player-owned visual and gameplay hub.
+- Growth is aligned with RPG milestones 1/5/10/15/20/25/30 and visibly communicates progression.
+- Home does not own Mastery, mathematical truth, Adaptive Policy, XP policy, Coins policy or Loot policy.
+- Home/Territory cannot bypass mathematical prerequisites.
+- Pet and equipped items are visibly integrated.
+- Confirmed Home/Territory state survives defeat and works offline-first.
+- Major upgrades emit idempotent HOME_MILESTONE progression events where applicable.
+- MVP excludes complex city-builder, farming, upkeep, real-time economy and mandatory daily maintenance.
+- Visual development starts before the first full Playable Prototype, with a minimum Hero/Pet/NPC/Enemy/Home/Territory asset slice.
