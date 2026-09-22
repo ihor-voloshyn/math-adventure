@@ -36,6 +36,60 @@ class GameProgressionTest {
     }
 
     @Test
+    fun oneTimeQuestCompletionIsRewardedAndMappedByQuestId() {
+        val store = RecordingStore()
+        val flow = CoreGameProgressionFlow(
+            PrototypeGameRewardPolicy(),
+            DefaultRpgLevelPolicy(),
+            EmptyUnlockPolicy(),
+            store
+        )
+        val questEvent = QuestProgressionEventMapper.map(
+            com.mathadventure.core.quest.QuestCompletion(
+                questId = "story_home_to_village",
+                playerId = "player-1",
+                instanceId = "session-1",
+                eventId = "quest-completed-session-1",
+                completedAtEpochMillis = 2_000L
+            ),
+            com.mathadventure.core.quest.QuestRepeatability.ONE_TIME
+        )
+
+        val first = flow.record(questEvent)
+        val duplicate = flow.record(questEvent)
+
+        assertEquals(GameEventType.QUEST_COMPLETED, questEvent.eventType)
+        assertEquals("story_home_to_village", questEvent.sourceId)
+        assertEquals(75L, first!!.reward.xpDelta)
+        assertEquals(15L, first.reward.coinsDelta)
+        assertNull(duplicate)
+    }
+
+    @Test
+    fun repeatableQuestRewardIsNotGrantedByPrototypePolicy() {
+        val store = RecordingStore()
+        val flow = CoreGameProgressionFlow(
+            PrototypeGameRewardPolicy(),
+            DefaultRpgLevelPolicy(),
+            EmptyUnlockPolicy(),
+            store
+        )
+        val questEvent = QuestProgressionEventMapper.map(
+            com.mathadventure.core.quest.QuestCompletion(
+                questId = "repeatable-quest",
+                playerId = "player-1",
+                instanceId = "session-2",
+                eventId = "quest-completed-session-2",
+                completedAtEpochMillis = 3_000L
+            ),
+            com.mathadventure.core.quest.QuestRepeatability.REPEATABLE
+        )
+
+        assertNull(flow.record(questEvent))
+        assertEquals(0, store.commits.size)
+    }
+
+    @Test
     fun rewardFlowIsIndependentFromMathMastery() {
         val store = RecordingStore()
         val flow = CoreGameProgressionFlow(FixedRewardPolicy(), DefaultRpgLevelPolicy(), EmptyUnlockPolicy(), store)
