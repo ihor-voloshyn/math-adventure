@@ -79,3 +79,6 @@
 - Implement the first visual asset slice.
 - Assemble the first Playable Prototype.
 - Child-test the core loop before expanding the Vertical Slice.
+
+## 2026-09-22
+- Implemented direct touch rotation for the Android prototype 3D camera, including bounded pitch and continuous yaw.
