@@ -75,3 +75,11 @@ PR #40 added a core integration test covering QuestEngine completion → QUEST_C
 Status: Approved
 
 PR #42 added executable core acceptance coverage for Home → Village → Forest → Combat → Return Home using the real QuestEngine, CombatEngine, QuestProgressionCoordinator and Game Progression. It verifies quest prerequisites, three correct combat attacks producing COMBAT_VICTORY, completion of the combat quest, one-time quest rewards, and accumulated XP/Coins without moving ownership across boundaries. Repository QA, Core Domain QA, and Android Prototype QA passed. PR #42 was merged into `main` as `2302acafda32e14cb43c74da13bcf9075698ca9e`.
+
+
+## D-012 — Items & Equipment core foundation
+Status: Approved
+
+PR #43 implemented the approved Items & Equipment domain foundation: item definitions, item instances, weightless inventory, consumable stacking, equipment slots, RPG-level gates, equip/unequip and replacement semantics. The core tests cover ownership, stacking, requirements and equipment state. Repository QA, Core Domain QA and Android Prototype QA passed. PR #43 merged into `main` as `41720bc9acc40f329ae10abc66ab1d2e681a5e3f`.
+
+Loot reward integration, Android persistence/UI and Combat stat consumption remain separate follow-up stages. Items do not own XP/Coins or mathematical authority.
