@@ -9,7 +9,7 @@ class DeterministicLootItemFactory(
         commit.reward.lootIds.mapIndexed { index, itemId ->
             require(itemId in definitions) { "unknown loot item: $itemId" }
             ItemInstance(
-                instanceId = "loot-\${commit.event.eventId}-$index-$itemId",
+                instanceId = "loot-${commit.event.eventId}-$index-$itemId",
                 playerId = commit.event.playerId,
                 itemId = itemId,
                 quantity = 1,
