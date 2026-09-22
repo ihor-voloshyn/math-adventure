@@ -98,3 +98,12 @@ Full-chat archival is part of the project workflow. Between each pair of «со�
 - Integration-test and offline/crash-recovery verification roadmap items are now complete.
 - Android MVP validation remains open; final child/device acceptance has not been claimed.
 - Next logical block: implement the next approved gameplay system/content slice while keeping the math/progression ownership boundaries intact.
+
+
+## Latest implementation checkpoint — Items & Equipment foundation
+- PR #43 added the approved Items & Equipment core domain foundation.
+- Inventory is weightless for MVP; consumables stack, equipment remains separate ItemInstances.
+- Equipment slots, RPG-level requirements, equip/unequip and replacement semantics are covered by core tests.
+- PR #43 passed Repository QA, Core Domain QA and Android Prototype QA and merged as `41720bc9acc40f329ae10abc66ab1d2e681a5e3f`.
+- Loot → Inventory reward integration, Android persistence/UI, and Combat stat consumption are not yet implemented.
+- Next logical block: connect Game Progression loot rewards to Inventory atomically, preserving event idempotency and ownership boundaries.
