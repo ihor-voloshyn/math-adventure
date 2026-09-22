@@ -27,9 +27,15 @@ class CombatEngine {
     fun start(combatId: String, heroHearts: Int = 3, enemyHp: Int = 3): CombatState =
         CombatState(combatId = combatId, heroHearts = heroHearts, enemyHp = enemyHp)
 
-    fun resolveMathAction(state: CombatState, action: CombatAction, correct: Boolean): CombatOutcome {
+    fun resolveMathAction(
+        state: CombatState,
+        action: CombatAction,
+        correct: Boolean,
+        attackDamage: Int = 1
+    ): CombatOutcome {
         require(state.active) { "combat is not active" }
         require(state.playerTurn) { "it is not the player's turn" }
+        require(attackDamage > 0) { "attackDamage must be positive" }
 
         if (action == CombatAction.FLEE) {
             return CombatOutcome(state.copy(active = false, playerTurn = false), CombatResolution.FLED)
@@ -42,7 +48,7 @@ class CombatEngine {
 
         return when (action) {
             CombatAction.ATTACK -> {
-                val hp = (state.enemyHp - 1).coerceAtLeast(0)
+                val hp = (state.enemyHp - attackDamage).coerceAtLeast(0)
                 if (hp == 0) {
                     CombatOutcome(
                         state.copy(enemyHp = 0, active = false, playerTurn = false),
