@@ -88,3 +88,13 @@ Full-chat archival is part of the project workflow. Between each pair of «со�
 - PR #40 passed Repository QA, Core Domain QA, and Android Prototype QA and merged as `622ce9bd63dcef94deb398ba473c301a8783c475`.
 - The remaining vertical-slice verification gaps are broader end-to-end acceptance and offline/crash-recovery checks.
 - Next logical implementation block: strengthen offline/crash-recovery semantics for combined quest/progression persistence, then continue the next approved gameplay/content block.
+
+
+## Latest implementation checkpoint — Recovery and vertical slice acceptance
+- PR #41 added a durable Quest Completion outbox and Android startup recovery for interrupted Quest → Game Progression commits.
+- PR #41 passed Repository QA, Core Domain QA and Android Prototype QA after fixing a Kotlin nullability compile error during verification, then merged as `25f45aaecab43fc8e092e0d51b59a6583888ef90`.
+- PR #42 added executable first-playable-loop acceptance coverage: Home → Village → Forest → Combat → Return Home.
+- PR #42 passed Repository QA, Core Domain QA and Android Prototype QA and merged as `2302acafda32e14cb43c74da13bcf9075698ca9e`.
+- Integration-test and offline/crash-recovery verification roadmap items are now complete.
+- Android MVP validation remains open; final child/device acceptance has not been claimed.
+- Next logical block: implement the next approved gameplay system/content slice while keeping the math/progression ownership boundaries intact.
