@@ -1,115 +1,56 @@
 # Math Adventure — Current State
 
 ## Last checkpoint
-2026-09-22 — checkpoint 0002 (Develop MVP 01)
+2026-09-23 — checkpoint 0003 (Develop MVP 01)
 
-Checkpoint 0002 records the current state and continuation context. The exact full transcript for the interval was not fully available in the active context, so no unavailable conversation text was fabricated.
-
-Quest System foundation merged and QA-validated.
-
-## Conversation continuity
-
-The project uses sequential numbered development chats because individual ChatGPT chats can reach their conversation limit.
-
-Sequence:
-- Develop MVP 00 — previous development chat.
-- Develop MVP 01 — current chat.
-- Develop MVP 02, 03, etc. — future continuation segments of the same Math Adventure project.
-
-A new numbered chat is a continuation of the same Math Adventure project, not a new project.
+Checkpoint 0003 preserves the current implementation and continuation state after the Items & Equipment → Inventory → Equipment → Combat integration sequence. The exact full transcript for this interval was not fully available in active context, so unavailable conversation text was not fabricated.
 
 ## Working agreement
+When the user writes «продолжай», inspect the repository, open PRs and QA first, then continue the next logical implementation stage without asking for confirmation.
+When the user writes «сохрани чат», preserve the available conversation context as a checkpoint/archive, update current state and durable decisions when needed, and commit the result to GitHub.
 
-When the user writes:
-
-СОХРАН ЧАТ
-
-the assistant treats everything since the previous checkpoint marker as a checkpoint to preserve in the repository, together with the resulting project-state changes.
-
-The checkpoint should:
-1. Preserve the relevant conversation text/decisions.
-2. Update the current project state.
-3. Compare the conversation decisions against repository documents.
-4. Record contradictions or unresolved questions instead of silently overwriting decisions.
-5. Commit the result to GitHub.
-
-When the user writes «продолжай», recover the repository/project state and continue development.
-
-When the user writes «статус», inspect and report the current project state.
-
-## Important limitation
-
-Saving cannot happen literally after every ChatGPT message without an explicit checkpoint request. The reliable trigger is the marker СОХРАН ЧАТ.
-
-Full-chat archival is part of the project workflow. Between each pair of «сохрани чат» markers, the assistant must preserve the verbatim conversational text available in the active chat in `chat-history/`. Checkpoints/summaries remain a separate fast-recovery layer. The archive is the source for recovering ideas and context; `CURRENT_STATE.md`, checkpoints, and decisions are the fast index. If an older transcript is no longer available in the active context, it must not be fabricated; it is explicitly marked as unavailable/reconstructed.
-
-## Current known state
-
+## Repository
 - Repository: ihor-voloshyn/math-adventure
 - Default branch: main
-- chat-import/ exists and is reserved for imported conversation history.
-- Exact old transcript has not yet been imported.
-- Product baseline: 01_PRODUCT_REQUIREMENTS.md v1.0.
-- Mathematical architecture boundary: Adaptive Engine → Task Generator → Math Engine.
-- Combat vertical slice exists through PR #32.
-- PR #33 and PR #35 were duplicate combat-progression attempts and are no longer open; their relevant work was consolidated into PR #36.
-- PR #36 was QA-validated and merged into `main` as merge commit `6f8e96d1caeefc1f74ff9940bb3e582e7f15f492`.
-- Canonical combat progression now connects `COMBAT_VICTORY → CoreGameProgressionFlow`, with prototype XP/Coins rewards and Android local persistence.
-- The current reward tuning is vertical-slice only: 100 XP and 25 Coins for the first victory for a source; final economy values are not yet approved.
-- Android persistence is a prototype boundary using one JSON document per player in SharedPreferences with idempotent event handling. It is not the final server-of-truth architecture.
-- No unlocks are granted yet by the prototype unlock policy.
-- PR #38 added and QA-validated the Quest System foundation, then merged into `main` as `584c7f21ab4efac4ecdd646fedc482fa864497be`.
-- Quest System foundation now defines quest states, objectives, prerequisites, completion event identity, and the first Home → Village → Forest → First Battle → Home chain.
-- Quest completion now maps to `QUEST_COMPLETED → CoreGameProgressionFlow`; one-time quest rewards are owned by Game Progression and are idempotent.
-- PR #39 passed Repository QA, Core Domain QA, and Android Prototype QA and merged into `main` as `1c227ad6f2b680e741e966e6d465220bc9b43851`.
-- Android prototype now persists the first quest chain locally and wires Home → Village → Forest → First Battle → Home objectives to quest completion rewards.
-- Repeatable quest reward semantics remain explicitly unsupported by the prototype policy until the final repeatable-economy rules are defined.
-- Quest System does not own Math Engine, Mastery, Adaptive Engine, or RPG rewards.
 
-## Recovery procedure for a new chat
+## Current implementation state
 
-1. Read 00_PROJECT_CONTEXT.md.
-2. Read chat/CURRENT_STATE.md.
-3. Read decisions/DECISIONS.md.
-4. Read the latest files under chat/checkpoints/.
-5. Compare those checkpoints with the product/technical documents before continuing.
-6. Inspect open PRs and QA status before modifying implementation.
-7. Verify the canonical main branch and obsolete PR/branch references after progression changes.
+### Items & Equipment
+- PR #43 added the approved Items & Equipment core foundation and merged as `41720bc9acc40f329ae10abc66ab1d2e681a5e3f`.
+- PR #44 connected Game Progression loot to Inventory through deterministic loot creation and an atomic progression+loot boundary; merged after QA.
+- PR #45 added Android Inventory/Equipment persistence and combat-victory loot wiring; merged after QA.
+- PR #46 added Android Equip/Unequip controls, persistence and visual weapon state; merged after QA.
+- PR #47 connected Equipment stats to Combat; attack damage and starting Hearts are consumed by Combat while Inventory/Equipment remains the source of state; merged after QA.
+- PR #48 hardened Equipment → Combat state invariants and merged after QA.
 
+### Open PR
+- PR #49: `fix: harden Android inventory persistence`
+- Head: `47e2003b2c3089bc21ceb263faec8d5d0c612d1a`
+- Status at checkpoint: open, awaiting CI/QA.
+- Scope: validate inventory player ownership, known item IDs, duplicate instance IDs, equipped ownership/non-stacking, and SharedPreferences commit failure. Keep progression + loot in one local persistence boundary.
 
-## Latest implementation checkpoint — Quest progression integration
-- Quest completion is now an explicit Game Progression event boundary.
-- One-time quest completions grant prototype rewards of 75 XP and 15 Coins; these are vertical-slice tuning, not final economy values.
-- Android quest state uses local SharedPreferences prototype persistence.
-- The first story chain is executable through the existing visual prototype without moving reward ownership into Quest.
-- Next logical implementation block: strengthen the integrated vertical slice with explicit quest/combat integration tests and then proceed to the next MVP gameplay system/content block.
+## Architecture boundaries
+- Math Engine is authoritative for mathematical truth.
+- Adaptive Engine owns learning selection, not correctness, Mastery mutation or rewards.
+- Task Generator creates concrete tasks, not authoritative answers.
+- Game Progression owns XP/Coins/Loot.
+- Inventory/Equipment owns item ownership and equipped state.
+- Combat consumes resolved combat stats and does not mutate Inventory/Equipment.
+- Visual equipment state derives from Equipment + Inventory + ItemDefinition.
+- Android SharedPreferences is prototype persistence only; final server-of-truth sync remains future work.
 
+## Known gaps
+- Android end-to-end persistence acceptance for Loot → Inventory → Equip → Restart/Load → Combat/Visual is not yet claimed complete.
+- Combat defense is resolved but not yet applied to enemy damage.
+- Final XP/Coins economy and unlock policy remain unapproved vertical-slice tuning.
+- Child/device acceptance is not claimed.
 
-## Latest implementation checkpoint — Integration coverage
-- PR #40 added a core integration test for QuestEngine → Game Progression event mapping → reward commit and duplicate idempotency.
-- PR #40 passed Repository QA, Core Domain QA, and Android Prototype QA and merged as `622ce9bd63dcef94deb398ba473c301a8783c475`.
-- The remaining vertical-slice verification gaps are broader end-to-end acceptance and offline/crash-recovery checks.
-- Next logical implementation block: strengthen offline/crash-recovery semantics for combined quest/progression persistence, then continue the next approved gameplay/content block.
+## Next continuation
+1. Check PR #49 CI/QA.
+2. If all required QA passes, merge PR #49 and verify main.
+3. Continue Android persistence/integration acceptance coverage.
+4. Then proceed to the next approved gameplay block while preserving the established ownership boundaries.
 
-
-## Latest implementation checkpoint — Recovery and vertical slice acceptance
-- PR #41 added a durable Quest Completion outbox and Android startup recovery for interrupted Quest → Game Progression commits.
-- PR #41 passed Repository QA, Core Domain QA and Android Prototype QA after fixing a Kotlin nullability compile error during verification, then merged as `25f45aaecab43fc8e092e0d51b59a6583888ef90`.
-- PR #42 added executable first-playable-loop acceptance coverage: Home → Village → Forest → Combat → Return Home.
-- PR #42 passed Repository QA, Core Domain QA and Android Prototype QA and merged as `2302acafda32e14cb43c74da13bcf9075698ca9e`.
-- Integration-test and offline/crash-recovery verification roadmap items are now complete.
-- Android MVP validation remains open; final child/device acceptance has not been claimed.
-- Next logical block: implement the next approved gameplay system/content slice while keeping the math/progression ownership boundaries intact.
-
-
-## Latest implementation checkpoint — Items & Equipment foundation
-- PR #43 added the approved Items & Equipment core domain foundation.
-- Inventory is weightless for MVP; consumables stack, equipment remains separate ItemInstances.
-- Equipment slots, RPG-level requirements, equip/unequip and replacement semantics are covered by core tests.
-- PR #43 passed Repository QA, Core Domain QA and Android Prototype QA and merged as `41720bc9acc40f329ae10abc66ab1d2e681a5e3f`.
-- Loot → Inventory reward integration, Android persistence/UI, and Combat stat consumption are not yet implemented.
-- Next logical block: connect Game Progression loot rewards to Inventory atomically, preserving event idempotency and ownership boundaries.
-
-## Checkpoint 0002 — 2026-09-22
-- No new durable product or architecture decisions were introduced after D-012 in the available conversation context.
-- On the next `продолжай`, inspect current `main`, open PRs and QA before implementation, then continue with Game Progression → Loot → Inventory.
+## Archive
+- Checkpoint: `chat/checkpoints/0003-2026-09-23.md`
+- Chat archive checkpoint: `chat-history/2026-09-23_develop-mvp-01_checkpoint-03.md`
