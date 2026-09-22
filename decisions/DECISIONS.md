@@ -47,3 +47,11 @@ The current 100 XP / 25 Coins reward values are vertical-slice tuning, not final
 - Final XP/Coins economy values remain intentionally unspecified by the vertical slice.
 - Define the final unlock policy when the RPG progression and content-unlock implementation is ready.
 - Replace prototype local progression persistence with the planned server-of-truth synchronization architecture before production.
+
+
+## D-008 — Quest System foundation
+Status: Approved
+
+PR #38 added the first executable Quest System foundation from approved `docs/18_QUEST_SYSTEM.md`: quest definitions/states, objective progression, prerequisite boundary, completion event identity, and the first onboarding chain. Repository QA, Core Domain QA, and Android Prototype QA passed. PR #38 was merged into `main` as `584c7f21ab4efac4ecdd646fedc482fa864497be`.
+
+Quest System remains separate from Math correctness/Mastery/Adaptive logic and does not grant RPG rewards directly. The next integration step is to connect quest completion events to Game Progression and the existing Android vertical slice without moving reward ownership into Quest System.
