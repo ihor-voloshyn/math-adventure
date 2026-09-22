@@ -19,6 +19,12 @@ import com.mathadventure.core.combat.CombatResolution
 import com.mathadventure.core.combat.CombatState
 import com.mathadventure.core.curriculum.Curriculum
 import com.mathadventure.core.flow.CoreLearningFlow
+import com.mathadventure.core.gameprogression.CoreGameProgressionFlow
+import com.mathadventure.core.gameprogression.DefaultRpgLevelPolicy
+import com.mathadventure.core.gameprogression.GameEventType
+import com.mathadventure.core.gameprogression.GameProgressionEvent
+import com.mathadventure.core.gameprogression.GameUnlockPolicy
+import com.mathadventure.core.gameprogression.VerticalSliceRewardPolicy
 import com.mathadventure.core.generator.DeterministicTaskGenerator
 import com.mathadventure.core.mastery.ApprovedMasteryPolicy
 import com.mathadventure.core.mastery.MasteryStateStore
@@ -42,6 +48,7 @@ class MainActivity : Activity() {
     private lateinit var masterySystem: PolicyDrivenMasterySystem
     private lateinit var flow: CoreLearningFlow
     private lateinit var progressStore: PrototypeProgressStore
+    private lateinit var gameProgression: CoreGameProgressionFlow
 
     private var stage = Stage.HOME
     private var generated: com.mathadventure.core.flow.GeneratedTask? = null
@@ -59,6 +66,16 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         progressStore = PrototypeProgressStore(this)
+        val gameStore = PrototypeGameProgressStore(this)
+        gameProgression = CoreGameProgressionFlow(
+            rewardPolicy = VerticalSliceRewardPolicy(),
+            levelPolicy = DefaultRpgLevelPolicy(),
+            unlockPolicy = GameUnlockPolicy { _, after ->
+                (1..after).filter { it in setOf(5, 10, 15, 20, 25, 30) }
+                    .map { "RPG_MILESTONE_$it" }.toSet()
+            },
+            store = gameStore
+        )
         masteryStore = AndroidMasteryStateStore(this)
         masterySystem = PolicyDrivenMasterySystem(masteryStore, ApprovedMasteryPolicy())
         flow = CoreLearningFlow(
@@ -222,7 +239,22 @@ class MainActivity : Activity() {
                 answers.visibility = View.GONE
                 fleeButton.visibility = View.GONE
                 title.text = "Победа над врагом!"
-                message.text = "Атака успешна. " + answered.generated.task.skillId + ": Mastery " + answered.mastery.mastery + "/5."
+                val commit = gameProgression.record(
+                    GameProgressionEvent(
+                        eventId = "combat-victory-" + current.task.taskId,
+                        playerId = playerId,
+                        eventType = GameEventType.COMBAT_VICTORY,
+                        sourceId = "forest-encounter-01",
+                        sessionId = "prototype-session",
+                        outcome = "VICTORY",
+                        timestampEpochMillis = System.currentTimeMillis()
+                    )
+                )
+                val progressionText = if (commit != null)
+                    " +${commit.reward.xpDelta} XP, +${commit.reward.coinsDelta} Coins. RPG Level ${commit.levelAfter}."
+                else
+                    " Победа уже была засчитана ранее."
+                message.text = "Атака успешна. " + answered.generated.task.skillId + ": Mastery " + answered.mastery.mastery + "/5." + progressionText
                 action.text = "Вернуться домой"
             }
             CombatResolution.DEFEAT -> {
