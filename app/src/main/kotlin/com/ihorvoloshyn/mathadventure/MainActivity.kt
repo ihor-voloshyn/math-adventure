@@ -58,6 +58,7 @@ class MainActivity : Activity() {
     private lateinit var gameProgression: CoreGameProgressionFlow
     private lateinit var gameProgressionStore: AndroidGameProgressionInventoryStore
     private lateinit var gameProgressionLoot: GameProgressionLootCoordinator
+    private lateinit var itemEngine: com.mathadventure.core.items.ItemEngine
     private lateinit var questProgression: QuestProgressionCoordinator
     private lateinit var questStore: AndroidQuestStore
     private lateinit var questEngine: QuestEngine
@@ -74,6 +75,7 @@ class MainActivity : Activity() {
     private lateinit var action: Button
     private lateinit var answers: LinearLayout
     private lateinit var fleeButton: Button
+    private lateinit var equipmentButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,6 +87,7 @@ class MainActivity : Activity() {
             unlockPolicy = PrototypeGameUnlockPolicy(),
             store = gameProgressionStore
         )
+        itemEngine = com.mathadventure.core.items.ItemEngine(PrototypeItemCatalog.definitions, gameProgressionStore)
         gameProgressionLoot = GameProgressionLootCoordinator(
             progression = gameProgression,
             store = gameProgressionStore,
@@ -139,6 +142,8 @@ class MainActivity : Activity() {
             setOnClickListener { flee() }
         }
         bottom.addView(fleeButton, LinearLayout.LayoutParams(-1, 62))
+        equipmentButton = Button(this).apply { setOnClickListener { toggleWeapon() } }
+        bottom.addView(equipmentButton, LinearLayout.LayoutParams(-1, 62))
 
         answers = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -405,17 +410,39 @@ class MainActivity : Activity() {
         }
     }
 
+    private fun toggleWeapon() {
+        val equipment = itemEngine.getEquipment(playerId)
+        if (equipment.weaponInstanceId != null) {
+            itemEngine.unequip(playerId, com.mathadventure.core.items.EquipmentSlot.WEAPON)
+        } else {
+            val sword = itemEngine.getInventory(playerId).firstOrNull { it.itemId == "sword_sparks" } ?: return
+            itemEngine.equip(playerId, sword.instanceId, gameProgressionStore.get(playerId).rpgLevel)
+        }
+        renderStage()
+    }
+
     private fun renderStage() {
-        renderer.setStage(stage.ordinal)
+        val equipment = itemEngine.getEquipment(playerId)
+        val weaponVisualId = equipment.weaponInstanceId?.let { instanceId ->
+            itemEngine.getInventory(playerId).firstOrNull { it.instanceId == instanceId }?.let { item ->
+                itemEngine.getItemDefinition(item.itemId).visualId
+            }
+        }
+        renderer.setEquippedWeapon(weaponVisualId)
         when (stage) {
             Stage.HOME -> {
                 title.text = "Дом героя"
-                message.text = "Питомец ждёт нового приключения."
+                val weapon = equipment.weaponInstanceId
+                val ownedSword = itemEngine.getInventory(playerId).any { it.itemId == "sword_sparks" }
+                message.text = if (weapon != null) "Питомец ждёт нового приключения. Оружие экипировано." else "Питомец ждёт нового приключения."
                 action.text = "Идти в деревню"
+                equipmentButton.visibility = if (ownedSword) View.VISIBLE else View.GONE
+                equipmentButton.text = if (weapon != null) "Снять меч" else "Экипировать меч"
                 answers.visibility = View.GONE
             }
             Stage.VILLAGE -> {
                 title.text = "Деревенская площадь"
+                equipmentButton.visibility = View.GONE
                 message.text = "NPC просит проверить дорогу в лес."
                 action.text = "Идти в лес"
                 answers.visibility = View.GONE
@@ -424,6 +451,7 @@ class MainActivity : Activity() {
                 title.text = "Лес"
                 message.text = "Впереди маленькое существо."
                 action.text = "Начать бой"
+                equipmentButton.visibility = View.GONE
                 answers.visibility = View.GONE
             }
             Stage.COMBAT -> {
@@ -431,6 +459,7 @@ class MainActivity : Activity() {
                 title.text = "Бой • Сердца " + state.heroHearts + "/3 • Враг " + state.enemyHp + "/3"
                 message.text = generated?.task?.prompt ?: "Математическая атака"
                 action.text = "Защищаться"
+                equipmentButton.visibility = View.GONE
                 answers.visibility = View.VISIBLE
                 fleeButton.visibility = View.VISIBLE
             }
@@ -438,6 +467,7 @@ class MainActivity : Activity() {
                 title.text = "Возвращение"
                 message.text = "Игровой цикл завершён. Правильных ответов в сохранении: ${progressStore.totalCorrect}."
                 action.text = "Вернуться домой"
+                equipmentButton.visibility = View.GONE
                 answers.visibility = View.GONE
             }
         }

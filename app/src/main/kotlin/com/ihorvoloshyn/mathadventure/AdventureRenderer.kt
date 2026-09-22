@@ -19,6 +19,7 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
 
     fun setStage(stage: Int) { scene.stage = stage }
     fun setVictory(value: Boolean) { scene.victory = value }
+    fun setEquippedWeapon(visualId: String?) { scene.equippedWeaponVisualId = visualId }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         return scene.handleTouch(event)
@@ -27,6 +28,7 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
     private class SceneRenderer : Renderer {
         var stage = 0
         var victory = false
+        var equippedWeaponVisualId: String? = null
         private var program = 0
         private val projection = FloatArray(16)
         private val view = FloatArray(16)
@@ -140,7 +142,12 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             cube(x, y + 2.0f, z, 0.7f, 0.7f, 0.7f, 0.95f, 0.78f, 0.58f)
             cube(x - 0.24f, y + 0.2f, z, 0.2f, 0.7f, 0.3f, 0.15f, 0.16f, 0.25f)
             cube(x + 0.24f, y + 0.2f, z, 0.2f, 0.7f, 0.3f, 0.15f, 0.16f, 0.25f)
-            cube(x + 0.55f, y + 1.05f, z, 0.18f, 0.9f, 0.18f, 0.72f, 0.72f, 0.78f)
+            if (equippedWeaponVisualId == "weapon_sword_sparks") {
+                cube(x + 0.72f, y + 1.12f, z, 0.12f, 1.15f, 0.12f, 0.78f, 0.78f, 0.82f)
+                cube(x + 0.72f, y + 0.55f, z, 0.35f, 0.10f, 0.14f, 0.32f, 0.18f, 0.08f)
+            } else {
+                cube(x + 0.55f, y + 1.05f, z, 0.18f, 0.9f, 0.18f, 0.72f, 0.72f, 0.78f)
+            }
         }
 
         private fun drawPet(x: Float, y: Float, z: Float) {
