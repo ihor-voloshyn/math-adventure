@@ -50,3 +50,12 @@
 ## Next
 - Define Home/Territory progression.
 - Define Quests and World/Story integration.
+
+## 2026-09-22
+- Approved Home & Territory v1.0: persistent player-owned hub, RPG-milestone visual growth, pet/equipment integration, offline-first persistence, idempotent Home Milestones, and controlled MVP scope without city-builder/upkeep complexity.
+- Explicitly moved visual development ahead of the first full Playable Prototype: Hero/Pet/NPC/Enemy/Home/Territory form the minimum visual slice.
+
+## Next
+- Define Quests and World/Story integration.
+- Define the visual asset/style specification and first playable visual slice.
+- Begin implementation of the first playable prototype.
