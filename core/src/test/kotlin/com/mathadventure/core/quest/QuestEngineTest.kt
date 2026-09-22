@@ -63,3 +63,20 @@ class QuestEngineTest {
         assertNull(engine.completion("p1", "story_village_to_forest", "instance-2"))
     }
 }
+
+
+    @Test
+    fun completionRejectsMismatchedInstanceId() {
+        val store = InMemoryQuestStore()
+        val engine = QuestEngine(
+            definitions = FirstQuestChain.definitions.associateBy { it.id },
+            store = store,
+            prerequisiteChecker = store
+        )
+        engine.start("player-1", "story_home_to_village", "session-1", 100L)
+        engine.recordObjectiveProgress("player-1", "story_home_to_village", "visit_village", nowEpochMillis = 200L)
+
+        assertFailsWith<IllegalArgumentException> {
+            engine.completion("player-1", "story_home_to_village", "wrong-session")
+        }
+    }
