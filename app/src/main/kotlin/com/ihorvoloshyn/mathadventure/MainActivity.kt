@@ -54,6 +54,7 @@ class MainActivity : Activity() {
     private lateinit var message: TextView
     private lateinit var action: Button
     private lateinit var answers: LinearLayout
+    private lateinit var fleeButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,6 +93,11 @@ class MainActivity : Activity() {
         }
         action = Button(this).apply { setOnClickListener { onPrimaryAction() } }
         bottom.addView(action, LinearLayout.LayoutParams(-1, 62))
+        fleeButton = Button(this).apply {
+            text = "Убежать"
+            setOnClickListener { flee() }
+        }
+        bottom.addView(fleeButton, LinearLayout.LayoutParams(-1, 62))
 
         answers = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -250,6 +256,15 @@ class MainActivity : Activity() {
             renderStage()
             message.text = "Ты защищаешься. Сердца: " + combatState!!.heroHearts + "/3. Теперь твой ход."
         }
+    }
+
+    private fun flee() {
+        combatState = combatEngine.resolveMathAction(combatState ?: return, CombatAction.FLEE, false).state
+        stage = Stage.RETURN_HOME
+        answers.visibility = View.GONE
+        title.text = "Отступление"
+        message.text = "Ты покинул бой без победы. Награда за победу не получена."
+        action.text = "Вернуться домой"
     }
 
     private fun onPrimaryAction() {
