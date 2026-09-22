@@ -25,6 +25,11 @@ import com.mathadventure.core.gameprogression.GameProgressionEvent
 import com.mathadventure.core.gameprogression.DefaultRpgLevelPolicy
 import com.mathadventure.core.gameprogression.PrototypeGameRewardPolicy
 import com.mathadventure.core.gameprogression.PrototypeGameUnlockPolicy
+import com.mathadventure.core.gameprogression.ProgressionCommit
+import com.mathadventure.core.gameprogression.QuestProgressionEventMapper
+import com.mathadventure.core.quest.FirstQuestChain
+import com.mathadventure.core.quest.QuestEngine
+import com.mathadventure.core.quest.QuestState
 import com.mathadventure.core.generator.DeterministicTaskGenerator
 import com.mathadventure.core.mastery.ApprovedMasteryPolicy
 import com.mathadventure.core.mastery.MasteryStateStore
@@ -50,6 +55,8 @@ class MainActivity : Activity() {
     private lateinit var progressStore: PrototypeProgressStore
     private lateinit var gameProgression: CoreGameProgressionFlow
     private lateinit var gameProgressionStore: AndroidGameProgressionStore
+    private lateinit var questStore: AndroidQuestStore
+    private lateinit var questEngine: QuestEngine
 
     private var stage = Stage.HOME
     private var generated: com.mathadventure.core.flow.GeneratedTask? = null
@@ -73,6 +80,12 @@ class MainActivity : Activity() {
             levelPolicy = DefaultRpgLevelPolicy(),
             unlockPolicy = PrototypeGameUnlockPolicy(),
             store = gameProgressionStore
+        )
+        questStore = AndroidQuestStore(this)
+        questEngine = QuestEngine(
+            definitions = FirstQuestChain.definitions.associateBy { it.id },
+            store = questStore,
+            prerequisiteChecker = questStore
         )
         masteryStore = AndroidMasteryStateStore(this)
         masterySystem = PolicyDrivenMasterySystem(masteryStore, ApprovedMasteryPolicy())
@@ -124,7 +137,37 @@ class MainActivity : Activity() {
         root.addView(hud, FrameLayout.LayoutParams(-1, -2))
         root.addView(bottom, FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM))
         setContentView(root)
+        ensureQuestStarted("story_home_to_village")
         renderStage()
+    }
+
+    private fun ensureQuestStarted(questId: String) {
+        if (questEngine.availability(playerId, questId) != QuestState.AVAILABLE) return
+        questEngine.start(
+            playerId = playerId,
+            questId = questId,
+            sessionId = "quest-session-" + questId + "-" + System.currentTimeMillis(),
+            nowEpochMillis = System.currentTimeMillis()
+        )
+    }
+
+    private fun recordQuestObjective(questId: String, objectiveId: String): ProgressionCommit? {
+        val current = questStore.get(playerId, questId)
+        if (current?.state != QuestState.ACTIVE) return null
+        val updated = questEngine.recordObjectiveProgress(
+            playerId = playerId,
+            questId = questId,
+            objectiveId = objectiveId,
+            nowEpochMillis = System.currentTimeMillis()
+        )
+        if (updated.state != QuestState.COMPLETED) return null
+        val definition = FirstQuestChain.definitions.first { it.id == questId }
+        val completion = questEngine.completion(
+            playerId = playerId,
+            questId = questId,
+            instanceId = updated.sessionId ?: error("completed quest has no session id")
+        ) ?: return null
+        return gameProgression.record(QuestProgressionEventMapper.map(completion, definition.repeatability))
     }
 
     private fun adaptivePolicy(): AdaptivePolicy = object : AdaptivePolicy {
@@ -233,6 +276,7 @@ class MainActivity : Activity() {
         when (result.resolution) {
             CombatResolution.VICTORY -> {
                 renderer.setVictory(true)
+                val questCommit = recordQuestObjective("story_first_battle", "win_first_battle")
                 val combatId = combatState!!.combatId
                 val commit = gameProgression.record(
                     GameProgressionEvent(
@@ -250,10 +294,22 @@ class MainActivity : Activity() {
                 answers.visibility = View.GONE
                 fleeButton.visibility = View.GONE
                 title.text = "Победа над врагом!"
-                message.text = if (commit != null) {
-                    "Победа! +" + commit.reward.xpDelta + " XP, +" + commit.reward.coinsDelta + " монет. RPG Level " + progression.rpgLevel + "."
-                } else {
-                    "Победа! Эта награда уже была получена. RPG Level " + progression.rpgLevel + "."
+                message.text = buildString {
+                    append(if (commit != null) {
+                        "Победа! +" + commit.reward.xpDelta + " XP, +" + commit.reward.coinsDelta + " монет."
+                    } else {
+                        "Победа! Награда за бой уже была получена."
+                    })
+                    if (questCommit != null) {
+                        append(" Квест завершён: +")
+                        append(questCommit.reward.xpDelta)
+                        append(" XP, +")
+                        append(questCommit.reward.coinsDelta)
+                        append(" монет.")
+                    }
+                    append(" RPG Level ")
+                    append(progression.rpgLevel)
+                    append(".")
                 }
                 action.text = "Вернуться домой"
             }
@@ -302,11 +358,36 @@ class MainActivity : Activity() {
 
     private fun onPrimaryAction() {
         when (stage) {
-            Stage.HOME -> { stage = Stage.VILLAGE; renderStage() }
-            Stage.VILLAGE -> { stage = Stage.FOREST; renderStage() }
+            Stage.HOME -> {
+                val questCommit = recordQuestObjective("story_home_to_village", "visit_village")
+                ensureQuestStarted("story_village_to_forest")
+                stage = Stage.VILLAGE
+                renderStage()
+                if (questCommit != null) {
+                    message.text = "Квест завершён: +" + questCommit.reward.xpDelta + " XP, +" + questCommit.reward.coinsDelta + " монет. Новый путь открыт."
+                }
+            }
+            Stage.VILLAGE -> {
+                recordQuestObjective("story_village_to_forest", "talk_to_npc")
+                val questCommit = recordQuestObjective("story_village_to_forest", "reach_forest")
+                ensureQuestStarted("story_first_battle")
+                stage = Stage.FOREST
+                renderStage()
+                if (questCommit != null) {
+                    message.text = "Квест завершён: +" + questCommit.reward.xpDelta + " XP, +" + questCommit.reward.coinsDelta + " монет."
+                }
+            }
             Stage.FOREST -> startCombat()
             Stage.COMBAT -> defend()
-            Stage.RETURN_HOME -> { stage = Stage.HOME; renderStage() }
+            Stage.RETURN_HOME -> {
+                ensureQuestStarted("story_return_home")
+                val questCommit = recordQuestObjective("story_return_home", "return_home")
+                stage = Stage.HOME
+                renderStage()
+                if (questCommit != null) {
+                    message.text = "Квест завершён: +" + questCommit.reward.xpDelta + " XP, +" + questCommit.reward.coinsDelta + " монет."
+                }
+            }
         }
     }
 
