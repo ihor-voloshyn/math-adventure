@@ -35,11 +35,7 @@ class AndroidGameProgressionInventoryStore(
         val currentProgression = readProgression(playerId)
         if (commit.event.eventId in currentProgression.grantedEventIds) return
 
-        loot.forEach {
-            require(it.playerId == playerId) { "loot player mismatch" }
-            require(it.itemId in definitions) { "unknown loot item" }
-            require(it.quantity > 0) { "loot quantity must be positive" }
-        }
+        validateInventory(playerId, loot)
 
         val bestResults = currentProgression.bestResults.toMutableMap()
         commit.bestResultAfter?.let { bestResults[it.sourceId] = it }
@@ -55,8 +51,8 @@ class AndroidGameProgressionInventoryStore(
 
         val nextInventory = readInventory(playerId).toMutableList()
         loot.forEach { item ->
-            val definition = definitions[item.itemId]
-            if (definition?.category == com.mathadventure.core.items.ItemCategory.CONSUMABLE &&
+            val definition = definitions[item.itemId]!!
+            if (definition.category == com.mathadventure.core.items.ItemCategory.CONSUMABLE &&
                 definition.equipmentSlot == null
             ) {
                 val index = nextInventory.indexOfFirst { it.itemId == item.itemId }
@@ -71,10 +67,12 @@ class AndroidGameProgressionInventoryStore(
             }
         }
 
-        preferences.edit()
-            .putString(progressionKey(playerId), encodeProgression(nextProgression))
-            .putString(inventoryKey(playerId), encodeInventory(nextInventory))
-            .commit()
+        persistAtomic(
+            progressionKey(playerId),
+            encodeProgression(nextProgression),
+            inventoryKey(playerId),
+            encodeInventory(nextInventory)
+        )
     }
 
     @Synchronized
@@ -85,16 +83,48 @@ class AndroidGameProgressionInventoryStore(
 
     @Synchronized
     override fun saveInventory(playerId: String, inventory: List<ItemInstance>) {
-        preferences.edit()
-            .putString(inventoryKey(playerId), encodeInventory(inventory))
-            .commit()
+        validateInventory(playerId, inventory)
+        persistAtomic(inventoryKey(playerId), encodeInventory(inventory))
     }
 
     @Synchronized
     override fun saveEquipment(playerId: String, equipment: EquipmentState) {
-        preferences.edit()
-            .putString(equipmentKey(playerId), encodeEquipment(equipment))
-            .commit()
+        validateEquipment(playerId, equipment)
+        persistAtomic(equipmentKey(playerId), encodeEquipment(equipment))
+    }
+
+    private fun validateInventory(playerId: String, inventory: List<ItemInstance>) {
+        val instanceIds = mutableSetOf<String>()
+        inventory.forEach { item ->
+            require(item.playerId == playerId) { "inventory player mismatch" }
+            require(item.itemId in definitions) { "unknown inventory item: ${item.itemId}" }
+            require(instanceIds.add(item.instanceId)) { "duplicate inventory instance: ${item.instanceId}" }
+        }
+    }
+
+    private fun validateEquipment(playerId: String, equipment: EquipmentState) {
+        val inventoryById = readInventory(playerId).associateBy { it.instanceId }
+        val equippedIds = listOfNotNull(
+            equipment.weaponInstanceId,
+            equipment.armorInstanceId,
+            equipment.helmetInstanceId,
+            equipment.accessoryInstanceId,
+            equipment.petAccessoryInstanceId
+        )
+        require(equippedIds.size == equippedIds.toSet().size) {
+            "an item instance cannot occupy multiple equipment slots"
+        }
+        equippedIds.forEach { instanceId ->
+            val instance = inventoryById[instanceId] ?: error("equipped item is not owned: $instanceId")
+            require(instance.quantity == 1) { "equipped item must have quantity 1: $instanceId" }
+        }
+    }
+
+    private fun persistAtomic(vararg entries: String) {
+        require(entries.size % 2 == 0)
+        val editor = preferences.edit()
+        entries.asList().chunked(2).forEach { (key, value) -> editor.putString(key, value) }
+        check(editor.commit()) { "failed to persist game state" }
     }
 
     private fun progressionKey(playerId: String) = "state:" + playerId
