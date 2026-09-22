@@ -99,3 +99,12 @@ Quest System v1.0 and World & Story v1.0 are approved. The first world loop is n
 ## Latest implementation checkpoint
 - Android prototype camera now supports direct touch rotation on the 3D scene: horizontal drag rotates yaw; vertical drag adjusts pitch within bounded limits.
 - This implements the first concrete camera requirement from the approved Visual Style & Asset Specification while keeping the renderer platform-independent from game-domain logic.
+
+
+## Latest implementation boundary — Quest → Game Progression
+Quest completion is now integrated with the Game Progression boundary. Quest remains responsible for objective state and completion identity; Game Progression maps the completion event into XP/Coins rewards and idempotent persistence. The Android prototype persists the first story chain and connects its objectives to the existing Home → Village → Forest → Combat → Home flow.
+
+## Next logical stage
+1. Add explicit integration coverage for Quest → Game Progression and the full first story/combat chain.
+2. Verify offline/crash-recovery behavior for combined quest and progression persistence.
+3. Continue the playable vertical slice with the next approved gameplay/content block without moving mathematical or reward ownership into Quest.
