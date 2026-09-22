@@ -25,5 +25,11 @@ Status: Approved
 
 The GitHub repository is the durable project memory. The marker СОХРАН ЧАТ requests a checkpoint. Checkpoints preserve conversation decisions and allow later comparison against repository documents.
 
+## D-005 — Sequential development chat numbering
+Status: Approved
+
+Development chats are numbered sequentially because ChatGPT conversations can reach their maximum length. Develop MVP 00, Develop MVP 01, Develop MVP 02, etc. are continuation segments of the same Math Adventure project. A new numbered chat must recover state from GitHub checkpoints and canonical documents rather than starting a new project.
+
 ## Open questions
-None added in this checkpoint.
+
+- PR #33 and PR #35 both appear to implement the COMBAT_VICTORY → Game Progression connection. They must be compared before further implementation.
