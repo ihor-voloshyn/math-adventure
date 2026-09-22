@@ -48,7 +48,7 @@ Full-chat archival is part of the project workflow. Between each pair of «со�
 - Product baseline: 01_PRODUCT_REQUIREMENTS.md v1.0.
 - Mathematical architecture boundary: Adaptive Engine → Task Generator → Math Engine.
 - Combat vertical slice exists through PR #32.
-- PR #33 and PR #35 are both currently open and both concern connecting COMBAT_VICTORY to Game Progression; they need comparison/consolidation before further progression implementation is treated as canonical.
+- PR #33 and PR #35 were duplicate combat-progression attempts and are no longer open. Their work is being consolidated through PR #36; only the PR #36 implementation should become canonical after QA.
 
 ## Recovery procedure for a new chat
 
@@ -58,3 +58,4 @@ Full-chat archival is part of the project workflow. Between each pair of «со�
 4. Read the latest files under chat/checkpoints/.
 5. Compare those checkpoints with the product/technical documents before continuing.
 6. Inspect open PRs and QA status before modifying implementation.
+7. After progression consolidation is merged, verify the canonical main branch and remove obsolete branch references from recovery notes.
