@@ -81,3 +81,10 @@ Full-chat archival is part of the project workflow. Between each pair of «со�
 - Android quest state uses local SharedPreferences prototype persistence.
 - The first story chain is executable through the existing visual prototype without moving reward ownership into Quest.
 - Next logical implementation block: strengthen the integrated vertical slice with explicit quest/combat integration tests and then proceed to the next MVP gameplay system/content block.
+
+
+## Latest implementation checkpoint — Integration coverage
+- PR #40 added a core integration test for QuestEngine → Game Progression event mapping → reward commit and duplicate idempotency.
+- PR #40 passed Repository QA, Core Domain QA, and Android Prototype QA and merged as `622ce9bd63dcef94deb398ba473c301a8783c475`.
+- The remaining vertical-slice verification gaps are broader end-to-end acceptance and offline/crash-recovery checks.
+- Next logical implementation block: strengthen offline/crash-recovery semantics for combined quest/progression persistence, then continue the next approved gameplay/content block.
