@@ -1,0 +1,48 @@
+package com.mathadventure.core.combat
+
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
+
+class CombatEngineTest {
+    private val engine = CombatEngine()
+
+    @Test fun correctAttackDamagesEnemy() {
+        val result = engine.resolveMathAction(engine.start("c1"), CombatAction.ATTACK, true)
+        assertEquals(2, result.state.enemyHp)
+        assertEquals(3, result.state.heroHearts)
+        assertTrue(result.state.playerTurn)
+    }
+
+    @Test fun incorrectAnswerMissesButDoesNotInstantlyKill() {
+        val result = engine.resolveMathAction(engine.start("c1"), CombatAction.ATTACK, false)
+        assertEquals(2, result.state.heroHearts)
+        assertEquals(3, result.state.enemyHp)
+        assertEquals(CombatResolution.MISS, result.resolution)
+        assertTrue(result.state.active)
+    }
+
+    @Test fun victoryEmitsCombatEvent() {
+        val state = engine.start("c1", heroHearts = 3, enemyHp = 1)
+        val result = engine.resolveMathAction(state, CombatAction.ATTACK, true)
+        assertEquals(CombatResolution.VICTORY, result.resolution)
+        assertEquals("COMBAT_VICTORY", result.gameEventType)
+        assertFalse(result.state.active)
+    }
+
+    @Test fun defeatPreservesConfirmedStateAndEndsCombat() {
+        val state = engine.start("c1", heroHearts = 1, enemyHp = 3)
+        val result = engine.resolveMathAction(state, CombatAction.ATTACK, false)
+        assertEquals(CombatResolution.DEFEAT, result.resolution)
+        assertEquals(0, result.state.heroHearts)
+        assertFalse(result.state.active)
+    }
+
+    @Test fun fleeEndsCombatWithoutVictory() {
+        val result = engine.resolveMathAction(engine.start("c1"), CombatAction.FLEE, false)
+        assertEquals(CombatResolution.FLED, result.resolution)
+        assertFalse(result.state.active)
+        assertEquals(null, result.gameEventType)
+    }
+}
