@@ -10,7 +10,7 @@ The project uses sequential numbered development chats because individual ChatGP
 Sequence:
 - Develop MVP 00 — previous development chat.
 - Develop MVP 01 — current chat.
-- Develop MVP 02, 03, etc. — future continuation chats as limits are reached.
+- Develop MVP 02, 03, etc. — future continuation segments of the same Math Adventure project.
 
 A new numbered chat is a continuation of the same Math Adventure project, not a new project.
 
@@ -48,7 +48,12 @@ Full-chat archival is part of the project workflow. Between each pair of «со�
 - Product baseline: 01_PRODUCT_REQUIREMENTS.md v1.0.
 - Mathematical architecture boundary: Adaptive Engine → Task Generator → Math Engine.
 - Combat vertical slice exists through PR #32.
-- PR #33 and PR #35 were duplicate combat-progression attempts and are no longer open. Their work is being consolidated through PR #36; only the PR #36 implementation should become canonical after QA.
+- PR #33 and PR #35 were duplicate combat-progression attempts and are no longer open; their relevant work was consolidated into PR #36.
+- PR #36 was QA-validated and merged into `main` as merge commit `6f8e96d1caeefc1f74ff9940bb3e582e7f15f492`.
+- Canonical combat progression now connects `COMBAT_VICTORY → CoreGameProgressionFlow`, with prototype XP/Coins rewards and Android local persistence.
+- The current reward tuning is vertical-slice only: 100 XP and 25 Coins for the first victory for a source; final economy values are not yet approved.
+- Android persistence is a prototype boundary using one JSON document per player in SharedPreferences with idempotent event handling. It is not the final server-of-truth architecture.
+- No unlocks are granted yet by the prototype unlock policy.
 
 ## Recovery procedure for a new chat
 
@@ -58,4 +63,4 @@ Full-chat archival is part of the project workflow. Between each pair of «со�
 4. Read the latest files under chat/checkpoints/.
 5. Compare those checkpoints with the product/technical documents before continuing.
 6. Inspect open PRs and QA status before modifying implementation.
-7. After progression consolidation is merged, verify the canonical main branch and remove obsolete branch references from recovery notes.
+7. Verify the canonical main branch and obsolete PR/branch references after progression changes.
