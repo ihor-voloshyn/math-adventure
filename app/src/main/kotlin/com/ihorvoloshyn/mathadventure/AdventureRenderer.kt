@@ -4,11 +4,13 @@ import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.opengl.Matrix
+import android.view.MotionEvent
 import kotlin.math.cos
 import kotlin.math.sin
 
 class AdventureRenderer(context: Context) : GLSurfaceView(context) {
     private val scene = SceneRenderer()
+
     init {
         setEGLContextClientVersion(2)
         setRenderer(scene)
@@ -17,6 +19,10 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
 
     fun setStage(stage: Int) { scene.stage = stage }
     fun setVictory(value: Boolean) { scene.victory = value }
+
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        return scene.handleTouch(event)
+    }
 
     private class SceneRenderer : Renderer {
         var stage = 0
@@ -27,16 +33,27 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
         private val model = FloatArray(16)
         private val mvp = FloatArray(16)
         private var angle = 0f
+        private var cameraYaw = 0f
+        private var cameraPitch = 0.62f
+        private var lastTouchX = 0f
+        private var lastTouchY = 0f
         private lateinit var cube: Cube
 
-        override fun onSurfaceCreated(gl: javax.microedition.khronos.opengles.GL10?, config: javax.microedition.khronos.egl.EGLConfig?) {
+        override fun onSurfaceCreated(
+            gl: javax.microedition.khronos.opengles.GL10?,
+            config: javax.microedition.khronos.egl.EGLConfig?
+        ) {
             GLES20.glClearColor(0.38f, 0.62f, 0.86f, 1f)
             program = Shader.create()
             cube = Cube()
             GLES20.glEnable(GLES20.GL_DEPTH_TEST)
         }
 
-        override fun onSurfaceChanged(gl: javax.microedition.khronos.opengles.GL10?, width: Int, height: Int) {
+        override fun onSurfaceChanged(
+            gl: javax.microedition.khronos.opengles.GL10?,
+            width: Int,
+            height: Int
+        ) {
             GLES20.glViewport(0, 0, width, height)
             val ratio = width.toFloat() / height.coerceAtLeast(1)
             Matrix.frustumM(projection, 0, -ratio, ratio, -1f, 1f, 2f, 40f)
@@ -45,8 +62,41 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
         override fun onDrawFrame(gl: javax.microedition.khronos.opengles.GL10?) {
             angle += 0.15f
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
-            Matrix.setLookAtM(view, 0, 8f, 7f, 10f, 0f, 0.8f, 0f, 0f, 1f, 0f)
+
+            val horizontalDistance = 12f
+            val cameraX = sin(cameraYaw) * horizontalDistance
+            val cameraZ = cos(cameraYaw) * horizontalDistance
+            val cameraY = 5.5f + cameraPitch * 2.5f
+
+            Matrix.setLookAtM(
+                view, 0,
+                cameraX, cameraY, cameraZ,
+                0f, 0.8f, 0f,
+                0f, 1f, 0f
+            )
             drawWorld()
+        }
+
+        fun handleTouch(event: MotionEvent): Boolean {
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    lastTouchX = event.x
+                    lastTouchY = event.y
+                    return true
+                }
+
+                MotionEvent.ACTION_MOVE -> {
+                    val dx = event.x - lastTouchX
+                    val dy = event.y - lastTouchY
+                    lastTouchX = event.x
+                    lastTouchY = event.y
+
+                    cameraYaw = (cameraYaw - dx * 0.008f) % (2f * Math.PI.toFloat())
+                    cameraPitch = (cameraPitch + dy * 0.006f).coerceIn(0.15f, 1.25f)
+                    return true
+                }
+            }
+            return true
         }
 
         private fun drawWorld() {
@@ -94,7 +144,7 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
         }
 
         private fun drawPet(x: Float, y: Float, z: Float) {
-            val bob = (sin(angle * 0.04f) * 0.08f)
+            val bob = sin(angle * 0.04f) * 0.08f
             cube(x, y + 0.38f + bob, z, 0.75f, 0.55f, 0.7f, 0.82f, 0.62f, 0.22f)
             cube(x, y + 0.75f + bob, z, 0.52f, 0.45f, 0.52f, 0.94f, 0.76f, 0.38f)
             cube(x - 0.2f, y + 0.92f + bob, z, 0.12f, 0.18f, 0.12f, 0.94f, 0.76f, 0.38f)
@@ -120,7 +170,11 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             cube(x, y + 2.85f, z, 1.2f, 1.1f, 1.2f, 0.18f, 0.62f, 0.25f)
         }
 
-        private fun cube(x: Float, y: Float, z: Float, sx: Float, sy: Float, sz: Float, r: Float, g: Float, b: Float) {
+        private fun cube(
+            x: Float, y: Float, z: Float,
+            sx: Float, sy: Float, sz: Float,
+            r: Float, g: Float, b: Float
+        ) {
             Matrix.setIdentityM(model, 0)
             Matrix.translateM(model, 0, x, y, z)
             Matrix.scaleM(model, 0, sx, sy, sz)
@@ -139,10 +193,15 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             0,1,2, 2,3,0, 1,5,6, 6,2,1, 5,4,7, 7,6,5,
             4,0,3, 3,7,4, 3,2,6, 6,7,3, 4,5,1, 1,0,4
         )
-        private val buffer = java.nio.ByteBuffer.allocateDirect(vertices.size * 4).order(java.nio.ByteOrder.nativeOrder()).asFloatBuffer()
-        private val indexBuffer = java.nio.ByteBuffer.allocateDirect(indices.size * 2).order(java.nio.ByteOrder.nativeOrder()).asShortBuffer()
+        private val buffer = java.nio.ByteBuffer.allocateDirect(vertices.size * 4)
+            .order(java.nio.ByteOrder.nativeOrder()).asFloatBuffer()
+        private val indexBuffer = java.nio.ByteBuffer.allocateDirect(indices.size * 2)
+            .order(java.nio.ByteOrder.nativeOrder()).asShortBuffer()
 
-        init { buffer.put(vertices).position(0); indexBuffer.put(indices).position(0) }
+        init {
+            buffer.put(vertices).position(0)
+            indexBuffer.put(indices).position(0)
+        }
 
         fun draw(program: Int, mvp: FloatArray, r: Float, g: Float, b: Float) {
             val pos = GLES20.glGetAttribLocation(program, "aPosition")
@@ -160,14 +219,21 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
 
     private object Shader {
         fun create(): Int {
-            val vertex = compile(GLES20.GL_VERTEX_SHADER, "attribute vec4 aPosition; uniform mat4 uMvp; void main(){gl_Position=uMvp*aPosition;}")
-            val fragment = compile(GLES20.GL_FRAGMENT_SHADER, "precision mediump float; uniform vec4 uColor; void main(){gl_FragColor=uColor;}")
+            val vertex = compile(
+                GLES20.GL_VERTEX_SHADER,
+                "attribute vec4 aPosition; uniform mat4 uMvp; void main(){gl_Position=uMvp*aPosition;}"
+            )
+            val fragment = compile(
+                GLES20.GL_FRAGMENT_SHADER,
+                "precision mediump float; uniform vec4 uColor; void main(){gl_FragColor=uColor;}"
+            )
             return GLES20.glCreateProgram().also {
                 GLES20.glAttachShader(it, vertex)
                 GLES20.glAttachShader(it, fragment)
                 GLES20.glLinkProgram(it)
             }
         }
+
         private fun compile(type: Int, source: String): Int {
             return GLES20.glCreateShader(type).also {
                 GLES20.glShaderSource(it, source)
