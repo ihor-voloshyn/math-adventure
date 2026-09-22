@@ -25,6 +25,11 @@ Status: Approved
 
 The GitHub repository is the durable project memory. The marker СОХРАН ЧАТ requests a checkpoint. Checkpoints preserve conversation decisions and allow later comparison against repository documents.
 
+## D-006 — Two-layer chat memory: full archive + checkpoint
+Status: Approved
+
+The command «сохрани чат» must preserve the full verbatim conversational text available between checkpoint markers in `chat-history/`. In parallel it must update `chat/CURRENT_STATE.md`, create/update a checkpoint, update durable decisions when needed, compare against canonical project documents, and commit the result. The full-chat archive is the source for recovering ideas, context, and the reasoning history. Checkpoints/summaries are a fast index so a new «продолжай» does not require reading the whole archive first. Older transcript text that is no longer available must never be invented; it must be marked as unavailable or reconstructed.
+
 ## D-005 — Sequential development chat numbering
 Status: Approved
 
