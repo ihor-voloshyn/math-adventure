@@ -11,6 +11,7 @@ class PrototypeGameRewardPolicy : GameRewardPolicy {
                 state = state,
                 xp = 100L,
                 coins = 25L,
+                lootIds = listOf("sword_sparks"),
                 rewardReason = "first_combat_victory"
             )
             GameEventType.QUEST_COMPLETED -> {
@@ -44,6 +45,7 @@ class PrototypeGameRewardPolicy : GameRewardPolicy {
         state: GameProgressionState,
         xp: Long,
         coins: Long,
+        lootIds: List<String> = emptyList(),
         rewardReason: String
     ): ProgressionEvaluation {
         val previous = state.bestResults[event.sourceId]
@@ -61,6 +63,7 @@ class PrototypeGameRewardPolicy : GameRewardPolicy {
             reward = RewardBundle(
                 xpDelta = xp,
                 coinsDelta = coins,
+                lootIds = lootIds,
                 reason = rewardReason
             ),
             bestResultAfter = BestResult(
