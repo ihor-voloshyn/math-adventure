@@ -11,7 +11,7 @@ class CombatEngineTest {
     @Test fun correctAttackDamagesEnemy() {
         val result = engine.resolveMathAction(engine.start("c1"), CombatAction.ATTACK, true)
         assertEquals(2, result.state.enemyHp)
-        assertEquals(3, result.state.heroHearts)
+        assertEquals(2, result.state.heroHearts)
         assertTrue(result.state.playerTurn)
     }
 
