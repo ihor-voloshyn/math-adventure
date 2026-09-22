@@ -25,7 +25,7 @@ Math Adventure is an Android-first, later iOS, 3D math-learning game for grades 
 - No minigames.
 
 ## Approved product documentation
-01_PRODUCT_REQUIREMENTS.md v1.0 is the approved product-requirements baseline.
+`docs/01_PRODUCT_REQUIREMENTS.md` v1.0 is the approved product-requirements baseline.
 
 ## Mathematical architecture boundary
 Adaptive Engine → Task Generator → Math Engine
