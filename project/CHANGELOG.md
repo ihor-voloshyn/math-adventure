@@ -59,3 +59,13 @@
 - Define Quests and World/Story integration.
 - Define the visual asset/style specification and first playable visual slice.
 - Begin implementation of the first playable prototype.
+
+## 2026-09-22
+- Approved Visual Style & Asset Specification v1.0.
+- Set the first child-testable visual slice: Hero, Pet, NPC, Enemy, Home, Territory, basic equipment, UI and VFX.
+- Established Stylized 3D Fantasy Adventure as the working visual direction and explicitly moved visual production ahead of the first full Playable Prototype.
+
+## Next
+- Define Quests and World/Story integration.
+- Build the first visual asset slice.
+- Assemble and test the first Playable Prototype.

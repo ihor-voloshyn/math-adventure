@@ -117,3 +117,14 @@ MVP rules:
 - Major upgrades emit idempotent HOME_MILESTONE progression events where applicable.
 - MVP excludes complex city-builder, farming, upkeep, real-time economy and mandatory daily maintenance.
 - Visual development starts before the first full Playable Prototype, with a minimum Hero/Pet/NPC/Enemy/Home/Territory asset slice.
+
+## R-024 — Visual Style & First Asset Slice
+
+**Status:** Approved by Product Owner delegation ("делай на свое усмотрение").
+
+MVP rules:
+- Visual development starts before the first full Playable Prototype.
+- First visual slice includes Hero, Pet, NPC, Enemy, Home, Territory, basic equipment, UI and VFX.
+- Visual direction is Stylized 3D Fantasy Adventure: expressive, child-friendly, readable silhouettes, non-gory and mobile-appropriate.
+- Full asset production is deferred until the first child-testable visual prototype validates the direction.
+- Visual assets do not own mathematical progression or Mastery.
