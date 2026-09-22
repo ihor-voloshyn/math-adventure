@@ -24,7 +24,6 @@ Phase 2 — Core implementation
 - [ ] iOS adaptation
 - [ ] Backend synchronization
 
-
 ## Phase 5 — Cloud-ready and commercial infrastructure (future)
 - [ ] Preserve offline-first game operation while introducing cloud-ready boundaries.
 - [ ] Implement account/server-of-truth synchronization without moving mathematical authority out of Math Engine.
@@ -38,7 +37,18 @@ Phase 2 — Core implementation
 - [ ] Establish contributor terms, attribution/IP rules and payment rules before accepting paid contributions.
 - [ ] Keep product-owner approval as the final gate for externally proposed ideas entering the product roadmap.
 
-## Phase 6 — Sustainable product ecosystem (future)
+## Phase 6 — AI Product Studio and sustainable product ecosystem (future)
+- [ ] Treat Math Adventure as Product #1 of a broader AI Product Studio.
+- [ ] Build shared Studio capabilities separately from product-specific Math Adventure code.
+- [ ] Develop reusable agent roles, permissions, review gates and orchestration from real project experience.
+- [ ] Build and version reusable prompts, workflows, templates and documentation practices based on measured outcomes.
+- [ ] Establish reusable development, QA, GitHub, CI/CD, security and observability infrastructure.
+- [ ] Establish Human-in-the-Loop testing for usability, attractiveness/engagement and perceived product value.
+- [ ] Create a structured real-user feedback → analysis → iteration loop.
+- [ ] Capture lessons learned from Product #1 and promote only genuinely reusable capabilities into the Studio.
+- [ ] Create a reusable new-product template: idea → research → requirements → architecture → agents → development → QA → real users → validation → commercialization.
+- [ ] Establish a Studio knowledge base / operating system that evolves from validated experience rather than assumptions.
+- [ ] Reuse the resulting Studio infrastructure for future products while keeping each product's scope and domain logic independent.
 - [ ] Launch controlled early-user/community testing before broad commercial expansion.
 - [ ] Introduce paid contribution programs only after legal, payment, child-safety and operational requirements are defined.
 - [ ] Establish a reinvestment budget for infrastructure, specialized AI/agent capacity, human contributors and product research.
