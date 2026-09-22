@@ -44,7 +44,7 @@ class AndroidQuestProgressionOutbox(context: Context) : QuestCompletionOutbox {
                         playerId = item.getString("playerId"),
                         eventType = GameEventType.valueOf(item.getString("eventType")),
                         sourceId = item.getString("sourceId"),
-                        sessionId = item.optString("sessionId").takeIf { it.isNotBlank() },
+                        sessionId = item.optString("sessionId", ""),
                         outcome = item.getString("outcome"),
                         timestampEpochMillis = item.getLong("timestampEpochMillis"),
                         metadata = metadata
