@@ -11,9 +11,9 @@ Phase 2 — Core implementation
 
 ## Phase 3 — QA and vertical slice
 - [x] Automated unit tests for current core slices
-- [ ] Integration tests
-- [ ] End-to-end vertical slice acceptance
-- [ ] Offline/crash-recovery verification
+- [x] Integration tests
+- [x] End-to-end vertical slice acceptance
+- [x] Offline/crash-recovery verification
 - [ ] Android MVP validation
 - [x] Prototype 3D camera rotation
 
