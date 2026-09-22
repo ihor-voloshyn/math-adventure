@@ -61,7 +61,7 @@ class MainActivity : Activity() {
     private var generated: com.mathadventure.core.flow.GeneratedTask? = null
     private var sessionCorrect = 0
     private var sessionIncorrect = 0
-    private var lastTaskSignature = ""
+    private var lastTaskSignature = ""\n    private lateinit var progressStore: PrototypeProgressStore
 
     private lateinit var renderer: AdventureRenderer
     private lateinit var title: TextView
@@ -71,6 +71,7 @@ class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        progressStore = PrototypeProgressStore(this)
         val root = FrameLayout(this)
         renderer = AdventureRenderer(this)
         root.addView(renderer)
@@ -107,6 +108,7 @@ class MainActivity : Activity() {
         val current = generated ?: return
         val answered = flow.answer(playerId, current, "attempt-" + System.currentTimeMillis(), value, System.currentTimeMillis())
         if (answered.evaluation.result == AnswerResult.CORRECT) {\n            sessionCorrect++
+            progressStore.recordCorrect()
             stage = Stage.RETURN_HOME
             renderer.setVictory(true)
             title.text = "Победа!"
@@ -126,7 +128,7 @@ class MainActivity : Activity() {
             Stage.VILLAGE -> { title.text = "Деревенская площадь"; message.text = "NPC просит проверить дорогу в лес."; action.text = "Идти в лес"; answers.visibility = View.GONE }
             Stage.FOREST -> { title.text = "Лес"; message.text = "Впереди маленькое существо."; action.text = "Начать бой"; answers.visibility = View.GONE }
             Stage.COMBAT -> { generateMathTask(); title.text = "Математическая атака"; message.text = generated?.task?.prompt ?: "Математическая задача"; action.text = "Выбери ответ"; answers.visibility = View.VISIBLE }
-            Stage.RETURN_HOME -> { title.text = "Возвращение"; message.text = "Игровой цикл завершён."; action.text = "Вернуться домой"; answers.visibility = View.GONE }
+            Stage.RETURN_HOME -> { title.text = "Возвращение"; message.text = "Игровой цикл завершён. Всего правильных ответов: ${progressStore.totalCorrect}."; action.text = "Вернуться домой"; answers.visibility = View.GONE }
         }
     }
 }
