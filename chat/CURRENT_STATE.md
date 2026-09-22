@@ -37,7 +37,7 @@ When the user writes «статус», inspect and report the current project st
 
 Saving cannot happen literally after every ChatGPT message without an explicit checkpoint request. The reliable trigger is the marker СОХРАН ЧАТ.
 
-The full verbatim ChatGPT transcript is not automatically available to the GitHub connector. The repository contains reconstructed project-history snapshots; a raw ChatGPT export can be imported later.
+Full-chat archival is part of the project workflow. Between each pair of «сохрани чат» markers, the assistant must preserve the verbatim conversational text available in the active chat in `chat-history/`. Checkpoints/summaries remain a separate fast-recovery layer. The archive is the source for recovering ideas and context; `CURRENT_STATE.md`, checkpoints, and decisions are the fast index. If an older transcript is no longer available in the active context, it must not be fabricated; it is explicitly marked as unavailable/reconstructed.
 
 ## Current known state
 
