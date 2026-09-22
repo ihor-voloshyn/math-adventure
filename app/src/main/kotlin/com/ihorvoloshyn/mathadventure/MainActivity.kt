@@ -220,6 +220,7 @@ class MainActivity : Activity() {
                 renderer.setVictory(true)
                 stage = Stage.RETURN_HOME
                 answers.visibility = View.GONE
+                fleeButton.visibility = View.GONE
                 title.text = "Победа над врагом!"
                 message.text = "Атака успешна. " + answered.generated.task.skillId + ": Mastery " + answered.mastery.mastery + "/5."
                 action.text = "Вернуться домой"
@@ -304,6 +305,7 @@ class MainActivity : Activity() {
                 message.text = generated?.task?.prompt ?: "Математическая атака"
                 action.text = "Защищаться"
                 answers.visibility = View.VISIBLE
+                fleeButton.visibility = View.VISIBLE
             }
             Stage.RETURN_HOME -> {
                 title.text = "Возвращение"
