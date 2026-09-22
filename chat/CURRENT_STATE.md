@@ -1,7 +1,9 @@
 # Math Adventure — Current State
 
 ## Last checkpoint
-2026-09-22 — Develop MVP 01
+2026-09-22 — checkpoint 0002 (Develop MVP 01)
+
+Checkpoint 0002 records the current state and continuation context. The exact full transcript for the interval was not fully available in the active context, so no unavailable conversation text was fabricated.
 
 Quest System foundation merged and QA-validated.
 
@@ -107,3 +109,7 @@ Full-chat archival is part of the project workflow. Between each pair of «со�
 - PR #43 passed Repository QA, Core Domain QA and Android Prototype QA and merged as `41720bc9acc40f329ae10abc66ab1d2e681a5e3f`.
 - Loot → Inventory reward integration, Android persistence/UI, and Combat stat consumption are not yet implemented.
 - Next logical block: connect Game Progression loot rewards to Inventory atomically, preserving event idempotency and ownership boundaries.
+
+## Checkpoint 0002 — 2026-09-22
+- No new durable product or architecture decisions were introduced after D-012 in the available conversation context.
+- On the next `продолжай`, inspect current `main`, open PRs and QA before implementation, then continue with Game Progression → Loot → Inventory.
