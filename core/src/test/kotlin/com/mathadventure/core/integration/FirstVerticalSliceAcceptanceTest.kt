@@ -62,10 +62,10 @@ class FirstVerticalSliceAcceptanceTest {
         )
         assertEquals(75L, battleReward!!.reward.xpDelta)
 
-        val homeQuest = completeAndReward(
+        completeAndReward(
             questEngine, coordinator, playerId, "story_return_home", "return_home", 500L
-        )!!
-        assertEquals(QuestState.COMPLETED, homeQuest.state)
+        )
+        assertEquals(QuestState.COMPLETED, questEngine.availability(playerId, "story_return_home"))
         assertEquals(300L, progressionStore.state.totalXp)
         assertEquals(60L, progressionStore.state.coins)
     }
