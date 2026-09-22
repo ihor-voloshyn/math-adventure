@@ -95,3 +95,7 @@ Quest System v1.0 and World & Story v1.0 are approved. The first world loop is n
 1. Implement the first visual asset slice.
 2. Assemble the first Playable Prototype: Home → Village → NPC → exploration → enemy → Math Task → return Home.
 3. Child-test the core loop before expanding the Vertical Slice.
+
+## Latest implementation checkpoint
+- Android prototype camera now supports direct touch rotation on the 3D scene: horizontal drag rotates yaw; vertical drag adjusts pitch within bounded limits.
+- This implements the first concrete camera requirement from the approved Visual Style & Asset Specification while keeping the renderer platform-independent from game-domain logic.
