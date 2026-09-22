@@ -69,3 +69,9 @@ PR #39 passed Repository QA, Core Domain QA, and Android Prototype QA and was me
 Status: Approved
 
 PR #40 added a core integration test covering QuestEngine completion → QUEST_COMPLETED event mapping → CoreGameProgressionFlow reward commit, including duplicate event idempotency and persisted XP/Coins state. Repository QA, Core Domain QA, and Android Prototype QA passed. PR #40 was merged into `main` as `622ce9bd63dcef94deb398ba473c301a8783c475`.
+
+
+## D-011 — First playable vertical slice acceptance
+Status: Approved
+
+PR #42 added executable core acceptance coverage for Home → Village → Forest → Combat → Return Home using the real QuestEngine, CombatEngine, QuestProgressionCoordinator and Game Progression. It verifies quest prerequisites, three correct combat attacks producing COMBAT_VICTORY, completion of the combat quest, one-time quest rewards, and accumulated XP/Coins without moving ownership across boundaries. Repository QA, Core Domain QA, and Android Prototype QA passed. PR #42 was merged into `main` as `2302acafda32e14cb43c74da13bcf9075698ca9e`.
