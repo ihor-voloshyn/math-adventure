@@ -18,6 +18,10 @@ import com.mathadventure.core.combat.CombatEngine
 import com.mathadventure.core.combat.CombatResolution
 import com.mathadventure.core.combat.CombatState
 import com.mathadventure.core.curriculum.Curriculum
+import com.mathadventure.core.gameprogression.CoreGameProgressionFlow
+import com.mathadventure.core.gameprogression.DefaultRpgLevelPolicy
+import com.mathadventure.core.gameprogression.GameEventType
+import com.mathadventure.core.gameprogression.GameProgressionEvent
 import com.mathadventure.core.flow.CoreLearningFlow
 import com.mathadventure.core.generator.DeterministicTaskGenerator
 import com.mathadventure.core.mastery.ApprovedMasteryPolicy
@@ -38,6 +42,8 @@ class MainActivity : Activity() {
     private val playerId = "prototype-player"
     private val mathEngine = BasicMathEngine()
     private val combatEngine = CombatEngine()
+    private lateinit var gameProgression: CoreGameProgressionFlow
+    private lateinit var gameProgressionStore: AndroidGameProgressionStore
     private lateinit var masteryStore: MasteryStateStore
     private lateinit var masterySystem: PolicyDrivenMasterySystem
     private lateinit var flow: CoreLearningFlow
@@ -61,6 +67,13 @@ class MainActivity : Activity() {
         progressStore = PrototypeProgressStore(this)
         masteryStore = AndroidMasteryStateStore(this)
         masterySystem = PolicyDrivenMasterySystem(masteryStore, ApprovedMasteryPolicy())
+        gameProgressionStore = AndroidGameProgressionStore(this)
+        gameProgression = CoreGameProgressionFlow(
+            PrototypeGameRewardPolicy(),
+            DefaultRpgLevelPolicy(),
+            PrototypeGameUnlockPolicy(),
+            gameProgressionStore
+        )
         flow = CoreLearningFlow(
             adaptive = RuleBasedAdaptiveEngine(Curriculum.mvp(), adaptivePolicy()),
             generator = DeterministicTaskGenerator(),
@@ -218,11 +231,24 @@ class MainActivity : Activity() {
         when (result.resolution) {
             CombatResolution.VICTORY -> {
                 renderer.setVictory(true)
+                val progression = gameProgression.record(
+                    GameProgressionEvent(
+                        eventId = "combat-victory-" + result.state.combatId,
+                        playerId = playerId,
+                        eventType = GameEventType.COMBAT_VICTORY,
+                        sourceId = result.state.combatId,
+                        sessionId = result.state.combatId,
+                        outcome = "VICTORY",
+                        timestampEpochMillis = System.currentTimeMillis()
+                    )
+                )
                 stage = Stage.RETURN_HOME
                 answers.visibility = View.GONE
                 fleeButton.visibility = View.GONE
                 title.text = "Победа над врагом!"
-                message.text = "Атака успешна. " + answered.generated.task.skillId + ": Mastery " + answered.mastery.mastery + "/5."
+                val gameState = gameProgressionStore.get(playerId)
+                val rewardText = progression?.reward?.let { " +${it.xpDelta} XP, +${it.coinsDelta} Coins" } ?: " Повторная победа без новой награды."
+                message.text = "Победа! " + answered.generated.task.skillId + ": Mastery " + answered.mastery.mastery + "/5. " + rewardText + " RPG Level " + gameState.rpgLevel + "."
                 action.text = "Вернуться домой"
             }
             CombatResolution.DEFEAT -> {
