@@ -16,12 +16,13 @@ import com.mathadventure.core.adaptive.RuleBasedAdaptiveEngine
 import com.mathadventure.core.curriculum.Curriculum
 import com.mathadventure.core.flow.CoreLearningFlow
 import com.mathadventure.core.generator.DeterministicTaskGenerator
-import com.mathadventure.core.mastery.InMemoryMasteryStateStore
-import com.mathadventure.core.mastery.MasteryUpdatePolicy
+import com.mathadventure.core.mastery.ApprovedMasteryPolicy
+import com.mathadventure.core.mastery.MasteryStateStore
 import com.mathadventure.core.mastery.PolicyDrivenMasterySystem
 import com.mathadventure.core.math.BasicMathEngine
 import com.mathadventure.core.model.AnswerResult
 import com.mathadventure.core.model.InputType
+import com.mathadventure.core.model.SkillState
 import com.mathadventure.core.model.TaskMode
 import com.mathadventure.core.validation.LogicalTaskValidator
 import com.mathadventure.core.validation.MathematicalTaskValidator
@@ -32,35 +33,15 @@ class MainActivity : Activity() {
     private enum class Stage { HOME, VILLAGE, FOREST, COMBAT, RETURN_HOME }
     private val playerId = "prototype-player"
     private val mathEngine = BasicMathEngine()
-    private val masteryStore = InMemoryMasteryStateStore()
-    private val masterySystem = PolicyDrivenMasterySystem(masteryStore, MasteryUpdatePolicy { current, input ->
-        when (input.answerResult) {
-            AnswerResult.CORRECT -> current.copy(mastery = minOf(5, current.mastery + 1), attempts = current.attempts + 1, correctAttempts = current.correctAttempts + 1, consecutiveCorrect = current.consecutiveCorrect + 1, consecutiveErrors = 0)
-            AnswerResult.INCORRECT -> current.copy(attempts = current.attempts + 1, incorrectAttempts = current.incorrectAttempts + 1, recentErrors = current.recentErrors + 1, consecutiveCorrect = 0, consecutiveErrors = current.consecutiveErrors + 1)
-            AnswerResult.SKIPPED -> current.copy(attempts = current.attempts + 1)
-        }
-    })
-    private val adaptivePolicy = object : AdaptivePolicy {
-        override fun priority(candidate: AdaptiveCandidate): AdaptivePriority? =
-            if (!candidate.requiredPrerequisitesSatisfied) AdaptivePriority.REQUIRED_PREREQUISITE
-            else if (candidate.state.mastery < 4) AdaptivePriority.REINFORCE
-            else AdaptivePriority.ADVANCE
-        override fun mode(candidate: AdaptiveCandidate) = TaskMode.DIRECT
-        override fun difficulty(candidate: AdaptiveCandidate) = 1
-        override fun contextType(candidate: AdaptiveCandidate) = "BATTLE"
-    }
-    private val flow = CoreLearningFlow(
-        adaptive = RuleBasedAdaptiveEngine(Curriculum.mvp(), adaptivePolicy),
-        generator = DeterministicTaskGenerator(),
-        validation = TaskValidationPipeline(StructuralTaskValidator(), LogicalTaskValidator(), MathematicalTaskValidator(mathEngine)),
-        mathEngine = mathEngine,
-        mastery = masterySystem
-    )
+    private lateinit var masteryStore: MasteryStateStore
+    private lateinit var masterySystem: PolicyDrivenMasterySystem
+    private lateinit var flow: CoreLearningFlow
+    private lateinit var progressStore: PrototypeProgressStore
+
     private var stage = Stage.HOME
     private var generated: com.mathadventure.core.flow.GeneratedTask? = null
     private var sessionCorrect = 0
     private var sessionIncorrect = 0
-    private lateinit var progressStore: PrototypeProgressStore
 
     private lateinit var renderer: AdventureRenderer
     private lateinit var title: TextView
@@ -71,30 +52,108 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         progressStore = PrototypeProgressStore(this)
+        masteryStore = AndroidMasteryStateStore(this)
+        masterySystem = PolicyDrivenMasterySystem(masteryStore, ApprovedMasteryPolicy())
+        flow = CoreLearningFlow(
+            adaptive = RuleBasedAdaptiveEngine(Curriculum.mvp(), adaptivePolicy()),
+            generator = DeterministicTaskGenerator(),
+            validation = TaskValidationPipeline(
+                StructuralTaskValidator(),
+                LogicalTaskValidator(),
+                MathematicalTaskValidator(mathEngine)
+            ),
+            mathEngine = mathEngine,
+            mastery = masterySystem
+        )
+
         val root = FrameLayout(this)
         renderer = AdventureRenderer(this)
         root.addView(renderer)
-        val hud = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(28, 20, 28, 20) }
+
+        val hud = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(28, 20, 28, 20)
+        }
         title = textView(24f)
         message = textView(17f)
         hud.addView(title)
         hud.addView(message)
-        val bottom = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER; setPadding(28, 8, 28, 22) }
+
+        val bottom = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER
+            setPadding(28, 8, 28, 22)
+        }
         action = Button(this).apply { setOnClickListener { advance() } }
         bottom.addView(action, LinearLayout.LayoutParams(-1, 62))
-        answers = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER; visibility = View.GONE }
-        listOf("14", "15", "17", "18").forEach { value ->
-            answers.addView(Button(this).apply {
-                text = value
-                setTextColor(Color.WHITE)
-                setOnClickListener { submit(value) }
-            }, LinearLayout.LayoutParams(0, 62, 1f))
+
+        answers = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+            visibility = View.GONE
         }
         bottom.addView(answers)
+
         root.addView(hud, FrameLayout.LayoutParams(-1, -2))
         root.addView(bottom, FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM))
         setContentView(root)
         renderStage()
+    }
+
+    private fun adaptivePolicy(): AdaptivePolicy = object : AdaptivePolicy {
+        override fun priority(candidate: AdaptiveCandidate): AdaptivePriority? =
+            when {
+                !candidate.requiredPrerequisitesSatisfied -> AdaptivePriority.REQUIRED_PREREQUISITE
+                candidate.state.consecutiveErrors >= 2 -> AdaptivePriority.RECENT_ERROR_RECOVERY
+                candidate.state.reviewState == "REVIEW" -> AdaptivePriority.DUE_REVIEW
+                candidate.state.mastery < 4 -> AdaptivePriority.REINFORCE
+                else -> AdaptivePriority.ADVANCE
+            }
+
+        override fun mode(candidate: AdaptiveCandidate): TaskMode = TaskMode.DIRECT
+
+        override fun difficulty(candidate: AdaptiveCandidate): Int =
+            when {
+                candidate.state.consecutiveErrors >= 2 -> 1
+                candidate.state.mastery <= 1 -> 1
+                candidate.state.mastery == 2 -> 2
+                else -> 3
+            }
+
+        override fun contextType(candidate: AdaptiveCandidate): String = "BATTLE"
+    }
+
+    private fun skillStates(): List<SkillState> =
+        listOf("ADD_BASIC", "ADD_CROSS_TEN").map { masterySystem.getSkillState(playerId, it) }
+
+    private fun generateMathTask() {
+        generated = flow.generateNext(
+            playerId = playerId,
+            skillStates = skillStates(),
+            availableSkills = setOf("ADD_BASIC", "ADD_CROSS_TEN"),
+            inputType = InputType.NUMERIC
+        )
+        showAnswerOptions(generated!!.task.answerSpec)
+    }
+
+    private fun showAnswerOptions(answerSpec: String) {
+        answers.removeAllViews()
+        val correct = answerSpec.toIntOrNull() ?: return
+        val offsets = listOf(-1, 0, 1, 10)
+        val values = offsets.map { correct + it }.distinct()
+        val ordered = when (correct % 4) {
+            0 -> values
+            1 -> values.reversed()
+            2 -> listOf(values[1], values[0], values[3], values[2])
+            else -> listOf(values[2], values[3], values[0], values[1])
+        }
+        ordered.forEach { value ->
+            answers.addView(Button(this).apply {
+                text = value.toString()
+                setTextColor(Color.WHITE)
+                setOnClickListener { submit(value.toString()) }
+            }, LinearLayout.LayoutParams(0, 62, 1f))
+        }
     }
 
     private fun textView(size: Float) = TextView(this).apply {
@@ -114,22 +173,27 @@ class MainActivity : Activity() {
         renderStage()
     }
 
-    private fun generateMathTask() {
-        val numCompare = masterySystem.getSkillState(playerId, "NUM_COMPARE").copy(mastery = 3)
-        val add = masterySystem.getSkillState(playerId, "ADD_BASIC")
-        generated = flow.generateNext(playerId, listOf(numCompare, add), setOf("ADD_BASIC"), InputType.NUMERIC)
-    }
-
     private fun submit(value: String) {
         val current = generated ?: return
-        val answered = flow.answer(playerId, current, "attempt-" + System.currentTimeMillis(), value, System.currentTimeMillis())
+        val answered = flow.answer(
+            playerId = playerId,
+            generated = current,
+            attemptId = "attempt-" + System.currentTimeMillis(),
+            submittedAnswer = value,
+            timestampEpochMillis = System.currentTimeMillis(),
+            evidenceMetadata = mapOf(
+                "difficultyBand" to if (current.task.difficulty <= 1) "INTRO" else "NORMAL",
+                "evidenceDiverse" to (current.task.contextType == "BATTLE").toString()
+            )
+        )
+
         if (answered.evaluation.result == AnswerResult.CORRECT) {
             sessionCorrect++
             progressStore.recordCorrect()
             stage = Stage.RETURN_HOME
             renderer.setVictory(true)
             title.text = "Победа!"
-            message.text = "Правильно. Mastery навыка: " + answered.mastery.mastery + "/5"
+            message.text = "Правильно. ${answered.generated.task.skillId}: Mastery ${answered.mastery.mastery}/5."
             action.text = "Вернуться домой"
             answers.visibility = View.GONE
         } else {
@@ -170,7 +234,7 @@ class MainActivity : Activity() {
             }
             Stage.RETURN_HOME -> {
                 title.text = "Возвращение"
-                message.text = "Игровой цикл завершён. Всего правильных ответов: ${progressStore.totalCorrect}."
+                message.text = "Игровой цикл завершён. Правильных ответов в сохранении: ${progressStore.totalCorrect}."
                 action.text = "Вернуться домой"
                 answers.visibility = View.GONE
             }
