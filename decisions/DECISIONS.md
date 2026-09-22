@@ -55,3 +55,11 @@ Status: Approved
 PR #38 added the first executable Quest System foundation from approved `docs/18_QUEST_SYSTEM.md`: quest definitions/states, objective progression, prerequisite boundary, completion event identity, and the first onboarding chain. Repository QA, Core Domain QA, and Android Prototype QA passed. PR #38 was merged into `main` as `584c7f21ab4efac4ecdd646fedc482fa864497be`.
 
 Quest System remains separate from Math correctness/Mastery/Adaptive logic and does not grant RPG rewards directly. The next integration step is to connect quest completion events to Game Progression and the existing Android vertical slice without moving reward ownership into Quest System.
+
+
+## D-009 — Quest completion to Game Progression integration
+Status: Approved
+
+PR #39 connected the Quest System completion boundary to Game Progression. Quest completion is mapped to `QUEST_COMPLETED` events; the Game Reward Policy owns XP/Coins; one-time quests are anti-farmed by stable quest `sourceId`; event IDs remain idempotent. The Android prototype now persists quest state and executes the first Home → Village → Forest → First Battle → Home quest chain. Repeatable quest reward semantics remain explicitly unsupported in the prototype until their economy policy is defined.
+
+PR #39 passed Repository QA, Core Domain QA, and Android Prototype QA and was merged into `main` as `1c227ad6f2b680e741e966e6d465220bc9b43851`.
