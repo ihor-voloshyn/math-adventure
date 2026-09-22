@@ -59,6 +59,10 @@ class MainActivity : Activity() {
     )
     private var stage = Stage.HOME
     private var generated: com.mathadventure.core.flow.GeneratedTask? = null
+    private var sessionCorrect = 0
+    private var sessionIncorrect = 0
+    private var lastTaskSignature = ""
+
     private lateinit var renderer: AdventureRenderer
     private lateinit var title: TextView
     private lateinit var message: TextView
@@ -102,7 +106,7 @@ class MainActivity : Activity() {
     private fun submit(value: String) {
         val current = generated ?: return
         val answered = flow.answer(playerId, current, "attempt-" + System.currentTimeMillis(), value, System.currentTimeMillis())
-        if (answered.evaluation.result == AnswerResult.CORRECT) {
+        if (answered.evaluation.result == AnswerResult.CORRECT) {\n            sessionCorrect++
             stage = Stage.RETURN_HOME
             renderer.setVictory(true)
             title.text = "Победа!"
