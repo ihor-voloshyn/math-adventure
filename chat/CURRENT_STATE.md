@@ -58,7 +58,10 @@ Full-chat archival is part of the project workflow. Between each pair of «со�
 - No unlocks are granted yet by the prototype unlock policy.
 - PR #38 added and QA-validated the Quest System foundation, then merged into `main` as `584c7f21ab4efac4ecdd646fedc482fa864497be`.
 - Quest System foundation now defines quest states, objectives, prerequisites, completion event identity, and the first Home → Village → Forest → First Battle → Home chain.
-- Quest completion currently emits an idempotent event identity boundary but is not yet wired into Game Progression or the Android UI.
+- Quest completion now maps to `QUEST_COMPLETED → CoreGameProgressionFlow`; one-time quest rewards are owned by Game Progression and are idempotent.
+- PR #39 passed Repository QA, Core Domain QA, and Android Prototype QA and merged into `main` as `1c227ad6f2b680e741e966e6d465220bc9b43851`.
+- Android prototype now persists the first quest chain locally and wires Home → Village → Forest → First Battle → Home objectives to quest completion rewards.
+- Repeatable quest reward semantics remain explicitly unsupported by the prototype policy until the final repeatable-economy rules are defined.
 - Quest System does not own Math Engine, Mastery, Adaptive Engine, or RPG rewards.
 
 ## Recovery procedure for a new chat
@@ -70,3 +73,11 @@ Full-chat archival is part of the project workflow. Between each pair of «со�
 5. Compare those checkpoints with the product/technical documents before continuing.
 6. Inspect open PRs and QA status before modifying implementation.
 7. Verify the canonical main branch and obsolete PR/branch references after progression changes.
+
+
+## Latest implementation checkpoint — Quest progression integration
+- Quest completion is now an explicit Game Progression event boundary.
+- One-time quest completions grant prototype rewards of 75 XP and 15 Coins; these are vertical-slice tuning, not final economy values.
+- Android quest state uses local SharedPreferences prototype persistence.
+- The first story chain is executable through the existing visual prototype without moving reward ownership into Quest.
+- Next logical implementation block: strengthen the integrated vertical slice with explicit quest/combat integration tests and then proceed to the next MVP gameplay system/content block.
