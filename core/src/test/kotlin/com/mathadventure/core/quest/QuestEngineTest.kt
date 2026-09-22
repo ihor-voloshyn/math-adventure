@@ -56,9 +56,9 @@ class QuestEngineTest {
         )
 
         assertEquals(QuestState.COMPLETED, updated.state)
-        val completion = engine.completion("p1", "story_home_to_village", "instance-1")
+        val completion = engine.completion("p1", "story_home_to_village", "session-1")
         assertNotNull(completion)
-        assertEquals("quest-completed-instance-1", completion.eventId)
+        assertEquals("quest-completed-session-1", completion.eventId)
         assertEquals(200L, completion.completedAtEpochMillis)
         assertNull(engine.completion("p1", "story_village_to_forest", "instance-2"))
     }

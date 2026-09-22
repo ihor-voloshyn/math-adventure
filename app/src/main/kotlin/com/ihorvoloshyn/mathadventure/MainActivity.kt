@@ -26,6 +26,7 @@ import com.mathadventure.core.gameprogression.DefaultRpgLevelPolicy
 import com.mathadventure.core.gameprogression.PrototypeGameRewardPolicy
 import com.mathadventure.core.gameprogression.PrototypeGameUnlockPolicy
 import com.mathadventure.core.gameprogression.ProgressionCommit
+import com.mathadventure.core.gameprogression.QuestProgressionCoordinator
 import com.mathadventure.core.gameprogression.QuestProgressionEventMapper
 import com.mathadventure.core.quest.FirstQuestChain
 import com.mathadventure.core.quest.QuestEngine
@@ -55,6 +56,7 @@ class MainActivity : Activity() {
     private lateinit var progressStore: PrototypeProgressStore
     private lateinit var gameProgression: CoreGameProgressionFlow
     private lateinit var gameProgressionStore: AndroidGameProgressionStore
+    private lateinit var questProgression: QuestProgressionCoordinator
     private lateinit var questStore: AndroidQuestStore
     private lateinit var questEngine: QuestEngine
 
@@ -80,6 +82,10 @@ class MainActivity : Activity() {
             levelPolicy = DefaultRpgLevelPolicy(),
             unlockPolicy = PrototypeGameUnlockPolicy(),
             store = gameProgressionStore
+        )
+        questProgression = QuestProgressionCoordinator(
+            outbox = AndroidQuestProgressionOutbox(this),
+            progression = gameProgression
         )
         questStore = AndroidQuestStore(this)
         questEngine = QuestEngine(
@@ -137,6 +143,7 @@ class MainActivity : Activity() {
         root.addView(hud, FrameLayout.LayoutParams(-1, -2))
         root.addView(bottom, FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM))
         setContentView(root)
+        questProgression.recover(playerId)
         ensureQuestStarted("story_home_to_village")
         renderStage()
     }
@@ -167,7 +174,7 @@ class MainActivity : Activity() {
             questId = questId,
             instanceId = updated.sessionId ?: error("completed quest has no session id")
         ) ?: return null
-        return gameProgression.record(QuestProgressionEventMapper.map(completion, definition.repeatability))
+        return questProgression.record(QuestProgressionEventMapper.map(completion, definition.repeatability))
     }
 
     private fun adaptivePolicy(): AdaptivePolicy = object : AdaptivePolicy {
