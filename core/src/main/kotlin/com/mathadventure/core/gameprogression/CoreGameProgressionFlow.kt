@@ -6,7 +6,13 @@ class CoreGameProgressionFlow(
     private val unlockPolicy: GameUnlockPolicy,
     private val store: GameProgressionStore
 ) {
-    fun record(event: GameProgressionEvent): ProgressionCommit? {
+    /**
+     * Builds the progression commit without persisting it.
+     *
+     * Coordinators that need to atomically combine progression with another
+     * owned subsystem (for example Inventory) use this preparation boundary.
+     */
+    fun prepare(event: GameProgressionEvent): ProgressionCommit? {
         val state = store.get(event.playerId)
         if (event.eventId in state.grantedEventIds) return null
 
@@ -15,7 +21,7 @@ class CoreGameProgressionFlow(
 
         val levelBefore = state.rpgLevel
         val levelAfter = levelPolicy.levelFor(state.totalXp + evaluation.reward.xpDelta)
-        val commit = ProgressionCommit(
+        return ProgressionCommit(
             event = event,
             reward = evaluation.reward,
             levelBefore = levelBefore,
@@ -23,6 +29,10 @@ class CoreGameProgressionFlow(
             unlocks = unlockPolicy.unlocksFor(levelBefore, levelAfter),
             bestResultAfter = evaluation.bestResultAfter
         )
+    }
+
+    fun record(event: GameProgressionEvent): ProgressionCommit? {
+        val commit = prepare(event) ?: return null
         store.commit(commit)
         return commit
     }
