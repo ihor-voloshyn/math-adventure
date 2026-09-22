@@ -73,3 +73,16 @@ MVP rules:
 - RPG Level and equipment may affect game combat parameters but cannot bypass required mathematical prerequisites.
 - Combat difficulty and Math Difficulty are separate concepts.
 - No real-time response speed requirement is used as a mathematical competence gate.
+
+## R-021 — Items & Equipment
+
+**Status:** Approved by Product Owner delegation ("делай на свое усмотрение").
+
+MVP rules:
+- Inventory has no weight limit.
+- Equipment uses a small fixed slot model and has visible equipped appearance.
+- Rarity is an RPG property, not a measure of mathematical mastery.
+- RPG Level may gate equipment; Mastery does not directly gate equipment.
+- Defeat does not destroy confirmed equipment or inventory.
+- Item acquisition flows through Game Event / Reward / Inventory boundaries and is idempotent.
+- Complex crafting, upgrades and mandatory set bonuses are out of MVP.
