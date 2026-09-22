@@ -1,0 +1,69 @@
+package com.mathadventure.core.combat
+
+enum class CombatAction { ATTACK, DEFEND, FLEE }
+
+enum class CombatResolution { HIT, MISS, BLOCKED, FLED, VICTORY, DEFEAT }
+
+data class CombatState(
+    val combatId: String,
+    val heroHearts: Int = 3,
+    val enemyHp: Int = 3,
+    val playerTurn: Boolean = true,
+    val active: Boolean = true
+) {
+    init {
+        require(heroHearts >= 0) { "heroHearts must be non-negative" }
+        require(enemyHp >= 0) { "enemyHp must be non-negative" }
+    }
+}
+
+data class CombatOutcome(
+    val state: CombatState,
+    val resolution: CombatResolution,
+    val gameEventType: String? = null
+)
+
+class CombatEngine {
+    fun start(combatId: String, heroHearts: Int = 3, enemyHp: Int = 3): CombatState =
+        CombatState(combatId = combatId, heroHearts = heroHearts, enemyHp = enemyHp)
+
+    fun resolveMathAction(state: CombatState, action: CombatAction, correct: Boolean): CombatOutcome {
+        require(state.active) { "combat is not active" }
+        require(state.playerTurn) { "it is not the player's turn" }
+
+        if (action == CombatAction.FLEE) {
+            return CombatOutcome(state.copy(active = false, playerTurn = false), CombatResolution.FLED)
+        }
+
+        if (!correct) {
+            val next = state.copy(playerTurn = false)
+            return enemyTurn(next, CombatResolution.MISS)
+        }
+
+        return when (action) {
+            CombatAction.ATTACK -> {
+                val hp = (state.enemyHp - 1).coerceAtLeast(0)
+                if (hp == 0) {
+                    CombatOutcome(
+                        state.copy(enemyHp = 0, active = false, playerTurn = false),
+                        CombatResolution.VICTORY,
+                        "COMBAT_VICTORY"
+                    )
+                } else {
+                    enemyTurn(state.copy(enemyHp = hp, playerTurn = false), CombatResolution.HIT)
+                }
+            }
+            CombatAction.DEFEND -> enemyTurn(state.copy(playerTurn = false), CombatResolution.BLOCKED)
+            CombatAction.FLEE -> error("handled above")
+        }
+    }
+
+    private fun enemyTurn(state: CombatState, playerResolution: CombatResolution): CombatOutcome {
+        val hearts = (state.heroHearts - 1).coerceAtLeast(0)
+        return if (hearts == 0) {
+            CombatOutcome(state.copy(heroHearts = 0, active = false, playerTurn = false), CombatResolution.DEFEAT)
+        } else {
+            CombatOutcome(state.copy(heroHearts = hearts, playerTurn = true), playerResolution)
+        }
+    }
+}
