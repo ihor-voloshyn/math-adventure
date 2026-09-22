@@ -15,6 +15,7 @@ Phase 2 — Core implementation
 - [ ] End-to-end vertical slice acceptance
 - [ ] Offline/crash-recovery verification
 - [ ] Android MVP validation
+- [x] Prototype 3D camera rotation
 
 ## Phase 4 — Content and expansion
 - [ ] World content
