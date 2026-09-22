@@ -108,3 +108,24 @@ Quest completion is now integrated with the Game Progression boundary. Quest rem
 1. Add explicit integration coverage for Quest → Game Progression and the full first story/combat chain.
 2. Verify offline/crash-recovery behavior for combined quest and progression persistence.
 3. Continue the playable vertical slice with the next approved gameplay/content block without moving mathematical or reward ownership into Quest.
+
+
+## Future commercial and community direction
+A future commercial layer is approved as a planning direction, not as a current product requirement. The MVP remains free/no-ads with monetization scaffold only.
+
+The future plan may use product revenue and/or other project funding to finance:
+- production servers and backend infrastructure;
+- AI/API and specialized agent usage;
+- CI/CD, QA and security infrastructure;
+- 3D/content/localization production;
+- structured compensation for eligible early users participating in testing and feedback;
+- rewards/bounties for external idea contributors.
+
+The future contributor model must remain separate from game progression. Participation, payments and idea rewards must never create gameplay advantages or bypass Math/Mastery/RPG rules.
+
+A future Idea Contributor workflow is planned as:
+challenge → submission → product/AI review → prototype → user validation → acceptance → reward.
+
+Before any paid contributor program launches, the project must define appropriate legal, payment, child-safety, consent, attribution and intellectual-property rules. For child testing, participation and any compensation must be handled through parents/guardians as required.
+
+Final product decisions remain with the Founder/Product Sponsor. External ideas can enter the backlog only through the approved product decision process.
