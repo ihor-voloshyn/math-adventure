@@ -69,3 +69,13 @@
 - Define Quests and World/Story integration.
 - Build the first visual asset slice.
 - Assemble and test the first Playable Prototype.
+
+
+## 2026-09-22
+- Approved Quest System v1.0 with child-readable objectives, first quest chain, offline/idempotent completion and strict ownership boundaries.
+- Approved World & Story v1.0 with Home/Village/Forest/Dungeon structure, gradual Dragon story, visible progression and first playable world slice.
+
+## Next
+- Implement the first visual asset slice.
+- Assemble the first Playable Prototype.
+- Child-test the core loop before expanding the Vertical Slice.
