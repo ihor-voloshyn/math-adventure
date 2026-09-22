@@ -34,3 +34,11 @@
 - Define Pet progression and bonuses.
 - Define Home/Territory progression.
 - Define Quests and World/Story integration.
+
+## 2026-09-22
+- Approved Items & Equipment v1.0: weightless inventory, fixed slots, visible equipment, RPG-level requirements, no direct Mastery gating, atomic rewards and defeat-safe confirmed ownership.
+
+## Next
+- Define Pet progression and bonuses.
+- Define Home/Territory progression.
+- Define Quests and World/Story integration.
