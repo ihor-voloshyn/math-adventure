@@ -438,12 +438,11 @@ class MainActivity : Activity() {
                 action.text = "Идти в деревню"
                 equipmentButton.visibility = if (ownedSword) View.VISIBLE else View.GONE
                 equipmentButton.text = if (weapon != null) "Снять меч" else "Экипировать меч"
-                equipmentButton.visibility = View.GONE
-                equipmentButton.visibility = View.GONE
                 answers.visibility = View.GONE
             }
             Stage.VILLAGE -> {
                 title.text = "Деревенская площадь"
+                equipmentButton.visibility = View.GONE
                 message.text = "NPC просит проверить дорогу в лес."
                 action.text = "Идти в лес"
                 answers.visibility = View.GONE
@@ -468,6 +467,7 @@ class MainActivity : Activity() {
                 title.text = "Возвращение"
                 message.text = "Игровой цикл завершён. Правильных ответов в сохранении: ${progressStore.totalCorrect}."
                 action.text = "Вернуться домой"
+                equipmentButton.visibility = View.GONE
                 answers.visibility = View.GONE
             }
         }
