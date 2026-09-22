@@ -171,7 +171,7 @@ class MainActivity : Activity() {
             answers.addView(Button(this).apply {
                 text = value.toString()
                 setTextColor(Color.WHITE)
-                setOnClickListener { submit(value.toString()) }
+                setOnClickListener { submitAttack(value.toString()) }
             }, LinearLayout.LayoutParams(0, 62, 1f))
         }
     }
