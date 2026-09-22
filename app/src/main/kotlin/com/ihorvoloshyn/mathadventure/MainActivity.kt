@@ -20,6 +20,7 @@ import com.mathadventure.core.combat.CombatState
 import com.mathadventure.core.curriculum.Curriculum
 import com.mathadventure.core.flow.CoreLearningFlow
 import com.mathadventure.core.gameprogression.CoreGameProgressionFlow
+import com.mathadventure.core.gameprogression.GameProgressionLootCoordinator
 import com.mathadventure.core.gameprogression.GameEventType
 import com.mathadventure.core.gameprogression.GameProgressionEvent
 import com.mathadventure.core.gameprogression.DefaultRpgLevelPolicy
@@ -55,7 +56,8 @@ class MainActivity : Activity() {
     private lateinit var flow: CoreLearningFlow
     private lateinit var progressStore: PrototypeProgressStore
     private lateinit var gameProgression: CoreGameProgressionFlow
-    private lateinit var gameProgressionStore: AndroidGameProgressionStore
+    private lateinit var gameProgressionStore: AndroidGameProgressionInventoryStore
+    private lateinit var gameProgressionLoot: GameProgressionLootCoordinator
     private lateinit var questProgression: QuestProgressionCoordinator
     private lateinit var questStore: AndroidQuestStore
     private lateinit var questEngine: QuestEngine
@@ -76,12 +78,17 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         progressStore = PrototypeProgressStore(this)
-        gameProgressionStore = AndroidGameProgressionStore(this)
+        gameProgressionStore = AndroidGameProgressionInventoryStore(this, PrototypeItemCatalog.definitions)
         gameProgression = CoreGameProgressionFlow(
             rewardPolicy = PrototypeGameRewardPolicy(),
             levelPolicy = DefaultRpgLevelPolicy(),
             unlockPolicy = PrototypeGameUnlockPolicy(),
             store = gameProgressionStore
+        )
+        gameProgressionLoot = GameProgressionLootCoordinator(
+            progression = gameProgression,
+            store = gameProgressionStore,
+            lootFactory = com.mathadventure.core.items.DeterministicLootItemFactory(PrototypeItemCatalog.definitions)
         )
         questProgression = QuestProgressionCoordinator(
             outbox = AndroidQuestProgressionOutbox(this),
@@ -285,7 +292,7 @@ class MainActivity : Activity() {
                 renderer.setVictory(true)
                 val questCommit = recordQuestObjective("story_first_battle", "win_first_battle")
                 val combatId = combatState!!.combatId
-                val commit = gameProgression.record(
+                val commit = gameProgressionLoot.record(
                     GameProgressionEvent(
                         eventId = "combat-victory-" + combatId,
                         playerId = playerId,
