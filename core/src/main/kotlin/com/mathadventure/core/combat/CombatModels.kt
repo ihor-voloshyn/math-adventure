@@ -65,7 +65,14 @@ class CombatEngine {
                     )
                 }
             }
-            CombatAction.DEFEND -> enemyTurn(state.copy(playerTurn = false), CombatResolution.BLOCKED)
+            CombatAction.DEFEND -> {
+                // Defending consumes the player's action but blocks the enemy attack.
+                // It must never remove a hero heart.
+                CombatOutcome(
+                    state.copy(playerTurn = true),
+                    CombatResolution.BLOCKED
+                )
+            }
             CombatAction.FLEE -> error("handled above")
         }
     }
