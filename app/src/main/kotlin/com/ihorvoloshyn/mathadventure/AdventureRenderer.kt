@@ -122,8 +122,8 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             }
 
             // The hero and pet are always visible so the player has a clear avatar identity.
-            drawHero(-1.5f, 0f, 1.4f)
-            drawPet(0.0f, 0f, 1.8f)
+            drawHero(-0.9f, 0f, 1.7f)
+            drawPet(0.65f, 0f, 1.85f)
 
             when (stage) {
                 1 -> drawNpc(1.8f, 0f, -1.2f)
@@ -134,13 +134,13 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
 
         private fun drawHome() {
             // House: walls + pitched roof + door + windows.
-            cube(-2.6f, 1.0f, -1.9f, 3.5f, 2.1f, 2.8f, 0.78f, 0.48f, 0.30f)
-            cone(-2.6f, 2.65f, -1.9f, 2.55f, 1.25f, 0.86f, 0.18f, 0.12f)
-            cube(-2.6f, 0.75f, -0.33f, 0.65f, 1.25f, 0.18f, 0.18f, 0.08f, 0.04f)
-            cube(-1.35f, 1.25f, -0.46f, 0.55f, 0.65f, 0.08f, 0.24f, 0.62f, 0.82f)
-            cube(-3.85f, 1.25f, -0.46f, 0.55f, 0.65f, 0.08f, 0.24f, 0.62f, 0.82f)
-            cylinder(-2.6f, 2.85f, -1.9f, 0.18f, 0.70f, 0.32f, 0.32f, 0.34f)
-            cube(-2.6f, 2.50f, -0.46f, 2.8f, 0.08f, 0.10f, 0.58f, 0.34f, 0.18f)
+            cube(-2.6f, 0.95f, -2.2f, 3.2f, 1.9f, 2.2f, 0.78f, 0.48f, 0.30f)
+            cone(-2.6f, 2.65f, -2.2f, 2.35f, 1.20f, 0.86f, 0.18f, 0.12f)
+            cube(-2.6f, 0.72f, 0.02f, 0.62f, 1.12f, 0.12f, 0.18f, 0.08f, 0.04f)
+            cube(-1.35f, 1.25f, 0.04f, 0.55f, 0.65f, 0.08f, 0.24f, 0.62f, 0.82f)
+            cube(-3.85f, 1.25f, 0.04f, 0.55f, 0.65f, 0.08f, 0.24f, 0.62f, 0.82f)
+            cylinder(-2.6f, 2.85f, -2.2f, 0.18f, 0.70f, 0.32f, 0.32f, 0.34f)
+            cube(-2.6f, 2.50f, 0.04f, 2.8f, 0.08f, 0.10f, 0.58f, 0.34f, 0.18f)
             cylinder(-0.8f, 0.22f, 0.6f, 0.55f, 0.32f, 0.62f, 0.38f, 0.22f)
             cylinder(-1.45f, 0.22f, 0.55f, 0.22f, 0.72f, 0.42f, 0.22f, 0.09f)
             cylinder(-1.05f, 0.18f, 0.62f, 0.20f, 0.62f, 0.50f, 0.27f, 0.11f)
@@ -185,8 +185,8 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             val furG = if (heroKind == HeroKind.CAT) 0.48f else 0.32f
             val furB = if (heroKind == HeroKind.CAT) 0.30f else 0.18f
             sphere(x, y + 0.92f + bob, z, 0.56f, 0.78f, 0.46f, furR, furG, furB)
-            sphere(x, y + 1.66f + bob, z - 0.02f, 0.50f, 0.48f, 0.46f, furR, furG, furB)
-            sphere(x, y + 1.56f + bob, z - 0.40f, 0.30f, 0.24f, 0.24f, 0.82f, 0.62f, 0.46f)
+            sphere(x, y + 1.66f + bob, z + 0.02f, 0.50f, 0.48f, 0.46f, furR, furG, furB)
+            sphere(x, y + 1.56f + bob, z + 0.40f, 0.30f, 0.24f, 0.24f, 0.82f, 0.62f, 0.46f)
             if (heroKind == HeroKind.CAT) {
                 cone(x - 0.30f, y + 2.10f + bob, z, 0.22f, 0.52f, furR, furG, furB)
                 cone(x + 0.30f, y + 2.10f + bob, z, 0.22f, 0.52f, furR, furG, furB)
@@ -198,32 +198,32 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
                 sphere(x, y + 1.52f + bob, z - 0.48f, 0.24f, 0.16f, 0.18f, 0.20f, 0.12f, 0.08f)
                 cylinder(x + 0.48f, y + 0.98f + bob, z + 0.04f, 0.10f, 0.62f, furR, furG, furB)
             }
-            sphere(x - 0.17f, y + 1.72f + bob, z - 0.43f, 0.07f, 0.07f, 0.05f, 0.03f, 0.03f, 0.03f)
-            sphere(x + 0.17f, y + 1.72f + bob, z - 0.43f, 0.07f, 0.07f, 0.05f, 0.03f, 0.03f, 0.03f)
-            sphere(x, y + 1.58f + bob, z - 0.64f, 0.07f, 0.06f, 0.05f, 0.12f, 0.05f, 0.04f)
+            sphere(x - 0.17f, y + 1.72f + bob, z + 0.43f, 0.07f, 0.07f, 0.05f, 0.03f, 0.03f, 0.03f)
+            sphere(x + 0.17f, y + 1.72f + bob, z + 0.43f, 0.07f, 0.07f, 0.05f, 0.03f, 0.03f, 0.03f)
+            sphere(x, y + 1.58f + bob, z + 0.64f, 0.07f, 0.06f, 0.05f, 0.12f, 0.05f, 0.04f)
             // Facial pads and collar improve the animal silhouette.
-            sphere(x - 0.20f, y + 1.52f + bob, z - 0.60f, 0.12f, 0.10f, 0.08f, 0.72f, 0.50f, 0.36f)
-            sphere(x + 0.20f, y + 1.52f + bob, z - 0.60f, 0.12f, 0.10f, 0.08f, 0.72f, 0.50f, 0.36f)
+            sphere(x - 0.20f, y + 1.52f + bob, z + 0.60f, 0.12f, 0.10f, 0.08f, 0.72f, 0.50f, 0.36f)
+            sphere(x + 0.20f, y + 1.52f + bob, z + 0.60f, 0.12f, 0.10f, 0.08f, 0.72f, 0.50f, 0.36f)
             // Whiskers give the cat a readable face even at the gameplay camera distance.
-            cylinder(x - 0.30f, y + 1.55f + bob, z - 0.67f, 0.018f, 0.34f, 0.88f, 0.82f, 0.72f)
-            cylinder(x + 0.30f, y + 1.55f + bob, z - 0.67f, 0.018f, 0.34f, 0.88f, 0.82f, 0.72f)
-            cylinder(x, y + 1.27f + bob, z - 0.02f, 0.31f, 0.08f, 0.82f, 0.64f, 0.12f)
-            sphere(x, y + 1.25f + bob, z - 0.34f, 0.06f, 0.06f, 0.04f, 0.95f, 0.72f, 0.10f)
+            cylinder(x - 0.30f, y + 1.55f + bob, z + 0.67f, 0.018f, 0.34f, 0.88f, 0.82f, 0.72f)
+            cylinder(x + 0.30f, y + 1.55f + bob, z + 0.67f, 0.018f, 0.34f, 0.88f, 0.82f, 0.72f)
+            cylinder(x, y + 1.27f + bob, z + 0.02f, 0.31f, 0.08f, 0.82f, 0.64f, 0.12f)
+            sphere(x, y + 1.25f + bob, z + 0.34f, 0.06f, 0.06f, 0.04f, 0.95f, 0.72f, 0.10f)
             cube(x, y + 1.02f + bob, z - 0.04f, 0.58f, 0.10f, 0.48f, 0.18f, 0.24f, 0.34f)
             sphere(x - 0.43f, y + 1.12f + bob, z, 0.18f, 0.13f, 0.25f, 0.22f, 0.30f, 0.40f)
             sphere(x + 0.43f, y + 1.12f + bob, z, 0.18f, 0.13f, 0.25f, 0.22f, 0.30f, 0.40f)
-            sphere(x, y + 1.05f + bob, z - 0.31f, 0.11f, 0.11f, 0.05f, 0.86f, 0.64f, 0.16f)
+            sphere(x, y + 1.05f + bob, z + 0.31f, 0.11f, 0.11f, 0.05f, 0.86f, 0.64f, 0.16f)
             cylinder(x - 0.23f, y + 0.24f, z, 0.15f, 0.62f, furR, furG, furB)
             cylinder(x + 0.23f, y + 0.24f, z, 0.15f, 0.62f, furR, furG, furB)
-            sphere(x - 0.23f, y + 0.02f, z - 0.02f, 0.18f, 0.10f, 0.28f, 0.12f, 0.12f, 0.14f)
-            sphere(x + 0.23f, y + 0.02f, z - 0.02f, 0.18f, 0.10f, 0.28f, 0.12f, 0.12f, 0.14f)
+            sphere(x - 0.23f, y + 0.02f, z + 0.02f, 0.18f, 0.10f, 0.28f, 0.12f, 0.12f, 0.14f)
+            sphere(x + 0.23f, y + 0.02f, z + 0.02f, 0.18f, 0.10f, 0.28f, 0.12f, 0.12f, 0.14f)
             // Layered armor details: shoulder plates, chest emblem, belt buckle and leg guards.
             sphere(x - 0.52f, y + 1.17f + bob, z + 0.02f, 0.24f, 0.20f, 0.28f, 0.34f, 0.40f, 0.50f)
             sphere(x + 0.52f, y + 1.17f + bob, z + 0.02f, 0.24f, 0.20f, 0.28f, 0.34f, 0.40f, 0.50f)
-            cube(x, y + 1.08f + bob, z - 0.50f, 0.20f, 0.22f, 0.06f, 0.70f, 0.58f, 0.18f)
-            sphere(x, y + 1.10f + bob, z - 0.57f, 0.08f, 0.08f, 0.04f, 0.92f, 0.78f, 0.22f)
-            cylinder(x, y + 0.82f + bob, z - 0.02f, 0.46f, 0.08f, 0.10f, 0.14f, 0.20f)
-            sphere(x, y + 0.82f + bob, z - 0.50f, 0.09f, 0.09f, 0.05f, 0.90f, 0.70f, 0.16f)
+            cube(x, y + 1.08f + bob, z + 0.50f, 0.20f, 0.22f, 0.06f, 0.70f, 0.58f, 0.18f)
+            sphere(x, y + 1.10f + bob, z + 0.57f, 0.08f, 0.08f, 0.04f, 0.92f, 0.78f, 0.22f)
+            cylinder(x, y + 0.82f + bob, z + 0.02f, 0.46f, 0.08f, 0.10f, 0.14f, 0.20f)
+            sphere(x, y + 0.82f + bob, z + 0.50f, 0.09f, 0.09f, 0.05f, 0.90f, 0.70f, 0.16f)
             sphere(x - 0.24f, y + 0.42f + bob, z - 0.01f, 0.18f, 0.16f, 0.18f, 0.26f, 0.32f, 0.40f)
             sphere(x + 0.24f, y + 0.42f + bob, z - 0.01f, 0.18f, 0.16f, 0.18f, 0.26f, 0.32f, 0.40f)
             if (equippedWeaponVisualId != null) {
@@ -254,25 +254,25 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
         private fun drawPet(x: Float, y: Float, z: Float) {
             val bob = sin(angle * 1.5f) * 0.08f
             sphere(x, y + 0.45f + bob, z, 0.62f, 0.46f, 0.78f, 0.22f, 0.54f, 0.66f)
-            sphere(x, y + 0.95f + bob, z - 0.02f, 0.44f, 0.42f, 0.48f, 0.30f, 0.66f, 0.72f)
-            sphere(x, y + 0.90f + bob, z - 0.40f, 0.24f, 0.20f, 0.18f, 0.72f, 0.82f, 0.78f)
+            sphere(x, y + 0.95f + bob, z + 0.02f, 0.44f, 0.42f, 0.48f, 0.30f, 0.66f, 0.72f)
+            sphere(x, y + 0.90f + bob, z + 0.40f, 0.24f, 0.20f, 0.18f, 0.72f, 0.82f, 0.78f)
             cone(x - 0.28f, y + 1.30f + bob, z, 0.18f, 0.42f, 0.20f, 0.48f, 0.60f)
             cone(x + 0.28f, y + 1.30f + bob, z, 0.18f, 0.42f, 0.20f, 0.48f, 0.60f)
-            sphere(x - 0.15f, y + 1.03f + bob, z - 0.42f, 0.06f, 0.06f, 0.04f, 0.02f, 0.02f, 0.02f)
-            sphere(x + 0.15f, y + 1.03f + bob, z - 0.42f, 0.06f, 0.06f, 0.04f, 0.02f, 0.02f, 0.02f)
+            sphere(x - 0.15f, y + 1.03f + bob, z + 0.42f, 0.06f, 0.06f, 0.04f, 0.02f, 0.02f, 0.02f)
+            sphere(x + 0.15f, y + 1.03f + bob, z + 0.42f, 0.06f, 0.06f, 0.04f, 0.02f, 0.02f, 0.02f)
             cylinder(x + 0.62f, y + 0.62f + bob, z + 0.02f, 0.08f, 0.52f, 0.22f, 0.54f, 0.66f)
-            sphere(x + 0.62f, y + 0.36f + bob, z - 0.02f, 0.13f, 0.10f, 0.16f, 0.16f, 0.34f, 0.42f)
+            sphere(x + 0.62f, y + 0.36f + bob, z + 0.02f, 0.13f, 0.10f, 0.16f, 0.16f, 0.34f, 0.42f)
             // Pet equipment: a small adventure harness and luminous tag.
-            cylinder(x, y + 0.54f + bob, z - 0.02f, 0.40f, 0.07f, 0.12f, 0.18f, 0.24f)
-            sphere(x, y + 0.56f + bob, z - 0.43f, 0.07f, 0.09f, 0.04f, 0.72f, 0.52f, 0.16f)
-            sphere(x, y + 0.34f + bob, z - 0.48f, 0.045f, 0.05f, 0.035f, 0.55f, 0.88f, 1.0f)
+            cylinder(x, y + 0.54f + bob, z + 0.02f, 0.40f, 0.07f, 0.12f, 0.18f, 0.24f)
+            sphere(x, y + 0.56f + bob, z + 0.43f, 0.07f, 0.09f, 0.04f, 0.72f, 0.52f, 0.16f)
+            sphere(x, y + 0.34f + bob, z + 0.48f, 0.045f, 0.05f, 0.035f, 0.55f, 0.88f, 1.0f)
             // Pet collar, tag and paws distinguish it from the hero while keeping it compact.
-            cylinder(x, y + 0.82f + bob, z - 0.43f, 0.23f, 0.07f, 0.10f, 0.24f, 0.30f)
-            sphere(x, y + 0.72f + bob, z - 0.50f, 0.08f, 0.09f, 0.05f, 0.92f, 0.68f, 0.16f)
-            sphere(x - 0.36f, y + 0.08f + bob, z - 0.28f, 0.18f, 0.10f, 0.22f, 0.14f, 0.36f, 0.44f)
-            sphere(x + 0.36f, y + 0.08f + bob, z - 0.28f, 0.18f, 0.10f, 0.22f, 0.14f, 0.36f, 0.44f)
-            sphere(x - 0.18f, y + 0.82f + bob, z - 0.49f, 0.07f, 0.05f, 0.04f, 0.08f, 0.08f, 0.08f)
-            sphere(x + 0.18f, y + 0.82f + bob, z - 0.49f, 0.07f, 0.05f, 0.04f, 0.08f, 0.08f, 0.08f)
+            cylinder(x, y + 0.82f + bob, z + 0.43f, 0.23f, 0.07f, 0.10f, 0.24f, 0.30f)
+            sphere(x, y + 0.72f + bob, z + 0.50f, 0.08f, 0.09f, 0.05f, 0.92f, 0.68f, 0.16f)
+            sphere(x - 0.36f, y + 0.08f + bob, z + 0.28f, 0.18f, 0.10f, 0.22f, 0.14f, 0.36f, 0.44f)
+            sphere(x + 0.36f, y + 0.08f + bob, z + 0.28f, 0.18f, 0.10f, 0.22f, 0.14f, 0.36f, 0.44f)
+            sphere(x - 0.18f, y + 0.82f + bob, z + 0.49f, 0.07f, 0.05f, 0.04f, 0.08f, 0.08f, 0.08f)
+            sphere(x + 0.18f, y + 0.82f + bob, z + 0.49f, 0.07f, 0.05f, 0.04f, 0.08f, 0.08f, 0.08f)
         }
 
         private fun drawNpc(x: Float, y: Float, z: Float) {
