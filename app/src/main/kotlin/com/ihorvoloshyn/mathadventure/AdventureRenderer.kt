@@ -186,7 +186,11 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             // Facial pads and collar improve the animal silhouette.
             sphere(x - 0.20f, y + 1.52f + bob, z - 0.60f, 0.12f, 0.10f, 0.08f, 0.72f, 0.50f, 0.36f)
             sphere(x + 0.20f, y + 1.52f + bob, z - 0.60f, 0.12f, 0.10f, 0.08f, 0.72f, 0.50f, 0.36f)
+            // Whiskers give the cat a readable face even at the gameplay camera distance.
+            cylinder(x - 0.30f, y + 1.55f + bob, z - 0.67f, 0.018f, 0.34f, 0.88f, 0.82f, 0.72f)
+            cylinder(x + 0.30f, y + 1.55f + bob, z - 0.67f, 0.018f, 0.34f, 0.88f, 0.82f, 0.72f)
             cylinder(x, y + 1.27f + bob, z - 0.02f, 0.31f, 0.08f, 0.82f, 0.64f, 0.12f)
+            sphere(x, y + 1.25f + bob, z - 0.34f, 0.06f, 0.06f, 0.04f, 0.95f, 0.72f, 0.10f)
             cube(x, y + 1.02f + bob, z - 0.04f, 0.58f, 0.10f, 0.48f, 0.18f, 0.24f, 0.34f)
             cylinder(x - 0.23f, y + 0.24f, z, 0.15f, 0.62f, furR, furG, furB)
             cylinder(x + 0.23f, y + 0.24f, z, 0.15f, 0.62f, furR, furG, furB)
@@ -208,6 +212,7 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             sphere(x - 0.15f, y + 1.03f + bob, z - 0.42f, 0.06f, 0.06f, 0.04f, 0.02f, 0.02f, 0.02f)
             sphere(x + 0.15f, y + 1.03f + bob, z - 0.42f, 0.06f, 0.06f, 0.04f, 0.02f, 0.02f, 0.02f)
             cylinder(x + 0.62f, y + 0.62f + bob, z + 0.02f, 0.08f, 0.52f, 0.22f, 0.54f, 0.66f)
+            sphere(x + 0.62f, y + 0.36f + bob, z - 0.02f, 0.13f, 0.10f, 0.16f, 0.16f, 0.34f, 0.42f)
         }\n\n        private fun drawNpc(x: Float, y: Float, z: Float) {
             cylinder(x, y + 0.82f, z, 0.58f, 1.25f, 0.30f, 0.58f, 0.38f)
             sphere(x, y + 1.72f, z, 0.48f, 0.88f, 0.72f, 0.55f, 0.38f)
@@ -226,6 +231,9 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             cylinder(x + 0.32f, y + 0.18f + bob, z, 0.16f, 0.52f, 0.25f, 0.14f, 0.09f)
             sphere(x - 0.20f, y + 1.58f + bob, z - 0.50f, 0.09f, 0.09f, 0.05f, 0.95f, 0.76f, 0.08f)
             sphere(x + 0.20f, y + 1.58f + bob, z - 0.50f, 0.09f, 0.09f, 0.05f, 0.95f, 0.76f, 0.08f)
+            // Goblin teeth and cheek plates.
+            sphere(x - 0.30f, y + 1.40f + bob, z - 0.55f, 0.16f, 0.12f, 0.10f, 0.52f, 0.30f, 0.18f)
+            sphere(x + 0.30f, y + 1.40f + bob, z - 0.55f, 0.16f, 0.12f, 0.10f, 0.52f, 0.30f, 0.18f)
             sphere(x, y + 1.38f + bob, z - 0.56f, 0.10f, 0.07f, 0.05f, 0.08f, 0.03f, 0.02f)
         }\n\n        private fun drawCombatEnemy(x: Float, y: Float, z: Float) {
             val bounce = if (victory) -0.45f else sin(angle * 1.5f) * 0.04f
