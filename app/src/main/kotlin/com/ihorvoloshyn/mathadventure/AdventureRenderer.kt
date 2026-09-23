@@ -40,6 +40,8 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
         private var lastTouchX = 0f
         private var lastTouchY = 0f
         private lateinit var cube: Cube
+        private lateinit var gableRoof: GableRoof
+        private lateinit var cone: LowPolyCone
 
         override fun onSurfaceCreated(
             gl: javax.microedition.khronos.opengles.GL10?,
@@ -48,6 +50,8 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             GLES20.glClearColor(0.38f, 0.62f, 0.86f, 1f)
             program = Shader.create()
             cube = Cube()
+            gableRoof = GableRoof()
+            cone = LowPolyCone()
             GLES20.glEnable(GLES20.GL_DEPTH_TEST)
         }
 
@@ -113,13 +117,22 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             drawPet(0.0f, 0f, 1.6f)
             if (stage == 1) drawNpc(1.8f, 0f, -1.2f)
             if (stage == 2 || stage == 3) drawEnemy(2.2f, 0f, -1.0f)
+            drawSceneDecor(-2.0f, 0f, -1.0f)
+            drawSceneDecor(1.0f, 0f, 1.1f)
         }
 
         private fun drawHome() {
-            cube(-2.5f, 1.1f, -1.8f, 3.4f, 2.5f, 2.8f, 0.78f, 0.48f, 0.30f)
-            cube(-2.5f, 2.65f, -1.8f, 3.8f, 0.45f, 3.1f, 0.72f, 0.16f, 0.12f)
-            cube(-2.5f, 0.75f, -0.33f, 0.75f, 1.25f, 0.15f, 0.20f, 0.10f, 0.05f)
-            cube(-3.2f, 0.2f, 0.0f, 1.0f, 0.3f, 0.7f, 0.62f, 0.42f, 0.20f)
+            // Warm cottage silhouette: wall mass + gabled roof + readable door/windows.
+            cube(-2.5f, 1.15f, -1.8f, 3.35f, 2.35f, 2.75f, 0.68f, 0.42f, 0.24f)
+            roof(-2.5f, 3.05f, -1.8f, 3.85f, 1.35f, 3.15f, 0.48f, 0.18f, 0.12f)
+            cube(-2.5f, 0.82f, -0.28f, 0.72f, 1.18f, 0.16f, 0.22f, 0.11f, 0.05f)
+            cube(-3.45f, 1.45f, -0.34f, 0.72f, 0.72f, 0.10f, 0.34f, 0.64f, 0.82f)
+            cube(-1.55f, 1.45f, -0.34f, 0.72f, 0.72f, 0.10f, 0.34f, 0.64f, 0.82f)
+            cube(-3.85f, 0.35f, -0.05f, 0.32f, 0.18f, 0.32f, 0.84f, 0.68f, 0.28f)
+            cube(-1.15f, 0.35f, -0.05f, 0.32f, 0.18f, 0.32f, 0.84f, 0.68f, 0.28f)
+            cube(-1.25f, 3.45f, -2.35f, 0.28f, 0.65f, 0.28f, 0.38f, 0.25f, 0.20f)
+            // Small pet-bed marker in the yard.
+            cube(-3.25f, 0.20f, 0.25f, 0.72f, 0.18f, 0.48f, 0.70f, 0.38f, 0.20f)
         }
 
         private fun drawVillage() {
@@ -138,43 +151,106 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
         }
 
         private fun drawHero(x: Float, y: Float, z: Float) {
-            cube(x, y + 1.0f, z, 0.75f, 1.5f, 0.55f, 0.25f, 0.42f, 0.78f)
-            cube(x, y + 2.0f, z, 0.7f, 0.7f, 0.7f, 0.95f, 0.78f, 0.58f)
-            cube(x - 0.24f, y + 0.2f, z, 0.2f, 0.7f, 0.3f, 0.15f, 0.16f, 0.25f)
-            cube(x + 0.24f, y + 0.2f, z, 0.2f, 0.7f, 0.3f, 0.15f, 0.16f, 0.25f)
+            val bob = sin(angle * 0.035f) * 0.035f
+            // Tunic, belt, boots and head read as a character rather than stacked blocks.
+            cube(x, y + 1.0f + bob, z, 0.62f, 1.15f, 0.48f, 0.20f, 0.36f, 0.72f)
+            cube(x, y + 1.82f + bob, z, 0.48f, 0.55f, 0.48f, 0.95f, 0.78f, 0.58f)
+            cube(x, y + 1.23f + bob, z, 0.68f, 0.10f, 0.50f, 0.25f, 0.16f, 0.08f)
+            cube(x - 0.20f, y + 0.22f + bob, z, 0.20f, 0.62f, 0.28f, 0.10f, 0.12f, 0.20f)
+            cube(x + 0.20f, y + 0.22f + bob, z, 0.20f, 0.62f, 0.28f, 0.10f, 0.12f, 0.20f)
+            // Simple shoulder guards and helmet crest.
+            cube(x - 0.58f, y + 1.42f + bob, z, 0.20f, 0.28f, 0.42f, 0.48f, 0.50f, 0.58f)
+            cube(x + 0.58f, y + 1.42f + bob, z, 0.20f, 0.28f, 0.42f, 0.48f, 0.50f, 0.58f)
+            cube(x, y + 2.34f + bob, z, 0.16f, 0.24f, 0.12f, 0.74f, 0.12f, 0.10f)
             if (equippedWeaponVisualId == "weapon_sword_sparks") {
-                cube(x + 0.72f, y + 1.12f, z, 0.12f, 1.15f, 0.12f, 0.78f, 0.78f, 0.82f)
-                cube(x + 0.72f, y + 0.55f, z, 0.35f, 0.10f, 0.14f, 0.32f, 0.18f, 0.08f)
+                cube(x + 0.68f, y + 1.18f + bob, z, 0.10f, 1.05f, 0.10f, 0.78f, 0.78f, 0.82f)
+                cube(x + 0.68f, y + 0.60f + bob, z, 0.32f, 0.09f, 0.12f, 0.32f, 0.18f, 0.08f)
             } else {
-                cube(x + 0.55f, y + 1.05f, z, 0.18f, 0.9f, 0.18f, 0.72f, 0.72f, 0.78f)
+                cube(x + 0.55f, y + 1.10f + bob, z, 0.16f, 0.82f, 0.16f, 0.72f, 0.72f, 0.78f)
             }
         }
 
         private fun drawPet(x: Float, y: Float, z: Float) {
-            val bob = sin(angle * 0.04f) * 0.08f
-            cube(x, y + 0.38f + bob, z, 0.75f, 0.55f, 0.7f, 0.82f, 0.62f, 0.22f)
-            cube(x, y + 0.75f + bob, z, 0.52f, 0.45f, 0.52f, 0.94f, 0.76f, 0.38f)
-            cube(x - 0.2f, y + 0.92f + bob, z, 0.12f, 0.18f, 0.12f, 0.94f, 0.76f, 0.38f)
-            cube(x + 0.2f, y + 0.92f + bob, z, 0.12f, 0.18f, 0.12f, 0.94f, 0.76f, 0.38f)
+            val bob = sin(angle * 0.05f) * 0.10f
+            // Friendly puppy/kitten-like silhouette with ears, muzzle and tail.
+            cube(x, y + 0.38f + bob, z, 0.68f, 0.48f, 0.62f, 0.82f, 0.62f, 0.22f)
+            cube(x, y + 0.78f + bob, z - 0.03f, 0.48f, 0.42f, 0.48f, 0.94f, 0.76f, 0.38f)
+            coneShape(x - 0.20f, y + 1.05f + bob, z, 0.13f, 0.25f, 0.13f, 0.72f, 0.48f, 0.20f)
+            coneShape(x + 0.20f, y + 1.05f + bob, z, 0.13f, 0.25f, 0.13f, 0.72f, 0.48f, 0.20f)
+            cube(x, y + 0.74f + bob, z - 0.25f, 0.22f, 0.16f, 0.10f, 0.88f, 0.66f, 0.30f)
+            cube(x + 0.48f, y + 0.48f + bob, z + 0.02f, 0.12f, 0.42f, 0.12f, 0.82f, 0.62f, 0.22f)
+            drawPetFace(x, y, z, bob)
         }
 
         private fun drawNpc(x: Float, y: Float, z: Float) {
-            cube(x, y + 1.0f, z, 0.75f, 1.5f, 0.55f, 0.32f, 0.62f, 0.38f)
-            cube(x, y + 2.0f, z, 0.7f, 0.7f, 0.7f, 0.95f, 0.78f, 0.58f)
+            cube(x, y + 1.0f, z, 0.66f, 1.35f, 0.50f, 0.32f, 0.62f, 0.38f)
+            cube(x, y + 1.82f, z, 0.48f, 0.55f, 0.48f, 0.95f, 0.78f, 0.58f)
+            cube(x, y + 1.30f, z, 0.72f, 0.09f, 0.52f, 0.20f, 0.16f, 0.08f)
+            cube(x, y + 2.18f, z, 0.64f, 0.18f, 0.64f, 0.28f, 0.18f, 0.42f)
+            cube(x - 0.52f, y + 1.35f, z, 0.16f, 0.55f, 0.16f, 0.26f, 0.48f, 0.30f)
+            cube(x + 0.52f, y + 1.35f, z, 0.16f, 0.55f, 0.16f, 0.26f, 0.48f, 0.30f)
         }
 
         private fun drawEnemy(x: Float, y: Float, z: Float) {
-            val bounce = if (victory) -0.35f else 0f
-            cube(x, y + 0.8f + bounce, z, 1.1f, 1.2f, 0.9f, 0.44f, 0.62f, 0.24f)
-            cube(x, y + 1.7f + bounce, z, 0.9f, 0.75f, 0.9f, 0.38f, 0.55f, 0.20f)
-            cube(x - 0.38f, y + 2.25f + bounce, z, 0.18f, 0.55f, 0.18f, 0.38f, 0.55f, 0.20f)
-            cube(x + 0.38f, y + 2.25f + bounce, z, 0.18f, 0.55f, 0.18f, 0.38f, 0.55f, 0.20f)
+            val bounce = if (victory) -0.35f else sin(angle * 0.07f) * 0.08f
+            // Chunky friendly fantasy monster: horns, belly and feet.
+            cube(x, y + 0.82f + bounce, z, 0.92f, 0.95f, 0.72f, 0.44f, 0.62f, 0.24f)
+            cube(x, y + 1.58f + bounce, z, 0.66f, 0.58f, 0.62f, 0.38f, 0.55f, 0.20f)
+            coneShape(x - 0.34f, y + 2.10f + bounce, z, 0.15f, 0.50f, 0.15f, 0.38f, 0.55f, 0.20f)
+            coneShape(x + 0.34f, y + 2.10f + bounce, z, 0.15f, 0.50f, 0.15f, 0.38f, 0.55f, 0.20f)
+            cube(x - 0.34f, y + 0.16f + bounce, z, 0.20f, 0.28f, 0.28f, 0.30f, 0.40f, 0.16f)
+            cube(x + 0.34f, y + 0.16f + bounce, z, 0.20f, 0.28f, 0.28f, 0.30f, 0.40f, 0.16f)
+            cube(x, y + 0.95f + bounce, z - 0.38f, 0.44f, 0.28f, 0.08f, 0.66f, 0.48f, 0.18f)
+            drawEnemyFace(x, y, z, bounce)
+        }
+
+        private fun drawPetFace(x: Float, y: Float, z: Float, bob: Float) {
+            // Tiny facial accents make the pet readable at gameplay distance.
+            cube(x - 0.12f, y + 0.80f + bob, z - 0.245f, 0.06f, 0.07f, 0.035f, 0.10f, 0.08f, 0.06f)
+            cube(x + 0.12f, y + 0.80f + bob, z - 0.245f, 0.06f, 0.07f, 0.035f, 0.10f, 0.08f, 0.06f)
+            cube(x, y + 0.69f + bob, z - 0.27f, 0.11f, 0.06f, 0.045f, 0.34f, 0.16f, 0.12f)
+        }
+
+        private fun drawEnemyFace(x: Float, y: Float, z: Float, bounce: Float) {
+            cube(x - 0.18f, y + 1.61f + bounce, z - 0.32f, 0.09f, 0.11f, 0.04f, 0.95f, 0.88f, 0.34f)
+            cube(x + 0.18f, y + 1.61f + bounce, z - 0.32f, 0.09f, 0.11f, 0.04f, 0.95f, 0.88f, 0.34f)
+            cube(x - 0.18f, y + 1.61f + bounce, z - 0.35f, 0.035f, 0.07f, 0.025f, 0.10f, 0.08f, 0.06f)
+            cube(x + 0.18f, y + 1.61f + bounce, z - 0.35f, 0.035f, 0.07f, 0.025f, 0.10f, 0.08f, 0.06f)
+        }
+
+        private fun drawSceneDecor(x: Float, y: Float, z: Float) {
+            // Small low-poly stones and flowers soften the ground without changing gameplay.
+            cube(x, y + 0.06f, z, 0.22f, 0.12f, 0.16f, 0.42f, 0.46f, 0.48f)
+            cube(x + 0.28f, y + 0.05f, z + 0.08f, 0.12f, 0.10f, 0.12f, 0.86f, 0.68f, 0.24f)
         }
 
         private fun tree(x: Float, y: Float, z: Float) {
-            cube(x, y + 0.9f, z, 0.35f, 1.8f, 0.35f, 0.42f, 0.24f, 0.10f)
-            cube(x, y + 2.1f, z, 1.6f, 1.6f, 1.6f, 0.16f, 0.52f, 0.22f)
-            cube(x, y + 2.85f, z, 1.2f, 1.1f, 1.2f, 0.18f, 0.62f, 0.25f)
+            cube(x, y + 0.85f, z, 0.28f, 1.7f, 0.28f, 0.42f, 0.24f, 0.10f)
+            coneShape(x, y + 2.05f, z, 1.20f, 1.65f, 1.20f, 0.16f, 0.52f, 0.22f)
+            coneShape(x, y + 2.75f, z, 0.92f, 1.25f, 0.92f, 0.18f, 0.62f, 0.25f)
+            coneShape(x + 0.10f, y + 3.25f, z, 0.58f, 0.80f, 0.58f, 0.20f, 0.68f, 0.28f)
+        }
+
+        private fun roof(
+            x: Float, y: Float, z: Float,
+            sx: Float, sy: Float, sz: Float,
+            r: Float, g: Float, b: Float
+        ) {
+            Matrix.setIdentityM(model, 0)
+            Matrix.translateM(model, 0, x, y, z)
+            Matrix.scaleM(model, 0, sx, sy, sz)
+            Matrix.multiplyMM(mvp, 0, view, 0, model, 0)
+            Matrix.multiplyMM(mvp, 0, projection, 0, mvp, 0)
+            gableRoof.draw(program, mvp, r, g, b)
+        }
+
+        private fun coneShape(x: Float, y: Float, z: Float, sx: Float, sy: Float, sz: Float, r: Float, g: Float, b: Float) {
+            Matrix.setIdentityM(model, 0)
+            Matrix.translateM(model, 0, x, y, z)
+            Matrix.scaleM(model, 0, sx, sy, sz)
+            Matrix.multiplyMM(mvp, 0, view, 0, model, 0)
+            Matrix.multiplyMM(mvp, 0, projection, 0, mvp, 0)
+            cone.draw(program, mvp, r, g, b)
         }
 
         private fun cube(
@@ -199,6 +275,75 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
         private val indices = shortArrayOf(
             0,1,2, 2,3,0, 1,5,6, 6,2,1, 5,4,7, 7,6,5,
             4,0,3, 3,7,4, 3,2,6, 6,7,3, 4,5,1, 1,0,4
+        )
+        private val buffer = java.nio.ByteBuffer.allocateDirect(vertices.size * 4)
+            .order(java.nio.ByteOrder.nativeOrder()).asFloatBuffer()
+        private val indexBuffer = java.nio.ByteBuffer.allocateDirect(indices.size * 2)
+            .order(java.nio.ByteOrder.nativeOrder()).asShortBuffer()
+
+        init {
+            buffer.put(vertices).position(0)
+            indexBuffer.put(indices).position(0)
+        }
+
+        fun draw(program: Int, mvp: FloatArray, r: Float, g: Float, b: Float) {
+            val pos = GLES20.glGetAttribLocation(program, "aPosition")
+            val matrix = GLES20.glGetUniformLocation(program, "uMvp")
+            val color = GLES20.glGetUniformLocation(program, "uColor")
+            GLES20.glUseProgram(program)
+            GLES20.glUniformMatrix4fv(matrix, 1, false, mvp, 0)
+            GLES20.glUniform4f(color, r, g, b, 1f)
+            GLES20.glEnableVertexAttribArray(pos)
+            GLES20.glVertexAttribPointer(pos, 3, GLES20.GL_FLOAT, false, 0, buffer)
+            GLES20.glDrawElements(GLES20.GL_TRIANGLES, indices.size, GLES20.GL_UNSIGNED_SHORT, indexBuffer)
+            GLES20.glDisableVertexAttribArray(pos)
+        }
+    }
+
+    private class LowPolyCone {
+        private val vertices = FloatArray(30)
+        private val indices = ShortArray(48)
+        private val buffer = java.nio.ByteBuffer.allocateDirect(vertices.size * 4).order(java.nio.ByteOrder.nativeOrder()).asFloatBuffer()
+        private val indexBuffer = java.nio.ByteBuffer.allocateDirect(indices.size * 2).order(java.nio.ByteOrder.nativeOrder()).asShortBuffer()
+        init {
+            vertices[0]=0f; vertices[1]=1f; vertices[2]=0f
+            for (i in 0 until 8) {
+                val a=(2.0*Math.PI*i/8).toFloat()
+                val p=3+i*3
+                vertices[p]=kotlin.math.cos(a); vertices[p+1]=-1f; vertices[p+2]=kotlin.math.sin(a)
+            }
+            vertices[27]=0f; vertices[28]=-1f; vertices[29]=0f
+            for(i in 0 until 8) {
+                val n=(i+1)%8; val p=i*6
+                indices[p]=0; indices[p+1]=(1+i).toShort(); indices[p+2]=(1+n).toShort()
+                indices[p+3]=9; indices[p+4]=(1+n).toShort(); indices[p+5]=(1+i).toShort()
+            }
+            buffer.put(vertices).position(0); indexBuffer.put(indices).position(0)
+        }
+        fun draw(program:Int,mvp:FloatArray,r:Float,g:Float,b:Float) {
+            val pos=GLES20.glGetAttribLocation(program,"aPosition")
+            val matrix=GLES20.glGetUniformLocation(program,"uMvp")
+            val color=GLES20.glGetUniformLocation(program,"uColor")
+            GLES20.glUseProgram(program)
+            GLES20.glUniformMatrix4fv(matrix,1,false,mvp,0)
+            GLES20.glUniform4f(color,r,g,b,1f)
+            GLES20.glEnableVertexAttribArray(pos)
+            GLES20.glVertexAttribPointer(pos,3,GLES20.GL_FLOAT,false,0,buffer)
+            GLES20.glDrawElements(GLES20.GL_TRIANGLES,indices.size,GLES20.GL_UNSIGNED_SHORT,indexBuffer)
+            GLES20.glDisableVertexAttribArray(pos)
+        }
+    }
+
+    private class GableRoof {
+        private val vertices = floatArrayOf(
+            -1f,0f,-1f, 1f,0f,-1f, 0f,1f,-1f,
+            -1f,0f,1f, 1f,0f,1f, 0f,1f,1f
+        )
+        private val indices = shortArrayOf(
+            0,1,2, 3,5,4,
+            0,3,4, 4,1,0,
+            1,4,5, 5,2,1,
+            2,5,3, 3,0,2
         )
         private val buffer = java.nio.ByteBuffer.allocateDirect(vertices.size * 4)
             .order(java.nio.ByteOrder.nativeOrder()).asFloatBuffer()
