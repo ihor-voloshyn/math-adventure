@@ -199,7 +199,7 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
                 cylinder(x + 0.48f, y + 0.98f + bob, z + 0.04f, 0.10f, 0.62f, furR, furG, furB)
             }
             sphere(x - 0.17f, y + 1.72f + bob, z - 0.43f, 0.07f, 0.07f, 0.05f, 0.03f, 0.03f, 0.03f)
-            sphere(x + 0.17f, y + 1.72f + bob, z - 0.43f, 0.07f, 0.07f, 0.05f, 0.03f, 0.03f)
+            sphere(x + 0.17f, y + 1.72f + bob, z - 0.43f, 0.07f, 0.07f, 0.05f, 0.03f, 0.03f, 0.03f)
             sphere(x, y + 1.58f + bob, z - 0.64f, 0.07f, 0.06f, 0.05f, 0.12f, 0.05f, 0.04f)
             // Facial pads and collar improve the animal silhouette.
             sphere(x - 0.20f, y + 1.52f + bob, z - 0.60f, 0.12f, 0.10f, 0.08f, 0.72f, 0.50f, 0.36f)
