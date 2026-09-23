@@ -217,6 +217,15 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             cylinder(x + 0.23f, y + 0.24f, z, 0.15f, 0.62f, furR, furG, furB)
             sphere(x - 0.23f, y + 0.02f, z - 0.02f, 0.18f, 0.10f, 0.28f, 0.12f, 0.12f, 0.14f)
             sphere(x + 0.23f, y + 0.02f, z - 0.02f, 0.18f, 0.10f, 0.28f, 0.12f, 0.12f, 0.14f)
+            // Layered armor details: shoulder plates, chest emblem, belt buckle and leg guards.
+            sphere(x - 0.52f, y + 1.17f + bob, z + 0.02f, 0.24f, 0.20f, 0.28f, 0.34f, 0.40f, 0.50f)
+            sphere(x + 0.52f, y + 1.17f + bob, z + 0.02f, 0.24f, 0.20f, 0.28f, 0.34f, 0.40f, 0.50f)
+            cube(x, y + 1.08f + bob, z - 0.50f, 0.20f, 0.22f, 0.06f, 0.70f, 0.58f, 0.18f)
+            sphere(x, y + 1.10f + bob, z - 0.57f, 0.08f, 0.08f, 0.04f, 0.92f, 0.78f, 0.22f)
+            cylinder(x, y + 0.82f + bob, z - 0.02f, 0.46f, 0.08f, 0.10f, 0.14f, 0.20f)
+            sphere(x, y + 0.82f + bob, z - 0.50f, 0.09f, 0.09f, 0.05f, 0.90f, 0.70f, 0.16f)
+            sphere(x - 0.24f, y + 0.42f + bob, z - 0.01f, 0.18f, 0.16f, 0.18f, 0.26f, 0.32f, 0.40f)
+            sphere(x + 0.24f, y + 0.42f + bob, z - 0.01f, 0.18f, 0.16f, 0.18f, 0.26f, 0.32f, 0.40f)
             if (equippedWeaponVisualId != null) {
                 drawSword(
                     x + 0.67f,
