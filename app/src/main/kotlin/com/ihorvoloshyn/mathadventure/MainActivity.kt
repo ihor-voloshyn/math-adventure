@@ -253,7 +253,7 @@ class MainActivity : Activity() {
         }
         ordered.forEach { value ->
             answers.addView(Button(this).apply {
-                text = value.toString()
+                text = "⚔ $value"
                 setTextColor(Color.WHITE)
                 setOnClickListener { submitAttack(value.toString()) }
             }, LinearLayout.LayoutParams(0, 62, 1f))
@@ -371,7 +371,7 @@ class MainActivity : Activity() {
         } else {
             generateMathTask()
             renderStage()
-            message.text = "Ты защищаешься. Сердца: " + combatState!!.heroHearts + "/" + combatState!!.maxHeroHearts + ". Теперь твой ход."
+            message.text = "🛡 Защита сработала: урон не получен. Сердца: " + combatState!!.heroHearts + "/" + combatState!!.maxHeroHearts + ".\nТеперь новый вопрос — выбери ответ для атаки."
         }
     }
 
@@ -467,9 +467,9 @@ class MainActivity : Activity() {
             }
             Stage.COMBAT -> {
                 val state = combatState ?: return
-                title.text = "Бой • Сердца " + state.heroHearts + "/" + state.maxHeroHearts + " • Враг " + state.enemyHp + "/3"
-                message.text = generated?.task?.prompt ?: "Математическая атака"
-                action.text = "Защищаться"
+                title.text = "⚔ Бой с Тёмным гоблином • Сердца " + state.heroHearts + "/" + state.maxHeroHearts + " • Гоблин " + state.enemyHp + "/3"
+                message.text = (generated?.task?.prompt ?: "Математическая атака") + "\nВыбери ответ — это атака. 🛡 Защита не наносит урон и не получает урон. 🏃 Убежать завершает бой."
+                action.text = "🛡 Защищаться — без урона"
                 equipmentButton.visibility = View.GONE
                 answers.visibility = View.VISIBLE
                 fleeButton.visibility = View.VISIBLE
