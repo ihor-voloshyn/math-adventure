@@ -294,7 +294,15 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             cylinder(x + 1.12f, y + 0.98f + bounce, z - 0.12f, 0.11f, 1.15f, 0.22f, 0.11f, 0.05f)
             sphere(x + 1.12f, y + 1.52f + bounce, z - 0.12f, 0.23f, 0.20f, 0.22f, 0.30f, 0.16f, 0.07f)
             sphere(x - 0.58f, y + 1.20f + bounce, z - 0.02f, 0.22f, 0.16f, 0.30f, 0.25f, 0.12f, 0.07f)
-        }\n\n        private fun tree(x: Float, y: Float, z: Float) {
+        }\n\n            // Battle silhouette details: belt, shoulder armor, horn bands and a clearer club head.
+            cylinder(x, y + 1.18f + bounce, z - 0.02f, 0.78f, 0.14f, 0.12f, 0.07f, 0.035f)
+            sphere(x - 0.78f, y + 1.18f + bounce, z - 0.02f, 0.30f, 0.22f, 0.34f, 0.18f, 0.10f, 0.06f)
+            sphere(x + 0.78f, y + 1.18f + bounce, z - 0.02f, 0.30f, 0.22f, 0.34f, 0.18f, 0.10f, 0.06f)
+            cylinder(x - 0.52f, y + 2.48f + bounce, z, 0.13f, 0.10f, 0.22f, 0.08f, 0.04f)
+            cylinder(x + 0.52f, y + 2.48f + bounce, z, 0.13f, 0.10f, 0.22f, 0.08f, 0.04f)
+            sphere(x + 1.12f, y + 1.62f + bounce, z - 0.12f, 0.30f, 0.18f, 0.26f, 0.26f, 0.12f, 0.05f)
+            sphere(x + 1.12f, y + 1.78f + bounce, z - 0.12f, 0.12f, 0.08f, 0.10f, 0.38f, 0.20f, 0.08f)
+        private fun tree(x: Float, y: Float, z: Float) {
             cylinder(x, y + 0.9f, z, 0.32f, 1.8f, 0.40f, 0.22f, 0.08f)
             sphere(x, y + 2.05f, z, 1.25f, 0.82f, 0.95f, 0.10f, 0.45f, 0.18f)
             sphere(x + 0.18f, y + 2.55f, z - 0.08f, 0.88f, 0.68f, 0.76f, 0.08f, 0.36f, 0.13f)
