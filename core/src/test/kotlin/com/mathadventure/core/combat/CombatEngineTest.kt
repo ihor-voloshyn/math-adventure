@@ -44,6 +44,16 @@ class CombatEngineTest {
         assertTrue(result.state.active)
     }
 
+
+
+    @Test fun defendBlocksDamageRegardlessOfAnswerFlag() {
+        val result = engine.resolveMathAction(engine.start("c1"), CombatAction.DEFEND, false)
+        assertEquals(3, result.state.heroHearts)
+        assertEquals(3, result.state.enemyHp)
+        assertEquals(CombatResolution.BLOCKED, result.resolution)
+        assertTrue(result.state.active)
+    }
+
     @Test fun incorrectAnswerMissesButDoesNotInstantlyKill() {
         val result = engine.resolveMathAction(engine.start("c1"), CombatAction.ATTACK, false)
         assertEquals(2, result.state.heroHearts)
