@@ -277,7 +277,7 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
 
         private fun drawNpc(x: Float, y: Float, z: Float) {
             cylinder(x, y + 0.82f, z, 0.58f, 1.25f, 0.30f, 0.58f, 0.38f)
-            sphere(x, y + 1.72f, z, 0.48f, 0.88f, 0.72f, 0.55f, 0.38f)
+            sphere(x, y + 1.72f, z, 0.48f, 0.88f, 0.72f, 0.55f, 0.38f, 0.28f)
             cone(x, y + 2.20f, z, 0.62f, 0.45f, 0.22f, 0.34f, 0.20f)
             // Friendly village NPC: face, belt and satchel make the role readable.
             sphere(x - 0.16f, y + 1.80f, z - 0.66f, 0.07f, 0.07f, 0.05f, 0.04f, 0.04f, 0.04f)
