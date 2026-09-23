@@ -79,6 +79,8 @@ class MainActivity : Activity() {
     private lateinit var message: TextView
     private lateinit var action: Button
     private lateinit var answers: LinearLayout
+    private lateinit var taskPanel: LinearLayout
+    private lateinit var taskText: TextView
     private lateinit var fleeButton: Button
     private lateinit var equipmentButton: Button
 
@@ -157,9 +159,27 @@ class MainActivity : Activity() {
             gravity = Gravity.CENTER
             visibility = View.GONE
         }
-        bottom.addView(answers, LinearLayout.LayoutParams(-1, 58))
+        bottom.addView(equipmentButton, LinearLayout.LayoutParams(-1, 52).apply { bottomMargin = 8 })
 
         root.addView(hud, FrameLayout.LayoutParams(-1, -2))
+        taskPanel = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER
+            setPadding(14, 12, 14, 12)
+            background = panelBackground(0xD9162034.toInt(), 22f)
+            visibility = View.GONE
+        }
+        taskText = textView(23f).apply {
+            gravity = Gravity.CENTER
+            setTypeface(typeface, android.graphics.Typeface.BOLD)
+            setPadding(8, 0, 8, 10)
+        }
+        taskPanel.addView(taskText, LinearLayout.LayoutParams(-1, -2))
+        taskPanel.addView(answers, LinearLayout.LayoutParams(-1, 58))
+        val taskParams = FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM).apply {
+            setMargins(18, 0, 18, 132)
+        }
+        root.addView(taskPanel, taskParams)
         root.addView(bottom, FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM))
         setContentView(root)
         questProgression.recover(playerId)
@@ -242,6 +262,8 @@ class MainActivity : Activity() {
             generationContext = mapOf("taskIndex" to combatTaskIndex.toString())
         )
         showAnswerOptions(generated!!.task.answerSpec)
+        taskText.text = generated!!.task.prompt
+        taskPanel.visibility = View.VISIBLE
         combatInputLocked = false
         combatTaskIndex++
     }
@@ -379,6 +401,7 @@ class MainActivity : Activity() {
             CombatResolution.DEFEAT -> {
                 stage = Stage.RETURN_HOME
                 answers.visibility = View.GONE
+                taskPanel.visibility = View.GONE
                 title.text = "Поражение"
                 message.text = "Ты потерял бой. Подтверждённый прогресс сохранён."
                 action.text = "Вернуться домой"
@@ -408,7 +431,7 @@ class MainActivity : Activity() {
         } else {
             generateMathTask()
             renderStage()
-            message.text = "🛡 Защита сработала: урон не получен. Сердца: " + combatState!!.heroHearts + "/" + combatState!!.maxHeroHearts + ".\nТеперь новый вопрос — выбери ответ для атаки."
+            message.text = "🛡 Защита сработала: урон не получен. Сердца: " + combatState!!.heroHearts + "/" + combatState!!.maxHeroHearts + ".\nНовая задача — выбери правильный ответ."
         }
     }
 
@@ -418,6 +441,7 @@ class MainActivity : Activity() {
         combatState = combatEngine.resolveMathAction(combatState ?: return, CombatAction.FLEE, false).state
         stage = Stage.RETURN_HOME
         answers.visibility = View.GONE
+        taskPanel.visibility = View.GONE
         title.text = "Отступление"
         message.text = "Ты покинул бой без победы. Награда за победу не получена."
         action.text = "Вернуться домой"
