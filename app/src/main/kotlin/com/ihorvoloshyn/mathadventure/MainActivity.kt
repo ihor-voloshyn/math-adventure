@@ -70,6 +70,7 @@ class MainActivity : Activity() {
     private var generated: com.mathadventure.core.flow.GeneratedTask? = null
     private var combatState: CombatState? = null
     private var combatTaskIndex = 0
+    private var combatInputLocked = false
     private var sessionCorrect = 0
     private var sessionIncorrect = 0
 
@@ -225,6 +226,7 @@ class MainActivity : Activity() {
         val stats = equipmentCombatStatsResolver.resolve(itemEngine.getInventory(playerId), itemEngine.getEquipment(playerId))
         combatState = combatEngine.start("forest-encounter-01", heroHearts = 3 + stats.hearts, enemyHp = 3)
         combatTaskIndex = 0
+        combatInputLocked = false
         stage = Stage.COMBAT
         renderer.setVictory(false)
         generateMathTask()
@@ -240,6 +242,7 @@ class MainActivity : Activity() {
             generationContext = mapOf("taskIndex" to combatTaskIndex.toString())
         )
         showAnswerOptions(generated!!.task.answerSpec)
+        combatInputLocked = false
         combatTaskIndex++
     }
 
@@ -258,7 +261,12 @@ class MainActivity : Activity() {
             answers.addView(gameButton().apply {
                 text = "⚔ $value"
                 setTextSize(18f)
-                setOnClickListener { submitAttack(value.toString()) }
+                setOnClickListener {
+                    if (combatInputLocked) return@setOnClickListener
+                    combatInputLocked = true
+                    isEnabled = false
+                    submitAttack(value.toString())
+                }
             }, LinearLayout.LayoutParams(0, 56, 1f).apply {
                 marginStart = 4
                 marginEnd = 4
@@ -301,7 +309,11 @@ class MainActivity : Activity() {
     }
 
     private fun submitAttack(value: String) {
-        val current = generated ?: return
+        if (stage != Stage.COMBAT || combatState?.active != true) {
+            combatInputLocked = false
+            return
+        }
+        val current = generated ?: run { combatInputLocked = false; return }
         val answered = flow.answer(
             playerId = playerId,
             generated = current,
@@ -383,6 +395,8 @@ class MainActivity : Activity() {
     }
 
     private fun defend() {
+        if (stage != Stage.COMBAT || combatInputLocked) return
+        combatInputLocked = true
         val result = combatEngine.resolveMathAction(combatState ?: return, CombatAction.DEFEND, true)
         combatState = result.state
         if (result.resolution == CombatResolution.DEFEAT) {
@@ -399,6 +413,8 @@ class MainActivity : Activity() {
     }
 
     private fun flee() {
+        if (stage != Stage.COMBAT || combatInputLocked) return
+        combatInputLocked = true
         combatState = combatEngine.resolveMathAction(combatState ?: return, CombatAction.FLEE, false).state
         stage = Stage.RETURN_HOME
         answers.visibility = View.GONE
