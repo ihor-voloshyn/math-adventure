@@ -48,7 +48,7 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             gl: javax.microedition.khronos.opengles.GL10?,
             config: javax.microedition.khronos.egl.EGLConfig?
         ) {
-            GLES20.glClearColor(0.34f, 0.58f, 0.82f, 1f)
+            GLES20.glClearColor(0.12f, 0.18f, 0.28f, 1f)
             program = Shader.create()
             cube = Mesh.cube()
             sphere = Mesh.sphere(14, 10)
@@ -104,7 +104,7 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
         }
 
         private fun drawWorld() {
-            cube(0f, -0.25f, 0f, 14f, 0.35f, 14f, 0.22f, 0.58f, 0.28f)
+            cube(0f, -0.25f, 0f, 14f, 0.35f, 14f, 0.14f, 0.30f, 0.18f)
 
             when (stage) {
                 0, 4 -> drawHome()
@@ -158,7 +158,7 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             val bob = sin(angle) * 0.025f
             cylinder(x, y + 0.82f + bob, z, 0.58f, 1.25f, 0.20f, 0.34f, 0.78f)
             sphere(x, y + 1.75f + bob, z, 0.48f, 0.90f, 0.70f, 0.52f, 0.36f)
-            cone(x, y + 2.25f + bob, z, 0.60f, 0.62f, 0.10f, 0.18f, 0.42f)
+            cone(x, y + 2.25f + bob, z, 0.60f, 0.62f, 0.16f, 0.25f, 0.55f)
             cylinder(x - 0.23f, y + 0.20f, z, 0.16f, 0.62f, 0.10f, 0.12f, 0.24f)
             cylinder(x + 0.23f, y + 0.20f, z, 0.16f, 0.62f, 0.10f, 0.12f, 0.24f)
 
