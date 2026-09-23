@@ -108,7 +108,11 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
         }
 
         private fun drawWorld() {
-            cube(0f, -0.25f, 0f, 14f, 0.35f, 14f, 0.14f, 0.30f, 0.18f)
+            cube(0f, -0.25f, 0f, 14f, 0.35f, 14f, 0.12f, 0.25f, 0.16f)
+            // Small stones break up the flat ground and make the scene read as a game world.
+            stone(-5.0f, 0f, -0.8f, 0.24f, 0.14f, 0.18f)
+            stone(5.1f, 0f, -1.8f, 0.30f, 0.16f, 0.22f)
+            stone(4.2f, 0f, 3.1f, 0.20f, 0.12f, 0.16f)
 
             when (stage) {
                 0, 4 -> drawHome()
@@ -250,8 +254,14 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             sphere(x, y + 1.64f + bounce, z - 0.72f, 0.12f, 0.08f, 0.06f, 0.05f, 0.02f, 0.01f)
         }\n\n        private fun tree(x: Float, y: Float, z: Float) {
             cylinder(x, y + 0.9f, z, 0.32f, 1.8f, 0.40f, 0.22f, 0.08f)
-            sphere(x, y + 2.05f, z, 1.25f, 0.82f, 0.95f, 0.10f, 0.45f)
-            sphere(x, y + 2.75f, z + 0.05f, 0.95f, 0.78f, 0.82f, 0.12f, 0.54f)
+            sphere(x, y + 2.05f, z, 1.25f, 0.82f, 0.95f, 0.10f, 0.45f, 0.18f)
+            sphere(x + 0.18f, y + 2.55f, z - 0.08f, 0.88f, 0.68f, 0.76f, 0.08f, 0.36f, 0.13f)
+            sphere(x - 0.28f, y + 2.82f, z + 0.06f, 0.72f, 0.60f, 0.70f, 0.12f, 0.50f, 0.20f)
+            sphere(x + 0.28f, y + 2.95f, z + 0.02f, 0.62f, 0.55f, 0.62f, 0.10f, 0.42f, 0.16f)
+        }
+
+        private fun stone(x: Float, y: Float, z: Float, sx: Float, sy: Float, sz: Float) {
+            sphere(x, y + sy, z, sx, sy, sz, 0.34f, 0.36f, 0.32f)
         }
 
         private fun drawMesh(
