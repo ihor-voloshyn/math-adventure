@@ -7,12 +7,15 @@ enum class CombatResolution { HIT, MISS, BLOCKED, FLED, VICTORY, DEFEAT }
 data class CombatState(
     val combatId: String,
     val heroHearts: Int = 3,
+    val maxHeroHearts: Int = 3,
     val enemyHp: Int = 3,
     val playerTurn: Boolean = true,
     val active: Boolean = true
 ) {
     init {
         require(heroHearts >= 0) { "heroHearts must be non-negative" }
+        require(maxHeroHearts > 0) { "maxHeroHearts must be positive" }
+        require(heroHearts <= maxHeroHearts) { "heroHearts must not exceed maxHeroHearts" }
         require(enemyHp >= 0) { "enemyHp must be non-negative" }
     }
 }
@@ -25,7 +28,7 @@ data class CombatOutcome(
 
 class CombatEngine {
     fun start(combatId: String, heroHearts: Int = 3, enemyHp: Int = 3): CombatState =
-        CombatState(combatId = combatId, heroHearts = heroHearts, enemyHp = enemyHp)
+        CombatState(combatId = combatId, heroHearts = heroHearts, maxHeroHearts = heroHearts, enemyHp = enemyHp)
 
     fun resolveMathAction(
         state: CombatState,

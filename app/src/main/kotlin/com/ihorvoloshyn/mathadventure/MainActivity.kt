@@ -346,9 +346,9 @@ class MainActivity : Activity() {
             }
             else -> {
                 message.text = if (answered.evaluation.result == AnswerResult.CORRECT)
-                    "Попадание! Враг: " + combatState!!.enemyHp + "/3 HP. Сердца: " + combatState!!.heroHearts + "/3."
+                    "Попадание! Враг: " + combatState!!.enemyHp + "/3 HP. Сердца: " + combatState!!.heroHearts + "/" + combatState!!.maxHeroHearts + "."
                 else
-                    "Промах. Враг атакует! Сердца: " + combatState!!.heroHearts + "/3."
+                    "Промах. Враг атакует! Сердца: " + combatState!!.heroHearts + "/" + combatState!!.maxHeroHearts + "."
                 generateMathTask()
                 renderStage()
             }

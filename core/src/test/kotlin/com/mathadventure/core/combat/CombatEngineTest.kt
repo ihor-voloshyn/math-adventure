@@ -15,6 +15,16 @@ class CombatEngineTest {
         assertTrue(result.state.playerTurn)
     }
 
+    @Test fun combatTracksMaximumHeartsForHud() {
+        val state = engine.start("c1", heroHearts = 5, enemyHp = 3)
+        assertEquals(5, state.heroHearts)
+        assertEquals(5, state.maxHeroHearts)
+
+        val result = engine.resolveMathAction(state, CombatAction.ATTACK, true)
+        assertEquals(4, result.state.heroHearts)
+        assertEquals(5, result.state.maxHeroHearts)
+    }
+
     @Test fun attackUsesResolvedEquipmentDamage() {
         val state = engine.start("c1", heroHearts = 3, enemyHp = 3)
         val result = engine.resolveMathAction(state, CombatAction.ATTACK, true, attackDamage = 2)
