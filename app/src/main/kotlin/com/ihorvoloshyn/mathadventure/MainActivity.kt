@@ -496,6 +496,7 @@ class MainActivity : Activity() {
     private fun renderStage() {
         renderer.setStage(stage.ordinal)
         fleeButton.visibility = if (stage == Stage.COMBAT) View.VISIBLE else View.GONE
+        taskPanel.visibility = if (stage == Stage.COMBAT) View.VISIBLE else View.GONE
         val equipment = itemEngine.getEquipment(playerId)
         val weaponVisualId = equipment.weaponInstanceId?.let { instanceId ->
             itemEngine.getInventory(playerId).firstOrNull { it.instanceId == instanceId }?.let { item ->
@@ -531,7 +532,7 @@ class MainActivity : Activity() {
             Stage.COMBAT -> {
                 val state = combatState ?: return
                 title.text = "⚔ Бой с Тёмным гоблином • Сердца " + state.heroHearts + "/" + state.maxHeroHearts + " • Гоблин " + state.enemyHp + "/3"
-                message.text = (generated?.task?.prompt ?: "Математическая атака") + "\nВыбери ответ — это атака. 🛡 Защита не наносит урон и не получает урон. 🏃 Убежать завершает бой."
+                message.text = "Выбери ответ для атаки. 🛡 Защита не наносит урон и не получает урон. 🏃 Убежать завершает бой."
                 action.text = "🛡 Защита"
                 equipmentButton.visibility = View.GONE
                 answers.visibility = View.VISIBLE
