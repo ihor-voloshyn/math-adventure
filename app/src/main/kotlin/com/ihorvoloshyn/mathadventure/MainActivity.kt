@@ -68,6 +68,7 @@ class MainActivity : Activity() {
     private var stage = Stage.HOME
     private var generated: com.mathadventure.core.flow.GeneratedTask? = null
     private var combatState: CombatState? = null
+    private var combatTaskIndex = 0
     private var sessionCorrect = 0
     private var sessionIncorrect = 0
 
@@ -220,6 +221,7 @@ class MainActivity : Activity() {
     private fun startCombat() {
         val stats = equipmentCombatStatsResolver.resolve(itemEngine.getInventory(playerId), itemEngine.getEquipment(playerId))
         combatState = combatEngine.start("forest-encounter-01", heroHearts = 3 + stats.hearts, enemyHp = 3)
+        combatTaskIndex = 0
         stage = Stage.COMBAT
         renderer.setVictory(false)
         generateMathTask()
@@ -231,9 +233,11 @@ class MainActivity : Activity() {
             playerId = playerId,
             skillStates = skillStates(),
             availableSkills = setOf("ADD_BASIC", "ADD_CROSS_TEN"),
-            inputType = InputType.NUMERIC
+            inputType = InputType.NUMERIC,
+            generationContext = mapOf("taskIndex" to combatTaskIndex.toString())
         )
         showAnswerOptions(generated!!.task.answerSpec)
+        combatTaskIndex++
     }
 
     private fun showAnswerOptions(answerSpec: String) {
