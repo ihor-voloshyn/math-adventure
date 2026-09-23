@@ -206,7 +206,14 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             cylinder(x + 0.23f, y + 0.24f, z, 0.15f, 0.62f, furR, furG, furB)
             sphere(x - 0.23f, y + 0.02f, z - 0.02f, 0.18f, 0.10f, 0.28f, 0.12f, 0.12f, 0.14f)
             sphere(x + 0.23f, y + 0.02f, z - 0.02f, 0.18f, 0.10f, 0.28f, 0.12f, 0.12f, 0.14f)
-            drawSword(x + 0.67f, y + 0.96f + bob, z - 0.05f, equippedWeaponVisualId == "weapon_sword_sparks")
+            if (equippedWeaponVisualId != null) {
+                drawSword(
+                    x + 0.67f,
+                    y + 0.96f + bob,
+                    z - 0.05f,
+                    equippedWeaponVisualId == "weapon_sword_sparks"
+                )
+            }
         }
 
         private fun drawSword(x: Float, y: Float, z: Float, enchanted: Boolean) {
