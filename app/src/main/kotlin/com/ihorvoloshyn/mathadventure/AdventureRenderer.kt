@@ -147,15 +147,22 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
         }
 
         private fun drawHero(x: Float, y: Float, z: Float) {
-            cube(x, y + 1.0f, z, 0.75f, 1.5f, 0.55f, 0.25f, 0.42f, 0.78f)
-            cube(x, y + 2.0f, z, 0.7f, 0.7f, 0.7f, 0.95f, 0.78f, 0.58f)
-            cube(x - 0.24f, y + 0.2f, z, 0.2f, 0.7f, 0.3f, 0.15f, 0.16f, 0.25f)
-            cube(x + 0.24f, y + 0.2f, z, 0.2f, 0.7f, 0.3f, 0.15f, 0.16f, 0.25f)
+            val bob = sin(angle * 0.035f) * 0.035f
+            // Tunic, belt, boots and head read as a character rather than stacked blocks.
+            cube(x, y + 1.0f + bob, z, 0.62f, 1.15f, 0.48f, 0.20f, 0.36f, 0.72f)
+            cube(x, y + 1.82f + bob, z, 0.48f, 0.55f, 0.48f, 0.95f, 0.78f, 0.58f)
+            cube(x, y + 1.23f + bob, z, 0.68f, 0.10f, 0.50f, 0.25f, 0.16f, 0.08f)
+            cube(x - 0.20f, y + 0.22f + bob, z, 0.20f, 0.62f, 0.28f, 0.10f, 0.12f, 0.20f)
+            cube(x + 0.20f, y + 0.22f + bob, z, 0.20f, 0.62f, 0.28f, 0.10f, 0.12f, 0.20f)
+            // Simple shoulder guards and helmet crest.
+            cube(x - 0.58f, y + 1.42f + bob, z, 0.20f, 0.28f, 0.42f, 0.48f, 0.50f, 0.58f)
+            cube(x + 0.58f, y + 1.42f + bob, z, 0.20f, 0.28f, 0.42f, 0.48f, 0.50f, 0.58f)
+            cube(x, y + 2.34f + bob, z, 0.16f, 0.24f, 0.12f, 0.74f, 0.12f, 0.10f)
             if (equippedWeaponVisualId == "weapon_sword_sparks") {
-                cube(x + 0.72f, y + 1.12f, z, 0.12f, 1.15f, 0.12f, 0.78f, 0.78f, 0.82f)
-                cube(x + 0.72f, y + 0.55f, z, 0.35f, 0.10f, 0.14f, 0.32f, 0.18f, 0.08f)
+                cube(x + 0.68f, y + 1.18f + bob, z, 0.10f, 1.05f, 0.10f, 0.78f, 0.78f, 0.82f)
+                cube(x + 0.68f, y + 0.60f + bob, z, 0.32f, 0.09f, 0.12f, 0.32f, 0.18f, 0.08f)
             } else {
-                cube(x + 0.55f, y + 1.05f, z, 0.18f, 0.9f, 0.18f, 0.72f, 0.72f, 0.78f)
+                cube(x + 0.55f, y + 1.10f + bob, z, 0.16f, 0.82f, 0.16f, 0.72f, 0.72f, 0.78f)
             }
         }
 
