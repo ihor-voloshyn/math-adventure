@@ -6,6 +6,7 @@ import com.mathadventure.core.gameprogression.BestResult
 import com.mathadventure.core.gameprogression.GameProgressionState
 import com.mathadventure.core.gameprogression.ProgressionCommit
 import com.mathadventure.core.items.EquipmentState
+import com.mathadventure.core.items.EquipmentStateValidator
 import com.mathadventure.core.items.ItemDefinition
 import com.mathadventure.core.items.ItemInstance
 import com.mathadventure.core.items.ItemStore
