@@ -6,6 +6,7 @@ import com.mathadventure.core.gameprogression.BestResult
 import com.mathadventure.core.gameprogression.GameProgressionState
 import com.mathadventure.core.gameprogression.ProgressionCommit
 import com.mathadventure.core.items.EquipmentState
+import com.mathadventure.core.items.EquipmentStateValidator
 import com.mathadventure.core.items.ItemDefinition
 import com.mathadventure.core.items.ItemInstance
 import com.mathadventure.core.items.ItemStore
@@ -103,21 +104,8 @@ class AndroidGameProgressionInventoryStore(
     }
 
     private fun validateEquipment(playerId: String, equipment: EquipmentState) {
-        val inventoryById = readInventory(playerId).associateBy { it.instanceId }
-        val equippedIds = listOfNotNull(
-            equipment.weaponInstanceId,
-            equipment.armorInstanceId,
-            equipment.helmetInstanceId,
-            equipment.accessoryInstanceId,
-            equipment.petAccessoryInstanceId
-        )
-        require(equippedIds.size == equippedIds.toSet().size) {
-            "an item instance cannot occupy multiple equipment slots"
-        }
-        equippedIds.forEach { instanceId ->
-            val instance = inventoryById[instanceId] ?: error("equipped item is not owned: $instanceId")
-            require(instance.quantity == 1) { "equipped item must have quantity 1: $instanceId" }
-        }
+        val inventory = readInventory(playerId)
+        EquipmentStateValidator(definitions).validate(inventory, equipment)
     }
 
     private fun persistAtomic(vararg entries: String) {
