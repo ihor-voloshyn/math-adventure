@@ -37,12 +37,16 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
         private var cameraYaw = 0f
         private var cameraPitch = 0.62f
         private var lastTouchX = 0f
+        // Prototype defaults to a cat hero; the same renderer supports a dog hero.
+        private val heroKind = HeroKind.CAT
         private var lastTouchY = 0f
 
         private lateinit var cube: Mesh
         private lateinit var sphere: Mesh
         private lateinit var cylinder: Mesh
         private lateinit var cone: Mesh
+
+        private enum class HeroKind { CAT, DOG }
 
         override fun onSurfaceCreated(
             gl: javax.microedition.khronos.opengles.GL10?,
@@ -156,55 +160,80 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
 
         private fun drawHero(x: Float, y: Float, z: Float) {
             val bob = sin(angle) * 0.025f
-            cylinder(x, y + 0.82f + bob, z, 0.58f, 1.25f, 0.20f, 0.34f, 0.78f)
-            sphere(x, y + 1.75f + bob, z, 0.48f, 0.90f, 0.70f, 0.52f, 0.36f)
-            cone(x, y + 2.25f + bob, z, 0.60f, 0.62f, 0.16f, 0.25f, 0.55f)
-            cylinder(x - 0.23f, y + 0.20f, z, 0.16f, 0.62f, 0.10f, 0.12f, 0.24f)
-            cylinder(x + 0.23f, y + 0.20f, z, 0.16f, 0.62f, 0.10f, 0.12f, 0.24f)
-
+            val furR = if (heroKind == HeroKind.CAT) 0.68f else 0.50f
+            val furG = if (heroKind == HeroKind.CAT) 0.48f else 0.32f
+            val furB = if (heroKind == HeroKind.CAT) 0.30f else 0.18f
+            sphere(x, y + 0.92f + bob, z, 0.56f, 0.78f, 0.46f, furR, furG, furB)
+            sphere(x, y + 1.66f + bob, z - 0.02f, 0.50f, 0.48f, 0.46f, furR, furG, furB)
+            sphere(x, y + 1.56f + bob, z - 0.40f, 0.30f, 0.24f, 0.24f, 0.82f, 0.62f, 0.46f)
+            if (heroKind == HeroKind.CAT) {
+                cone(x - 0.30f, y + 2.10f + bob, z, 0.22f, 0.52f, furR, furG, furB)
+                cone(x + 0.30f, y + 2.10f + bob, z, 0.22f, 0.52f, furR, furG, furB)
+                cylinder(x - 0.48f, y + 0.92f + bob, z + 0.05f, 0.10f, 0.65f, furR, furG, furB)
+                cone(x - 0.48f, y + 1.30f + bob, z + 0.05f, 0.11f, 0.42f, furR, furG, furB)
+            } else {
+                sphere(x - 0.43f, y + 1.75f + bob, z, 0.18f, 0.34f, 0.22f, 0.34f, 0.20f, 0.12f)
+                sphere(x + 0.43f, y + 1.75f + bob, z, 0.18f, 0.34f, 0.22f, 0.34f, 0.20f, 0.12f)
+                sphere(x, y + 1.52f + bob, z - 0.48f, 0.24f, 0.16f, 0.18f, 0.20f, 0.12f, 0.08f)
+                cylinder(x + 0.48f, y + 0.98f + bob, z + 0.04f, 0.10f, 0.62f, furR, furG, furB)
+            }
+            sphere(x - 0.17f, y + 1.72f + bob, z - 0.43f, 0.07f, 0.07f, 0.05f, 0.03f, 0.03f, 0.03f)
+            sphere(x + 0.17f, y + 1.72f + bob, z - 0.43f, 0.07f, 0.07f, 0.05f, 0.03f, 0.03f)
+            sphere(x, y + 1.58f + bob, z - 0.64f, 0.07f, 0.06f, 0.05f, 0.12f, 0.05f, 0.04f)
+            cube(x, y + 1.02f + bob, z - 0.04f, 0.58f, 0.10f, 0.48f, 0.18f, 0.24f, 0.34f)
+            cylinder(x - 0.23f, y + 0.24f, z, 0.15f, 0.62f, furR, furG, furB)
+            cylinder(x + 0.23f, y + 0.24f, z, 0.15f, 0.62f, furR, furG, furB)
+            sphere(x - 0.23f, y + 0.02f, z - 0.02f, 0.18f, 0.10f, 0.28f, 0.12f, 0.12f, 0.14f)
+            sphere(x + 0.23f, y + 0.02f, z - 0.02f, 0.18f, 0.10f, 0.28f, 0.12f, 0.12f, 0.14f)
             if (equippedWeaponVisualId == "weapon_sword_sparks") {
-                cylinder(x + 0.67f, y + 1.02f, z, 0.07f, 1.15f, 0.78f, 0.80f, 0.86f)
-                cylinder(x + 0.67f, y + 0.52f, z, 0.18f, 0.10f, 0.32f, 0.18f, 0.08f)
+                cylinder(x + 0.67f, y + 1.02f, z - 0.02f, 0.07f, 1.15f, 0.78f, 0.80f, 0.86f)
+                cylinder(x + 0.67f, y + 0.52f, z - 0.02f, 0.18f, 0.10f, 0.32f, 0.18f, 0.08f)
             } else {
                 cylinder(x + 0.55f, y + 1.0f, z, 0.07f, 0.82f, 0.72f, 0.72f, 0.76f)
             }
-        }
-
-        private fun drawPet(x: Float, y: Float, z: Float) {
+        }\n\n        private fun drawPet(x: Float, y: Float, z: Float) {
             val bob = sin(angle * 1.5f) * 0.08f
-            sphere(x, y + 0.45f + bob, z, 0.58f, 0.74f, 0.58f, 0.18f, 0.60f)
-            sphere(x, y + 0.92f + bob, z - 0.02f, 0.44f, 0.90f, 0.72f, 0.42f, 0.28f)
-            cone(x - 0.24f, y + 1.25f + bob, z, 0.22f, 0.45f, 0.78f, 0.52f, 0.18f)
-            cone(x + 0.24f, y + 1.25f + bob, z, 0.22f, 0.45f, 0.78f, 0.52f, 0.18f)
-        }
-
-        private fun drawNpc(x: Float, y: Float, z: Float) {
+            sphere(x, y + 0.45f + bob, z, 0.62f, 0.46f, 0.78f, 0.22f, 0.54f, 0.66f)
+            sphere(x, y + 0.95f + bob, z - 0.02f, 0.44f, 0.42f, 0.48f, 0.30f, 0.66f, 0.72f)
+            sphere(x, y + 0.90f + bob, z - 0.40f, 0.24f, 0.20f, 0.18f, 0.72f, 0.82f, 0.78f)
+            cone(x - 0.28f, y + 1.30f + bob, z, 0.18f, 0.42f, 0.20f, 0.48f, 0.60f)
+            cone(x + 0.28f, y + 1.30f + bob, z, 0.18f, 0.42f, 0.20f, 0.48f, 0.60f)
+            sphere(x - 0.15f, y + 1.03f + bob, z - 0.42f, 0.06f, 0.06f, 0.04f, 0.02f, 0.02f, 0.02f)
+            sphere(x + 0.15f, y + 1.03f + bob, z - 0.42f, 0.06f, 0.06f, 0.04f, 0.02f, 0.02f, 0.02f)
+            cylinder(x + 0.62f, y + 0.62f + bob, z + 0.02f, 0.08f, 0.52f, 0.22f, 0.54f, 0.66f)
+        }\n\n        private fun drawNpc(x: Float, y: Float, z: Float) {
             cylinder(x, y + 0.82f, z, 0.58f, 1.25f, 0.30f, 0.58f, 0.38f)
             sphere(x, y + 1.72f, z, 0.48f, 0.88f, 0.72f, 0.55f, 0.38f)
             cone(x, y + 2.20f, z, 0.62f, 0.45f, 0.22f, 0.34f, 0.20f)
         }
 
         private fun drawEnemy(x: Float, y: Float, z: Float) {
-            // Forest encounter preview: clearly visible monster before combat starts.
             val bob = sin(angle * 1.2f) * 0.06f
-            sphere(x, y + 0.72f + bob, z, 0.90f, 0.68f, 0.82f, 0.48f, 0.12f)
-            sphere(x, y + 1.48f + bob, z, 0.70f, 0.58f, 0.72f, 0.38f, 0.08f)
-            cone(x - 0.42f, y + 2.15f + bob, z, 0.24f, 0.72f, 0.42f, 0.08f, 0.06f)
-            cone(x + 0.42f, y + 2.15f + bob, z, 0.24f, 0.72f, 0.42f, 0.08f, 0.06f)
-        }
-
-        private fun drawCombatEnemy(x: Float, y: Float, z: Float) {
+            sphere(x, y + 0.72f + bob, z, 0.88f, 0.72f, 0.66f, 0.34f, 0.20f, 0.12f)
+            sphere(x, y + 1.48f + bob, z - 0.02f, 0.66f, 0.58f, 0.58f, 0.40f, 0.26f, 0.16f)
+            cone(x - 0.40f, y + 2.12f + bob, z, 0.22f, 0.68f, 0.30f, 0.16f, 0.10f)
+            cone(x + 0.40f, y + 2.12f + bob, z, 0.22f, 0.68f, 0.30f, 0.16f, 0.10f)
+            cylinder(x - 0.92f, y + 0.78f + bob, z - 0.02f, 0.13f, 0.78f, 0.28f, 0.16f, 0.10f)
+            cylinder(x + 0.92f, y + 0.78f + bob, z - 0.02f, 0.13f, 0.78f, 0.28f, 0.16f, 0.10f)
+            cylinder(x - 0.32f, y + 0.18f + bob, z, 0.16f, 0.52f, 0.25f, 0.14f, 0.09f)
+            cylinder(x + 0.32f, y + 0.18f + bob, z, 0.16f, 0.52f, 0.25f, 0.14f, 0.09f)
+            sphere(x - 0.20f, y + 1.58f + bob, z - 0.50f, 0.09f, 0.09f, 0.05f, 0.95f, 0.76f, 0.08f)
+            sphere(x + 0.20f, y + 1.58f + bob, z - 0.50f, 0.09f, 0.09f, 0.05f, 0.95f, 0.76f, 0.08f)
+            sphere(x, y + 1.38f + bob, z - 0.56f, 0.10f, 0.07f, 0.05f, 0.08f, 0.03f, 0.02f)
+        }\n\n        private fun drawCombatEnemy(x: Float, y: Float, z: Float) {
             val bounce = if (victory) -0.45f else sin(angle * 1.5f) * 0.04f
-            // Larger combat monster positioned opposite the hero.
-            sphere(x, y + 0.85f + bounce, z, 1.10f, 0.82f, 0.95f, 0.58f, 0.10f)
-            sphere(x, y + 1.75f + bounce, z, 0.82f, 0.62f, 0.78f, 0.45f, 0.07f)
-            cone(x - 0.48f, y + 2.48f + bounce, z, 0.28f, 0.82f, 0.52f, 0.08f, 0.05f)
-            cone(x + 0.48f, y + 2.48f + bounce, z, 0.28f, 0.82f, 0.52f, 0.08f, 0.05f)
-            sphere(x - 0.28f, y + 1.82f + bounce, z - 0.68f, 0.10f, 1.0f, 0.15f, 0.05f, 0.03f)
-            sphere(x + 0.28f, y + 1.82f + bounce, z - 0.68f, 0.10f, 1.0f, 0.15f, 0.05f, 0.03f)
-        }
-
-        private fun tree(x: Float, y: Float, z: Float) {
+            sphere(x, y + 0.85f + bounce, z, 1.10f, 0.86f, 0.92f, 0.46f, 0.18f, 0.10f)
+            sphere(x, y + 1.76f + bounce, z - 0.03f, 0.82f, 0.66f, 0.74f, 0.38f, 0.12f, 0.08f)
+            cone(x - 0.52f, y + 2.50f + bounce, z, 0.28f, 0.90f, 0.28f, 0.10f, 0.06f)
+            cone(x + 0.52f, y + 2.50f + bounce, z, 0.28f, 0.90f, 0.28f, 0.10f, 0.06f)
+            cylinder(x - 1.05f, y + 0.90f + bounce, z - 0.02f, 0.16f, 0.95f, 0.34f, 0.12f, 0.07f)
+            cylinder(x + 1.05f, y + 0.90f + bounce, z - 0.02f, 0.16f, 0.95f, 0.34f, 0.12f, 0.07f)
+            cylinder(x - 0.40f, y + 0.22f + bounce, z, 0.20f, 0.62f, 0.28f, 0.10f, 0.06f)
+            cylinder(x + 0.40f, y + 0.22f + bounce, z, 0.20f, 0.62f, 0.28f, 0.10f, 0.06f)
+            sphere(x - 0.28f, y + 1.86f + bounce, z - 0.66f, 0.12f, 0.12f, 0.06f, 1.0f, 0.82f, 0.10f)
+            sphere(x + 0.28f, y + 1.86f + bounce, z - 0.66f, 0.12f, 0.12f, 0.06f, 1.0f, 0.82f, 0.10f)
+            sphere(x, y + 1.64f + bounce, z - 0.72f, 0.12f, 0.08f, 0.06f, 0.05f, 0.02f, 0.01f)
+        }\n\n        private fun tree(x: Float, y: Float, z: Float) {
             cylinder(x, y + 0.9f, z, 0.32f, 1.8f, 0.40f, 0.22f, 0.08f)
             sphere(x, y + 2.05f, z, 1.25f, 0.82f, 0.95f, 0.10f, 0.45f)
             sphere(x, y + 2.75f, z + 0.05f, 0.95f, 0.78f, 0.82f, 0.12f, 0.54f)
