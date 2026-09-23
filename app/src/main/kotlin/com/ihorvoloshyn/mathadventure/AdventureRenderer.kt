@@ -209,6 +209,18 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             drawSword(x + 0.67f, y + 0.96f + bob, z - 0.05f, equippedWeaponVisualId == "weapon_sword_sparks")
         }
 
+        private fun drawSword(x: Float, y: Float, z: Float, enchanted: Boolean) {
+            // Readable weapon silhouette: grip + guard + blade + pommel.
+            cylinder(x, y - 0.36f, z, 0.065f, 0.42f, 0.24f, 0.12f, 0.06f)
+            cylinder(x, y - 0.10f, z, 0.16f, 0.09f, 0.76f, 0.58f, 0.16f)
+            cone(x, y + 0.50f, z, 0.12f, 0.95f, 0.72f, 0.76f, 0.82f)
+            sphere(x, y - 0.58f, z, 0.10f, 0.10f, 0.10f, 0.56f, 0.38f, 0.12f)
+            if (enchanted) {
+                sphere(x, y + 0.72f, z - 0.03f, 0.07f, 0.07f, 0.07f, 0.45f, 0.78f, 1.0f)
+                sphere(x, y + 0.42f, z - 0.03f, 0.045f, 0.045f, 0.045f, 0.75f, 0.92f, 1.0f)
+            }
+        }
+
         private fun drawPet(x: Float, y: Float, z: Float) {
             val bob = sin(angle * 1.5f) * 0.08f
             sphere(x, y + 0.45f + bob, z, 0.62f, 0.46f, 0.78f, 0.22f, 0.54f, 0.66f)
