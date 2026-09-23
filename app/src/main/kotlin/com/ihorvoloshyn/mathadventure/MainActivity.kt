@@ -315,6 +315,7 @@ class MainActivity : Activity() {
                 )
                 val progression = gameProgressionStore.get(playerId)
                 stage = Stage.RETURN_HOME
+                renderer.setStage(stage.ordinal)
                 answers.visibility = View.GONE
                 fleeButton.visibility = View.GONE
                 title.text = "Победа над врагом!"
@@ -339,6 +340,7 @@ class MainActivity : Activity() {
             }
             CombatResolution.DEFEAT -> {
                 stage = Stage.RETURN_HOME
+                renderer.setStage(stage.ordinal)
                 answers.visibility = View.GONE
                 title.text = "Поражение"
                 message.text = "Ты потерял бой. Подтверждённый прогресс сохранён."
@@ -374,7 +376,9 @@ class MainActivity : Activity() {
     private fun flee() {
         combatState = combatEngine.resolveMathAction(combatState ?: return, CombatAction.FLEE, false).state
         stage = Stage.RETURN_HOME
+        renderer.setStage(stage.ordinal)
         answers.visibility = View.GONE
+        fleeButton.visibility = View.GONE
         title.text = "Отступление"
         message.text = "Ты покинул бой без победы. Награда за победу не получена."
         action.text = "Вернуться домой"
@@ -427,6 +431,7 @@ class MainActivity : Activity() {
     }
 
     private fun renderStage() {
+        renderer.setStage(stage.ordinal)
         val equipment = itemEngine.getEquipment(playerId)
         val weaponVisualId = equipment.weaponInstanceId?.let { instanceId ->
             itemEngine.getInventory(playerId).firstOrNull { it.instanceId == instanceId }?.let { item ->
@@ -436,6 +441,7 @@ class MainActivity : Activity() {
         renderer.setEquippedWeapon(weaponVisualId)
         when (stage) {
             Stage.HOME -> {
+                fleeButton.visibility = View.GONE
                 title.text = "Дом героя"
                 val weapon = equipment.weaponInstanceId
                 val ownedSword = itemEngine.getInventory(playerId).any { it.itemId == "sword_sparks" }
@@ -446,6 +452,7 @@ class MainActivity : Activity() {
                 answers.visibility = View.GONE
             }
             Stage.VILLAGE -> {
+                fleeButton.visibility = View.GONE
                 title.text = "Деревенская площадь"
                 equipmentButton.visibility = View.GONE
                 message.text = "NPC просит проверить дорогу в лес."
@@ -453,6 +460,7 @@ class MainActivity : Activity() {
                 answers.visibility = View.GONE
             }
             Stage.FOREST -> {
+                fleeButton.visibility = View.GONE
                 title.text = "Лес"
                 message.text = "Впереди маленькое существо."
                 action.text = "Начать бой"
@@ -469,6 +477,7 @@ class MainActivity : Activity() {
                 fleeButton.visibility = View.VISIBLE
             }
             Stage.RETURN_HOME -> {
+                fleeButton.visibility = View.GONE
                 title.text = "Возвращение"
                 message.text = "Игровой цикл завершён. Правильных ответов в сохранении: ${progressStore.totalCorrect}."
                 action.text = "Вернуться домой"
