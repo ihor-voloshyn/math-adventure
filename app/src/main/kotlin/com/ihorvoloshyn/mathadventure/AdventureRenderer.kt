@@ -198,6 +198,12 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             cube(x, y + 0.95f + bounce, z - 0.38f, 0.44f, 0.28f, 0.08f, 0.66f, 0.48f, 0.18f)
         }
 
+        private fun drawSceneDecor(x: Float, y: Float, z: Float) {
+            // Small low-poly stones and flowers soften the ground without changing gameplay.
+            cube(x, y + 0.06f, z, 0.22f, 0.12f, 0.16f, 0.42f, 0.46f, 0.48f)
+            cube(x + 0.28f, y + 0.05f, z + 0.08f, 0.12f, 0.10f, 0.12f, 0.86f, 0.68f, 0.24f)
+        }
+
         private fun tree(x: Float, y: Float, z: Float) {
             cube(x, y + 0.85f, z, 0.28f, 1.7f, 0.28f, 0.42f, 0.24f, 0.10f)
             cube(x, y + 1.75f, z, 1.15f, 1.05f, 1.15f, 0.16f, 0.52f, 0.22f)
