@@ -59,7 +59,10 @@ class CombatEngine {
                         "COMBAT_VICTORY"
                     )
                 } else {
-                    enemyTurn(state.copy(enemyHp = hp, playerTurn = false), CombatResolution.HIT)
+                    CombatOutcome(
+                        state.copy(enemyHp = hp, playerTurn = true),
+                        CombatResolution.HIT
+                    )
                 }
             }
             CombatAction.DEFEND -> enemyTurn(state.copy(playerTurn = false), CombatResolution.BLOCKED)
