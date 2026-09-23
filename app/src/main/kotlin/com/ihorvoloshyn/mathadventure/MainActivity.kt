@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.widget.Button
+import android.graphics.drawable.GradientDrawable
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -126,34 +127,36 @@ class MainActivity : Activity() {
 
         val hud = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(28, 20, 28, 20)
+            setPadding(24, 18, 24, 12)
+            background = panelBackground(0xB81B2638.toInt(), 24f)
         }
-        title = textView(24f)
-        message = textView(17f)
+        title = textView(24f).apply { setTypeface(typeface, android.graphics.Typeface.BOLD) }
+        message = textView(16f).apply { setPadding(0, 8, 0, 4) }
         hud.addView(title)
         hud.addView(message)
 
         val bottom = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER
-            setPadding(28, 8, 28, 22)
+            setPadding(18, 8, 18, 18)
+            background = panelBackground(0xCC101722.toInt(), 26f)
         }
-        action = Button(this).apply { setOnClickListener { onPrimaryAction() } }
-        bottom.addView(action, LinearLayout.LayoutParams(-1, 62))
-        fleeButton = Button(this).apply {
-            text = "Убежать"
+        action = gameButton().apply { setOnClickListener { onPrimaryAction() } }
+        bottom.addView(action, LinearLayout.LayoutParams(-1, 56).apply { bottomMargin = 8 })
+        fleeButton = gameButton().apply {
+            text = "🏃 Убежать"
             setOnClickListener { flee() }
         }
-        bottom.addView(fleeButton, LinearLayout.LayoutParams(-1, 62))
-        equipmentButton = Button(this).apply { setOnClickListener { toggleWeapon() } }
-        bottom.addView(equipmentButton, LinearLayout.LayoutParams(-1, 62))
+        bottom.addView(fleeButton, LinearLayout.LayoutParams(-1, 52).apply { bottomMargin = 8 })
+        equipmentButton = gameButton().apply { setOnClickListener { toggleWeapon() } }
+        bottom.addView(equipmentButton, LinearLayout.LayoutParams(-1, 52).apply { bottomMargin = 8 })
 
         answers = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
             visibility = View.GONE
         }
-        bottom.addView(answers)
+        bottom.addView(answers, LinearLayout.LayoutParams(-1, 58))
 
         root.addView(hud, FrameLayout.LayoutParams(-1, -2))
         root.addView(bottom, FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM))
@@ -252,18 +255,38 @@ class MainActivity : Activity() {
             else -> listOf(values[2], values[3], values[0], values[1])
         }
         ordered.forEach { value ->
-            answers.addView(Button(this).apply {
+            answers.addView(gameButton().apply {
                 text = "⚔ $value"
-                setTextColor(Color.WHITE)
+                setTextSize(18f)
                 setOnClickListener { submitAttack(value.toString()) }
-            }, LinearLayout.LayoutParams(0, 62, 1f))
+            }, LinearLayout.LayoutParams(0, 56, 1f).apply {
+                marginStart = 4
+                marginEnd = 4
+            })
         }
     }
 
     private fun textView(size: Float) = TextView(this).apply {
         textSize = size
         setTextColor(Color.WHITE)
-        setShadowLayer(6f, 2f, 2f, Color.BLACK)
+        setShadowLayer(5f, 2f, 2f, Color.BLACK)
+    }
+
+    private fun panelBackground(color: Int, radius: Float) =
+        GradientDrawable().apply {
+            setColor(color)
+            cornerRadius = radius
+        }
+
+    private fun gameButton() = Button(this).apply {
+        setTextColor(Color.WHITE)
+        textSize = 15f
+        isAllCaps = false
+        minHeight = 0
+        minimumHeight = 0
+        setPadding(10, 0, 10, 0)
+        background = panelBackground(0xE52D3A4A.toInt(), 22f)
+        stateListAnimator = null
     }
 
     private fun advance() {
@@ -339,7 +362,7 @@ class MainActivity : Activity() {
                     append(progression.rpgLevel)
                     append(".")
                 }
-                action.text = "Вернуться домой"
+                action.text = "↩ Вернуться домой"
             }
             CombatResolution.DEFEAT -> {
                 stage = Stage.RETURN_HOME
@@ -469,7 +492,7 @@ class MainActivity : Activity() {
                 val state = combatState ?: return
                 title.text = "⚔ Бой с Тёмным гоблином • Сердца " + state.heroHearts + "/" + state.maxHeroHearts + " • Гоблин " + state.enemyHp + "/3"
                 message.text = (generated?.task?.prompt ?: "Математическая атака") + "\nВыбери ответ — это атака. 🛡 Защита не наносит урон и не получает урон. 🏃 Убежать завершает бой."
-                action.text = "🛡 Защищаться — без урона"
+                action.text = "🛡 Защита"
                 equipmentButton.visibility = View.GONE
                 answers.visibility = View.VISIBLE
                 fleeButton.visibility = View.VISIBLE
