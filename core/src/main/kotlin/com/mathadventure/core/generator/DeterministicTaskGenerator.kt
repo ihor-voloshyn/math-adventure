@@ -17,11 +17,15 @@ class DeterministicTaskGenerator(private val generatorVersion: String = "1.0") :
         }
     }
     private fun additionTask(b: TaskBlueprint, seed: Long, crossTen: Boolean): TaskInstance {
-        val a = if (crossTen) 27 else 12
-        val c = if (crossTen) 18 else 5
+        val index = b.constraints["taskIndex"]?.toIntOrNull() ?: 0
+        val basicPairs = listOf(12 to 5, 8 to 7, 14 to 3, 9 to 6, 11 to 8)
+        val crossPairs = listOf(27 to 18, 16 to 15, 28 to 14, 19 to 23, 36 to 17)
+        val pair = (if (crossTen) crossPairs else basicPairs)[kotlin.math.abs(index) % (if (crossTen) crossPairs.size else basicPairs.size)]
+        val a = pair.first
+        val c = pair.second
         return TaskInstance("task-" + seed.toString(16), b.skillId, b.mode, b.difficulty, b.contextType,
             "$a + $c = ?", b.inputType, (a + c).toString(),
-            generationMetadata = mapOf("generatorVersion" to generatorVersion, "seed" to seed.toString()))
+            generationMetadata = mapOf("generatorVersion" to generatorVersion, "seed" to seed.toString(), "taskIndex" to index.toString()))
     }
     private fun genericTask(b: TaskBlueprint, seed: Long) = TaskInstance(
         "task-" + seed.toString(16), b.skillId, b.mode, b.difficulty, b.contextType,
