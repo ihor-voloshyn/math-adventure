@@ -44,6 +44,15 @@ class CombatEngine {
             return CombatOutcome(state.copy(active = false, playerTurn = false), CombatResolution.FLED)
         }
 
+        if (action == CombatAction.DEFEND) {
+            // Defense is an explicit combat action, so it blocks the enemy
+            // regardless of the math-answer flag supplied by the caller.
+            return CombatOutcome(
+                state.copy(playerTurn = true),
+                CombatResolution.BLOCKED
+            )
+        }
+
         if (!correct) {
             val next = state.copy(playerTurn = false)
             return enemyTurn(next, CombatResolution.MISS)
@@ -65,14 +74,7 @@ class CombatEngine {
                     )
                 }
             }
-            CombatAction.DEFEND -> {
-                // Defending consumes the player's action but blocks the enemy attack.
-                // It must never remove a hero heart.
-                CombatOutcome(
-                    state.copy(playerTurn = true),
-                    CombatResolution.BLOCKED
-                )
-            }
+            CombatAction.DEFEND -> error("handled above")
             CombatAction.FLEE -> error("handled above")
         }
     }
