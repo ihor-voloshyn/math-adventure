@@ -329,6 +329,8 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             cylinder(x + 0.52f, y + 2.48f + bounce, z, 0.13f, 0.10f, 0.22f, 0.08f, 0.04f)
             sphere(x + 1.12f, y + 1.62f + bounce, z - 0.12f, 0.30f, 0.18f, 0.26f, 0.26f, 0.12f, 0.05f)
             sphere(x + 1.12f, y + 1.78f + bounce, z - 0.12f, 0.12f, 0.08f, 0.10f, 0.38f, 0.20f, 0.08f)
+        }
+
         private fun tree(x: Float, y: Float, z: Float) {
             cylinder(x, y + 0.9f, z, 0.32f, 1.8f, 0.40f, 0.22f, 0.08f)
             sphere(x, y + 2.05f, z, 1.25f, 0.82f, 0.95f, 0.10f, 0.45f, 0.18f)
