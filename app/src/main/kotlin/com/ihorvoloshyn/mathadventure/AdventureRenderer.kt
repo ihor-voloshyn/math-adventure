@@ -179,6 +179,7 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             coneShape(x + 0.20f, y + 1.05f + bob, z, 0.13f, 0.25f, 0.13f, 0.72f, 0.48f, 0.20f)
             cube(x, y + 0.74f + bob, z - 0.25f, 0.22f, 0.16f, 0.10f, 0.88f, 0.66f, 0.30f)
             cube(x + 0.48f, y + 0.48f + bob, z + 0.02f, 0.12f, 0.42f, 0.12f, 0.82f, 0.62f, 0.22f)
+            drawPetFace(x, y, z, bob)
         }
 
         private fun drawNpc(x: Float, y: Float, z: Float) {
@@ -200,6 +201,21 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             cube(x - 0.34f, y + 0.16f + bounce, z, 0.20f, 0.28f, 0.28f, 0.30f, 0.40f, 0.16f)
             cube(x + 0.34f, y + 0.16f + bounce, z, 0.20f, 0.28f, 0.28f, 0.30f, 0.40f, 0.16f)
             cube(x, y + 0.95f + bounce, z - 0.38f, 0.44f, 0.28f, 0.08f, 0.66f, 0.48f, 0.18f)
+            drawEnemyFace(x, y, z, bounce)
+        }
+
+        private fun drawPetFace(x: Float, y: Float, z: Float, bob: Float) {
+            // Tiny facial accents make the pet readable at gameplay distance.
+            cube(x - 0.12f, y + 0.80f + bob, z - 0.245f, 0.06f, 0.07f, 0.035f, 0.10f, 0.08f, 0.06f)
+            cube(x + 0.12f, y + 0.80f + bob, z - 0.245f, 0.06f, 0.07f, 0.035f, 0.10f, 0.08f, 0.06f)
+            cube(x, y + 0.69f + bob, z - 0.27f, 0.11f, 0.06f, 0.045f, 0.34f, 0.16f, 0.12f)
+        }
+
+        private fun drawEnemyFace(x: Float, y: Float, z: Float, bounce: Float) {
+            cube(x - 0.18f, y + 1.61f + bounce, z - 0.32f, 0.09f, 0.11f, 0.04f, 0.95f, 0.88f, 0.34f)
+            cube(x + 0.18f, y + 1.61f + bounce, z - 0.32f, 0.09f, 0.11f, 0.04f, 0.95f, 0.88f, 0.34f)
+            cube(x - 0.18f, y + 1.61f + bounce, z - 0.35f, 0.035f, 0.07f, 0.025f, 0.10f, 0.08f, 0.06f)
+            cube(x + 0.18f, y + 1.61f + bounce, z - 0.35f, 0.035f, 0.07f, 0.025f, 0.10f, 0.08f, 0.06f)
         }
 
         private fun drawSceneDecor(x: Float, y: Float, z: Float) {
