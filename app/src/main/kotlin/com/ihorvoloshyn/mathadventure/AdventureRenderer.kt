@@ -262,8 +262,6 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             sphere(x + 0.15f, y + 1.03f + bob, z - 0.42f, 0.06f, 0.06f, 0.04f, 0.02f, 0.02f, 0.02f)
             cylinder(x + 0.62f, y + 0.62f + bob, z + 0.02f, 0.08f, 0.52f, 0.22f, 0.54f, 0.66f)
             sphere(x + 0.62f, y + 0.36f + bob, z - 0.02f, 0.13f, 0.10f, 0.16f, 0.16f, 0.34f, 0.42f)
-        }
-
             // Pet equipment: a small adventure harness and luminous tag.
             cylinder(x, y + 0.54f + bob, z - 0.02f, 0.40f, 0.07f, 0.12f, 0.18f, 0.24f)
             sphere(x, y + 0.56f + bob, z - 0.43f, 0.07f, 0.09f, 0.04f, 0.72f, 0.52f, 0.16f)
@@ -275,6 +273,8 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             sphere(x + 0.36f, y + 0.08f + bob, z - 0.28f, 0.18f, 0.10f, 0.22f, 0.14f, 0.36f, 0.44f)
             sphere(x - 0.18f, y + 0.82f + bob, z - 0.49f, 0.07f, 0.05f, 0.04f, 0.08f, 0.08f, 0.08f)
             sphere(x + 0.18f, y + 0.82f + bob, z - 0.49f, 0.07f, 0.05f, 0.04f, 0.08f, 0.08f, 0.08f)
+        }
+
         private fun drawNpc(x: Float, y: Float, z: Float) {
             cylinder(x, y + 0.82f, z, 0.58f, 1.25f, 0.30f, 0.58f, 0.38f)
             sphere(x, y + 1.72f, z, 0.48f, 0.88f, 0.72f, 0.55f, 0.38f)
@@ -334,8 +334,6 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             cylinder(x + 0.52f, y + 2.48f + bounce, z, 0.13f, 0.10f, 0.22f, 0.08f, 0.04f)
             sphere(x + 1.12f, y + 1.62f + bounce, z - 0.12f, 0.30f, 0.18f, 0.26f, 0.26f, 0.12f, 0.05f)
             sphere(x + 1.12f, y + 1.78f + bounce, z - 0.12f, 0.12f, 0.08f, 0.10f, 0.38f, 0.20f, 0.08f)
-        }
-
         }
 
         private fun tree(x: Float, y: Float, z: Float) {
