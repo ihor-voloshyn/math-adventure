@@ -41,6 +41,7 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
         private var lastTouchY = 0f
         private lateinit var cube: Cube
         private lateinit var gableRoof: GableRoof
+        private lateinit var cone: LowPolyCone
 
         override fun onSurfaceCreated(
             gl: javax.microedition.khronos.opengles.GL10?,
@@ -50,6 +51,7 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             program = Shader.create()
             cube = Cube()
             gableRoof = GableRoof()
+            cone = LowPolyCone()
             GLES20.glEnable(GLES20.GL_DEPTH_TEST)
         }
 
@@ -115,6 +117,8 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             drawPet(0.0f, 0f, 1.6f)
             if (stage == 1) drawNpc(1.8f, 0f, -1.2f)
             if (stage == 2 || stage == 3) drawEnemy(2.2f, 0f, -1.0f)
+            drawSceneDecor(-2.0f, 0f, -1.0f)
+            drawSceneDecor(1.0f, 0f, 1.1f)
         }
 
         private fun drawHome() {
@@ -171,8 +175,8 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             // Friendly puppy/kitten-like silhouette with ears, muzzle and tail.
             cube(x, y + 0.38f + bob, z, 0.68f, 0.48f, 0.62f, 0.82f, 0.62f, 0.22f)
             cube(x, y + 0.78f + bob, z - 0.03f, 0.48f, 0.42f, 0.48f, 0.94f, 0.76f, 0.38f)
-            cube(x - 0.20f, y + 1.02f + bob, z, 0.14f, 0.22f, 0.14f, 0.72f, 0.48f, 0.20f)
-            cube(x + 0.20f, y + 1.02f + bob, z, 0.14f, 0.22f, 0.14f, 0.72f, 0.48f, 0.20f)
+            coneShape(x - 0.20f, y + 1.05f + bob, z, 0.13f, 0.25f, 0.13f, 0.72f, 0.48f, 0.20f)
+            coneShape(x + 0.20f, y + 1.05f + bob, z, 0.13f, 0.25f, 0.13f, 0.72f, 0.48f, 0.20f)
             cube(x, y + 0.74f + bob, z - 0.25f, 0.22f, 0.16f, 0.10f, 0.88f, 0.66f, 0.30f)
             cube(x + 0.48f, y + 0.48f + bob, z + 0.02f, 0.12f, 0.42f, 0.12f, 0.82f, 0.62f, 0.22f)
         }
@@ -191,8 +195,8 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             // Chunky friendly fantasy monster: horns, belly and feet.
             cube(x, y + 0.82f + bounce, z, 0.92f, 0.95f, 0.72f, 0.44f, 0.62f, 0.24f)
             cube(x, y + 1.58f + bounce, z, 0.66f, 0.58f, 0.62f, 0.38f, 0.55f, 0.20f)
-            cube(x - 0.34f, y + 2.02f + bounce, z, 0.14f, 0.42f, 0.14f, 0.38f, 0.55f, 0.20f)
-            cube(x + 0.34f, y + 2.02f + bounce, z, 0.14f, 0.42f, 0.14f, 0.38f, 0.55f, 0.20f)
+            coneShape(x - 0.34f, y + 2.10f + bounce, z, 0.15f, 0.50f, 0.15f, 0.38f, 0.55f, 0.20f)
+            coneShape(x + 0.34f, y + 2.10f + bounce, z, 0.15f, 0.50f, 0.15f, 0.38f, 0.55f, 0.20f)
             cube(x - 0.34f, y + 0.16f + bounce, z, 0.20f, 0.28f, 0.28f, 0.30f, 0.40f, 0.16f)
             cube(x + 0.34f, y + 0.16f + bounce, z, 0.20f, 0.28f, 0.28f, 0.30f, 0.40f, 0.16f)
             cube(x, y + 0.95f + bounce, z - 0.38f, 0.44f, 0.28f, 0.08f, 0.66f, 0.48f, 0.18f)
@@ -206,9 +210,9 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
 
         private fun tree(x: Float, y: Float, z: Float) {
             cube(x, y + 0.85f, z, 0.28f, 1.7f, 0.28f, 0.42f, 0.24f, 0.10f)
-            cube(x, y + 1.75f, z, 1.15f, 1.05f, 1.15f, 0.16f, 0.52f, 0.22f)
-            cube(x, y + 2.55f, z, 0.92f, 0.85f, 0.92f, 0.18f, 0.62f, 0.25f)
-            cube(x + 0.12f, y + 3.05f, z, 0.62f, 0.48f, 0.62f, 0.20f, 0.68f, 0.28f)
+            coneShape(x, y + 2.05f, z, 1.20f, 1.65f, 1.20f, 0.16f, 0.52f, 0.22f)
+            coneShape(x, y + 2.75f, z, 0.92f, 1.25f, 0.92f, 0.18f, 0.62f, 0.25f)
+            coneShape(x + 0.10f, y + 3.25f, z, 0.58f, 0.80f, 0.58f, 0.20f, 0.68f, 0.28f)
         }
 
         private fun roof(
@@ -222,6 +226,15 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             Matrix.multiplyMM(mvp, 0, view, 0, model, 0)
             Matrix.multiplyMM(mvp, 0, projection, 0, mvp, 0)
             gableRoof.draw(program, mvp, r, g, b)
+        }
+
+        private fun coneShape(x: Float, y: Float, z: Float, sx: Float, sy: Float, sz: Float, r: Float, g: Float, b: Float) {
+            Matrix.setIdentityM(model, 0)
+            Matrix.translateM(model, 0, x, y, z)
+            Matrix.scaleM(model, 0, sx, sy, sz)
+            Matrix.multiplyMM(mvp, 0, view, 0, model, 0)
+            Matrix.multiplyMM(mvp, 0, projection, 0, mvp, 0)
+            cone.draw(program, mvp, r, g, b)
         }
 
         private fun cube(
@@ -267,6 +280,40 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             GLES20.glEnableVertexAttribArray(pos)
             GLES20.glVertexAttribPointer(pos, 3, GLES20.GL_FLOAT, false, 0, buffer)
             GLES20.glDrawElements(GLES20.GL_TRIANGLES, indices.size, GLES20.GL_UNSIGNED_SHORT, indexBuffer)
+            GLES20.glDisableVertexAttribArray(pos)
+        }
+    }
+
+    private class LowPolyCone {
+        private val vertices = FloatArray(30)
+        private val indices = ShortArray(48)
+        private val buffer = java.nio.ByteBuffer.allocateDirect(vertices.size * 4).order(java.nio.ByteOrder.nativeOrder()).asFloatBuffer()
+        private val indexBuffer = java.nio.ByteBuffer.allocateDirect(indices.size * 2).order(java.nio.ByteOrder.nativeOrder()).asShortBuffer()
+        init {
+            vertices[0]=0f; vertices[1]=1f; vertices[2]=0f
+            for (i in 0 until 8) {
+                val a=(2.0*Math.PI*i/8).toFloat()
+                val p=3+i*3
+                vertices[p]=kotlin.math.cos(a); vertices[p+1]=-1f; vertices[p+2]=kotlin.math.sin(a)
+            }
+            vertices[27]=0f; vertices[28]=-1f; vertices[29]=0f
+            for(i in 0 until 8) {
+                val n=(i+1)%8; val p=i*6
+                indices[p]=0; indices[p+1]=(1+i).toShort(); indices[p+2]=(1+n).toShort()
+                indices[p+3]=9; indices[p+4]=(1+n).toShort(); indices[p+5]=(1+i).toShort()
+            }
+            buffer.put(vertices).position(0); indexBuffer.put(indices).position(0)
+        }
+        fun draw(program:Int,mvp:FloatArray,r:Float,g:Float,b:Float) {
+            val pos=GLES20.glGetAttribLocation(program,"aPosition")
+            val matrix=GLES20.glGetUniformLocation(program,"uMvp")
+            val color=GLES20.glGetUniformLocation(program,"uColor")
+            GLES20.glUseProgram(program)
+            GLES20.glUniformMatrix4fv(matrix,1,false,mvp,0)
+            GLES20.glUniform4f(color,r,g,b,1f)
+            GLES20.glEnableVertexAttribArray(pos)
+            GLES20.glVertexAttribPointer(pos,3,GLES20.GL_FLOAT,false,0,buffer)
+            GLES20.glDrawElements(GLES20.GL_TRIANGLES,indices.size,GLES20.GL_UNSIGNED_SHORT,indexBuffer)
             GLES20.glDisableVertexAttribArray(pos)
         }
     }
