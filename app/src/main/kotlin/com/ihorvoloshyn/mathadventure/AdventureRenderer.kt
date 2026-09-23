@@ -129,7 +129,7 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             roof(-2.5f, 2.45f, -1.8f, 3.95f, 1.35f, 3.1f, 0.55f, 0.12f, 0.10f)
             cube(-2.5f, 0.75f, -0.35f, 0.75f, 1.35f, 0.16f, 0.18f, 0.09f, 0.05f)
             cube(-3.25f, 0.18f, -0.15f, 0.8f, 0.18f, 1.0f, 0.55f, 0.36f, 0.18f)
-            sphere(-3.25f, 0.52f, -0.15f, 0.38f, 0.28f, 0.12f, 0.05f)
+            sphere(-3.25f, 0.52f, -0.15f, 0.38f, 0.28f, 0.12f, 0.62f, 0.42f, 0.20f)
         }
 
         private fun drawVillage() {
@@ -247,70 +247,34 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
                 for(i in 0 until rings) for(j in 0 until seg){ val a=(i*seg+j).toShort(); val b=(i*seg+(j+1)%seg).toShort(); val c=((i+1)*seg+j).toShort(); val d=((i+1)*seg+(j+1)%seg).toShort(); ind += a; ind += c; ind += b; ind += b; ind += c; ind += d }
                 return Mesh(v.toFloatArray(),ind.toShortArray())
             }
-            fun cylinder(): Mesh { return prism(12, 1f, 1f) }
+            fun cylinder(): Mesh { return cylinderMesh(12) }
             fun cone(): Mesh { return coneMesh(12) }
-            fun roof(): Mesh { return prism(4, 1f, 0.72f) }
-            private fun prism(seg:Int, top:Float, bottom:Float): Mesh { val v=mutableListOf<Float>(); val ind=mutableListOf<Short>(); v += -1f;v += -1f;v += -1f;v += 1f;v += -1f;v += -1f;v += 1f;v += -1f;v += 1f;v += -1f;v += -1f;v += 1f; return cubeLike(v,ind) }
-            private fun cubeLike(v:MutableList<Float>,i:MutableList<Short>):Mesh { i += 0;i += 1;i += 2;i += 2;i += 3;i += 0; return Mesh(v.toFloatArray(),i.toShortArray()) }
-            private fun coneMesh(seg:Int): Mesh { val v=mutableListOf<Float>(); val i=mutableListOf<Short>(); v += 0f;v += 1f;v += 0f; for(j in 0 until seg){ val t=2*Math.PI*j/seg; v += cos(t).toFloat();v += -1f;v += sin(t).toFloat() }; for(j in 0 until seg){ i += 0;i += (1+j).toShort();i += (1+(j+1)%seg).toShort() }; return Mesh(v.toFloatArray(),i.toShortArray()) }
-        }
-    }
-
-    private class Cube {
-        private val vertices = floatArrayOf(
-            -1f,-1f,-1f, 1f,-1f,-1f, 1f,1f,-1f, -1f,1f,-1f,
-            -1f,-1f,1f, 1f,-1f,1f, 1f,1f,1f, -1f,1f,1f
-        )
-        private val indices = shortArrayOf(
-            0,1,2, 2,3,0, 1,5,6, 6,2,1, 5,4,7, 7,6,5,
-            4,0,3, 3,7,4, 3,2,6, 6,7,3, 4,5,1, 1,0,4
-        )
-        private val buffer = java.nio.ByteBuffer.allocateDirect(vertices.size * 4)
-            .order(java.nio.ByteOrder.nativeOrder()).asFloatBuffer()
-        private val indexBuffer = java.nio.ByteBuffer.allocateDirect(indices.size * 2)
-            .order(java.nio.ByteOrder.nativeOrder()).asShortBuffer()
-
-        init {
-            buffer.put(vertices).position(0)
-            indexBuffer.put(indices).position(0)
-        }
-
-        fun draw(program: Int, mvp: FloatArray, r: Float, g: Float, b: Float) {
-            val pos = GLES20.glGetAttribLocation(program, "aPosition")
-            val matrix = GLES20.glGetUniformLocation(program, "uMvp")
-            val color = GLES20.glGetUniformLocation(program, "uColor")
-            GLES20.glUseProgram(program)
-            GLES20.glUniformMatrix4fv(matrix, 1, false, mvp, 0)
-            GLES20.glUniform4f(color, r, g, b, 1f)
-            GLES20.glEnableVertexAttribArray(pos)
-            GLES20.glVertexAttribPointer(pos, 3, GLES20.GL_FLOAT, false, 0, buffer)
-            GLES20.glDrawElements(GLES20.GL_TRIANGLES, indices.size, GLES20.GL_UNSIGNED_SHORT, indexBuffer)
-            GLES20.glDisableVertexAttribArray(pos)
-        }
-    }
-
-    private object Shader {
-        fun create(): Int {
-            val vertex = compile(
-                GLES20.GL_VERTEX_SHADER,
-                "attribute vec4 aPosition; uniform mat4 uMvp; void main(){gl_Position=uMvp*aPosition;}"
-            )
-            val fragment = compile(
-                GLES20.GL_FRAGMENT_SHADER,
-                "precision mediump float; uniform vec4 uColor; void main(){gl_FragColor=uColor;}"
-            )
-            return GLES20.glCreateProgram().also {
-                GLES20.glAttachShader(it, vertex)
-                GLES20.glAttachShader(it, fragment)
-                GLES20.glLinkProgram(it)
+            fun roof(): Mesh { return pyramidMesh() }
+            private fun cylinderMesh(seg:Int): Mesh {
+                val v=mutableListOf<Float>(); val i=mutableListOf<Short>()
+                for (y in listOf(-1f, 1f)) for (j in 0 until seg) {
+                    val t=2*Math.PI*j/seg
+                    v += cos(t).toFloat(); v += y; v += sin(t).toFloat()
+                }
+                for (j in 0 until seg) {
+                    val n=(j+1)%seg
+                    i += j.toShort(); i += (seg+j).toShort(); i += n.toShort()
+                    i += n.toShort(); i += (seg+j).toShort(); i += (seg+n).toShort()
+                    i += 0; i += n.toShort(); i += j.toShort()
+                    i += seg.toShort(); i += (seg+j).toShort(); i += (seg+n).toShort()
+                }
+                return Mesh(v.toFloatArray(),i.toShortArray())
             }
-        }
-
-        private fun compile(type: Int, source: String): Int {
-            return GLES20.glCreateShader(type).also {
-                GLES20.glShaderSource(it, source)
-                GLES20.glCompileShader(it)
+            private fun coneMesh(seg:Int): Mesh {
+                val v=mutableListOf<Float>(); val i=mutableListOf<Short>()
+                v += 0f; v += 1f; v += 0f
+                for (j in 0 until seg) { val t=2*Math.PI*j/seg; v += cos(t).toFloat(); v += -1f; v += sin(t).toFloat() }
+                for (j in 0 until seg) { val n=(j+1)%seg; i += 0; i += (1+j).toShort(); i += (1+n).toShort() }
+                return Mesh(v.toFloatArray(),i.toShortArray())
             }
-        }
-    }
-}
+            private fun pyramidMesh(): Mesh {
+                val v=floatArrayOf(-1f,-1f,-1f, 1f,-1f,-1f, 1f,-1f,1f, -1f,-1f,1f, 0f,1f,0f)
+                val i=shortArrayOf(0,1,4, 1,2,4, 2,3,4, 3,0,4)
+                return Mesh(v,i)
+            }
+
