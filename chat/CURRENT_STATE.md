@@ -1,9 +1,9 @@
 # Math Adventure — Current State
 
 ## Last checkpoint
-2026-09-23 — checkpoint 0003 (Develop MVP 01)
+2026-09-23 — checkpoint 0004 (Develop MVP 01)
 
-Checkpoint 0003 preserves the current implementation and continuation state after the Items & Equipment → Inventory → Equipment → Combat integration sequence. The exact full transcript for this interval was not fully available in active context, so unavailable conversation text was not fabricated.
+Checkpoint 0004 preserves the latest implementation state and the newly confirmed Hero/Pet concept.
 
 ## Working agreement
 When the user writes «продолжай», inspect the repository, open PRs and QA first, then continue the next logical implementation stage without asking for confirmation.
@@ -14,20 +14,41 @@ When the user writes «сохрани чат», preserve the available conversat
 - Default branch: main
 
 ## Current implementation state
+- PR #43 Items & Equipment foundation merged.
+- PR #44 Game Progression loot → Inventory merged.
+- PR #45 Android Inventory/Equipment persistence + combat loot wiring merged.
+- PR #46 Android Equip/Unequip + persistence + visual weapon state merged.
+- PR #47 Equipment stats → Combat merged.
+- PR #48 Equipment → Combat invariant validation merged.
+- PR #49 Android inventory persistence hardening merged.
+- PR #50 Equipment state validation before persistence merged.
+- PR #51 Android MVP acceptance matrix merged.
+- PR #52 is currently open: fix: show actual combat heart maximum.
+  - Base main SHA: 1b71339f52734edcabe12d8d367330ddd8a6e9ae
+  - Head SHA: 9f30bcc945b06f1e21d37435ecddee43d405f80d
+  - Scope: CombatState carries maxHeroHearts; HUD displays actual maximum; core test covers a 5-heart combat state.
+  - It has not been claimed merged; CI/QA must be checked before merge.
 
-### Items & Equipment
-- PR #43 added the approved Items & Equipment core foundation and merged as `41720bc9acc40f329ae10abc66ab1d2e681a5e3f`.
-- PR #44 connected Game Progression loot to Inventory through deterministic loot creation and an atomic progression+loot boundary; merged after QA.
-- PR #45 added Android Inventory/Equipment persistence and combat-victory loot wiring; merged after QA.
-- PR #46 added Android Equip/Unequip controls, persistence and visual weapon state; merged after QA.
-- PR #47 connected Equipment stats to Combat; attack damage and starting Hearts are consumed by Combat while Inventory/Equipment remains the source of state; merged after QA.
-- PR #48 hardened Equipment → Combat state invariants and merged after QA.
+## Confirmed Hero concept
+- The Hero is the character itself: a kitten or puppy.
+- The player chooses Cat or Dog at the start.
+- There is no gender-selection step.
+- Cat/Dog is not a separate pet.
+- The Hero grows visually through progression: kitten/puppy → young → adult hero.
+- Hero development supports Knight and Mage directions.
+- Equipment is visually worn by the Hero.
+- Appearance can be customized through fur/appearance, clothing, armor, weapons, artifacts and accessories.
+- Hero gameplay stats are separate from mathematical Mastery.
 
-### Open PR
-- PR #49: `fix: harden Android inventory persistence`
-- Head: `47e2003b2c3089bc21ceb263faec8d5d0c612d1a`
-- Status at checkpoint: open, awaiting CI/QA.
-- Scope: validate inventory player ownership, known item IDs, duplicate instance IDs, equipped ownership/non-stacking, and SharedPreferences commit failure. Keep progression + loot in one local persistence boundary.
+## Confirmed separate Pet system
+- Separate companion pets can exist in addition to the Cat/Dog Hero.
+- Initial concept list: rabbit, fox, dragon, owl, squirrel, turtle, hedgehog, frog.
+- MVP should expose only a small subset; other pets can unlock progressively.
+- Pets can grow/develop visually.
+- Pets may provide gameplay bonuses such as Attack, Defense, Hearts, Ability Power or other Combat Modifiers.
+- Pets do not directly modify Mastery, Adaptive Engine decisions, or mathematical correctness.
+- Pet bonuses are conceptually equivalent to equipment/other gameplay bonuses.
+- The pet catalog remains extensible; the full final roster is not yet locked.
 
 ## Architecture boundaries
 - Math Engine is authoritative for mathematical truth.
@@ -38,19 +59,28 @@ When the user writes «сохрани чат», preserve the available conversat
 - Combat consumes resolved combat stats and does not mutate Inventory/Equipment.
 - Visual equipment state derives from Equipment + Inventory + ItemDefinition.
 - Android SharedPreferences is prototype persistence only; final server-of-truth sync remains future work.
+- Mastery remains a learning-system state and is not modified by RPG Level, equipment or pet bonuses.
+
+## Current gameplay stat model
+- Base combat hearts without equipment: 3.
+- Equipment can add Hearts; current prototype sword gives Attack +1 and no Hearts bonus.
+- Combat HUD fix PR #52 makes the displayed maximum match the actual combat start value.
+- Attack and Hearts are currently consumed by Combat; Defense is resolved but not yet applied to enemy damage.
+- XP/RPG Level, Equipment, Abilities, Pets and Combat Modifiers belong to game progression; Mastery remains separate.
 
 ## Known gaps
-- Android end-to-end persistence acceptance for Loot → Inventory → Equip → Restart/Load → Combat/Visual is not yet claimed complete.
-- Combat defense is resolved but not yet applied to enemy damage.
+- PR #52 QA/merge status still needs verification.
+- Android runtime/device acceptance A01–A20 is not claimed complete.
+- Combat defense application remains intentionally unresolved.
 - Final XP/Coins economy and unlock policy remain unapproved vertical-slice tuning.
-- Child/device acceptance is not claimed.
+- Final server synchronization is future work.
 
 ## Next continuation
-1. Check PR #49 CI/QA.
-2. If all required QA passes, merge PR #49 and verify main.
-3. Continue Android persistence/integration acceptance coverage.
-4. Then proceed to the next approved gameplay block while preserving the established ownership boundaries.
+1. Inspect PR #52 CI/QA.
+2. If all required QA passes, merge PR #52 and verify main.
+3. Continue Android MVP runtime/integration acceptance; do not claim device acceptance from CI alone.
+4. Preserve the Hero/Pet concept and existing ownership boundaries.
 
 ## Archive
-- Checkpoint: `chat/checkpoints/0003-2026-09-23.md`
-- Chat archive checkpoint: `chat-history/2026-09-23_develop-mvp-01_checkpoint-03.md`
+- Checkpoint: chat/checkpoints/0004-2026-09-23.md
+- Chat archive: chat-history/2026-09-23_develop-mvp-01_checkpoint-04.md
