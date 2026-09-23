@@ -163,8 +163,19 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             tree(2.8f, 0f, -3.0f)
             tree(-4.0f, 0f, 2.7f)
             if (combat) {
+                // A distinct battle clearing: raised ring, stones, torches and a worn path.
                 cylinder(0.8f, 0.04f, -1.2f, 2.8f, 0.08f, 0.35f, 0.52f, 0.28f)
                 cylinder(0.8f, 0.10f, -1.2f, 2.15f, 0.06f, 0.48f, 0.60f, 0.34f)
+                cylinder(0.8f, 0.16f, -1.2f, 1.72f, 0.05f, 0.30f, 0.42f, 0.22f)
+                stone(-1.15f, 0.10f, -2.25f, 0.26f, 0.12f, 0.20f)
+                stone(2.65f, 0.10f, -0.55f, 0.22f, 0.14f, 0.18f)
+                stone(0.25f, 0.10f, -2.65f, 0.18f, 0.10f, 0.16f)
+                cylinder(-1.15f, 0.58f, -1.20f, 0.08f, 0.92f, 0.22f, 0.12f, 0.06f)
+                sphere(-1.15f, 1.12f, -1.20f, 0.18f, 0.20f, 0.18f, 0.88f, 0.42f, 0.08f)
+                cylinder(2.75f, 0.58f, -1.20f, 0.08f, 0.92f, 0.22f, 0.12f, 0.06f)
+                sphere(2.75f, 1.12f, -1.20f, 0.18f, 0.20f, 0.18f, 0.88f, 0.42f, 0.08f)
+                cylinder(0.8f, 0.17f, 1.00f, 0.34f, 0.05f, 0.30f, 0.25f, 0.16f)
+                cylinder(0.8f, 0.18f, 0.45f, 0.26f, 0.05f, 0.34f, 0.28f, 0.18f)
             }
         }
 
