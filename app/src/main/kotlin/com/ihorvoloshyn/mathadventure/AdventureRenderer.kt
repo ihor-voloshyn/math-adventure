@@ -243,8 +243,11 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             cone(x, y + 0.50f, z, 0.12f, 0.95f, 0.72f, 0.76f, 0.82f)
             sphere(x, y - 0.58f, z, 0.10f, 0.10f, 0.10f, 0.56f, 0.38f, 0.12f)
             if (enchanted) {
+                // Enchanted blade: rune-like guards and a small magical trail.
                 sphere(x, y + 0.72f, z - 0.03f, 0.07f, 0.07f, 0.07f, 0.45f, 0.78f, 1.0f)
                 sphere(x, y + 0.42f, z - 0.03f, 0.045f, 0.045f, 0.045f, 0.75f, 0.92f, 1.0f)
+                sphere(x - 0.12f, y + 0.22f, z - 0.03f, 0.035f, 0.06f, 0.035f, 0.40f, 0.82f, 1.0f)
+                sphere(x + 0.12f, y + 0.58f, z - 0.03f, 0.035f, 0.06f, 0.035f, 0.55f, 0.90f, 1.0f)
             }
         }
 
@@ -259,7 +262,11 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             sphere(x + 0.15f, y + 1.03f + bob, z - 0.42f, 0.06f, 0.06f, 0.04f, 0.02f, 0.02f, 0.02f)
             cylinder(x + 0.62f, y + 0.62f + bob, z + 0.02f, 0.08f, 0.52f, 0.22f, 0.54f, 0.66f)
             sphere(x + 0.62f, y + 0.36f + bob, z - 0.02f, 0.13f, 0.10f, 0.16f, 0.16f, 0.34f, 0.42f)
-        }\n\n            // Pet collar, tag and paws distinguish it from the hero while keeping it compact.
+        }\n\n            // Pet equipment: a small adventure harness and luminous tag.
+            cylinder(x, y + 0.54f + bob, z - 0.02f, 0.40f, 0.07f, 0.12f, 0.18f, 0.24f)
+            sphere(x, y + 0.56f + bob, z - 0.43f, 0.07f, 0.09f, 0.04f, 0.72f, 0.52f, 0.16f)
+            sphere(x, y + 0.34f + bob, z - 0.48f, 0.045f, 0.05f, 0.035f, 0.55f, 0.88f, 1.0f)
+            // Pet collar, tag and paws distinguish it from the hero while keeping it compact.
             cylinder(x, y + 0.82f + bob, z - 0.43f, 0.23f, 0.07f, 0.10f, 0.24f, 0.30f)
             sphere(x, y + 0.72f + bob, z - 0.50f, 0.08f, 0.09f, 0.05f, 0.92f, 0.68f, 0.16f)
             sphere(x - 0.36f, y + 0.08f + bob, z - 0.28f, 0.18f, 0.10f, 0.22f, 0.14f, 0.36f, 0.44f)
