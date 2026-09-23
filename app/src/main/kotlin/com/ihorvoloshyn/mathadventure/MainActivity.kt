@@ -2,8 +2,9 @@ package com.ihorvoloshyn.mathadventure
 
 import android.app.Activity
 import android.graphics.Color
-import android.os.Bundle
+import android.graphics.drawable.GradientDrawable
 import android.view.Gravity
+import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.FrameLayout
@@ -137,14 +138,14 @@ class MainActivity : Activity() {
             gravity = Gravity.CENTER
             setPadding(28, 8, 28, 22)
         }
-        action = Button(this).apply { setOnClickListener { onPrimaryAction() } }
+        action = styledButton().apply { setOnClickListener { onPrimaryAction() } }
         bottom.addView(action, LinearLayout.LayoutParams(-1, 62))
-        fleeButton = Button(this).apply {
+        fleeButton = styledButton().apply {
             text = "Убежать"
             setOnClickListener { flee() }
         }
         bottom.addView(fleeButton, LinearLayout.LayoutParams(-1, 62))
-        equipmentButton = Button(this).apply { setOnClickListener { toggleWeapon() } }
+        equipmentButton = styledButton().apply { setOnClickListener { toggleWeapon() } }
         bottom.addView(equipmentButton, LinearLayout.LayoutParams(-1, 62))
 
         answers = LinearLayout(this).apply {
@@ -248,12 +249,27 @@ class MainActivity : Activity() {
             else -> listOf(values[2], values[3], values[0], values[1])
         }
         ordered.forEach { value ->
-            answers.addView(Button(this).apply {
+            answers.addView(styledButton().apply {
                 text = value.toString()
                 setTextColor(Color.WHITE)
                 setOnClickListener { submitAttack(value.toString()) }
             }, LinearLayout.LayoutParams(0, 62, 1f))
         }
+    }
+
+    private fun styledButton() = Button(this).apply {
+        textSize = 16f
+        isAllCaps = false
+        setTextColor(Color.WHITE)
+        gravity = Gravity.CENTER
+        setPadding(18, 0, 18, 0)
+        background = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = 28f
+            setColor(Color.rgb(62, 74, 92))
+            setStroke(2, Color.rgb(150, 166, 190))
+        }
+        elevation = 8f
     }
 
     private fun textView(size: Float) = TextView(this).apply {
