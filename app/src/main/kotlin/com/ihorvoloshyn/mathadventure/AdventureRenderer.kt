@@ -403,11 +403,11 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
         fun create(): Int {
             val vertex = compile(
                 GLES20.GL_VERTEX_SHADER,
-                "attribute vec4 aPosition; uniform mat4 uMvp; void main(){gl_Position=uMvp*aPosition;}"
+                "attribute vec4 aPosition; uniform mat4 uMvp; varying float vLight; void main(){vec3 n=normalize(aPosition.xyz); vec3 lightDir=normalize(vec3(-0.45,0.80,0.55)); vLight=0.70+0.30*max(0.0,dot(n,lightDir)); gl_Position=uMvp*aPosition;}"
             )
             val fragment = compile(
                 GLES20.GL_FRAGMENT_SHADER,
-                "precision mediump float; uniform vec4 uColor; void main(){gl_FragColor=uColor;}"
+                "precision mediump float; uniform vec4 uColor; varying float vLight; void main(){gl_FragColor=vec4(uColor.rgb*vLight,uColor.a);}"
             )
             return GLES20.glCreateProgram().also {
                 GLES20.glAttachShader(it, vertex)
