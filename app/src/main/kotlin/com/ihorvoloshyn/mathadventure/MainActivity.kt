@@ -367,7 +367,7 @@ class MainActivity : Activity() {
         } else {
             generateMathTask()
             renderStage()
-            message.text = "Ты защищаешься. Сердца: " + combatState!!.heroHearts + "/3. Теперь твой ход."
+            message.text = "Ты защищаешься. Сердца: " + combatState!!.heroHearts + "/" + combatState!!.maxHeroHearts + ". Теперь твой ход."
         }
     }
 
@@ -461,7 +461,7 @@ class MainActivity : Activity() {
             }
             Stage.COMBAT -> {
                 val state = combatState ?: return
-                title.text = "Бой • Сердца " + state.heroHearts + "/3 • Враг " + state.enemyHp + "/3"
+                title.text = "Бой • Сердца " + state.heroHearts + "/" + state.maxHeroHearts + " • Враг " + state.enemyHp + "/3"
                 message.text = generated?.task?.prompt ?: "Математическая атака"
                 action.text = "Защищаться"
                 equipmentButton.visibility = View.GONE
