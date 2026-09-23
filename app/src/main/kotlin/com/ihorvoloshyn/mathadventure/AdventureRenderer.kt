@@ -135,6 +135,8 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             cube(-2.6f, 0.75f, -0.33f, 0.65f, 1.25f, 0.18f, 0.18f, 0.08f, 0.04f)
             cube(-1.35f, 1.25f, -0.46f, 0.55f, 0.65f, 0.08f, 0.24f, 0.62f, 0.82f)
             cube(-3.85f, 1.25f, -0.46f, 0.55f, 0.65f, 0.08f, 0.24f, 0.62f, 0.82f)
+            cylinder(-2.6f, 2.85f, -1.9f, 0.18f, 0.70f, 0.32f, 0.32f, 0.34f)
+            cube(-2.6f, 2.50f, -0.46f, 2.8f, 0.08f, 0.10f, 0.58f, 0.34f, 0.18f)
             cylinder(-0.8f, 0.22f, 0.6f, 0.55f, 0.32f, 0.62f, 0.38f, 0.22f)
         }
 
@@ -155,6 +157,7 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             tree(-4.0f, 0f, 2.7f)
             if (combat) {
                 cylinder(0.8f, 0.04f, -1.2f, 2.8f, 0.08f, 0.35f, 0.52f, 0.28f)
+                cylinder(0.8f, 0.10f, -1.2f, 2.15f, 0.06f, 0.48f, 0.60f, 0.34f)
             }
         }
 
@@ -180,6 +183,10 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             sphere(x - 0.17f, y + 1.72f + bob, z - 0.43f, 0.07f, 0.07f, 0.05f, 0.03f, 0.03f, 0.03f)
             sphere(x + 0.17f, y + 1.72f + bob, z - 0.43f, 0.07f, 0.07f, 0.05f, 0.03f, 0.03f)
             sphere(x, y + 1.58f + bob, z - 0.64f, 0.07f, 0.06f, 0.05f, 0.12f, 0.05f, 0.04f)
+            // Facial pads and collar improve the animal silhouette.
+            sphere(x - 0.20f, y + 1.52f + bob, z - 0.60f, 0.12f, 0.10f, 0.08f, 0.72f, 0.50f, 0.36f)
+            sphere(x + 0.20f, y + 1.52f + bob, z - 0.60f, 0.12f, 0.10f, 0.08f, 0.72f, 0.50f, 0.36f)
+            cylinder(x, y + 1.27f + bob, z - 0.02f, 0.31f, 0.08f, 0.82f, 0.64f, 0.12f)
             cube(x, y + 1.02f + bob, z - 0.04f, 0.58f, 0.10f, 0.48f, 0.18f, 0.24f, 0.34f)
             cylinder(x - 0.23f, y + 0.24f, z, 0.15f, 0.62f, furR, furG, furB)
             cylinder(x + 0.23f, y + 0.24f, z, 0.15f, 0.62f, furR, furG, furB)
