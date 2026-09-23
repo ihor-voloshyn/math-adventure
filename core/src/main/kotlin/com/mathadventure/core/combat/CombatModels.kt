@@ -44,6 +44,15 @@ class CombatEngine {
             return CombatOutcome(state.copy(active = false, playerTurn = false), CombatResolution.FLED)
         }
 
+        if (action == CombatAction.DEFEND) {
+            // Defense is an explicit combat action, so it blocks the enemy
+            // regardless of the math-answer flag supplied by the caller.
+            return CombatOutcome(
+                state.copy(playerTurn = true),
+                CombatResolution.BLOCKED
+            )
+        }
+
         if (!correct) {
             val next = state.copy(playerTurn = false)
             return enemyTurn(next, CombatResolution.MISS)
@@ -59,10 +68,13 @@ class CombatEngine {
                         "COMBAT_VICTORY"
                     )
                 } else {
-                    enemyTurn(state.copy(enemyHp = hp, playerTurn = false), CombatResolution.HIT)
+                    CombatOutcome(
+                        state.copy(enemyHp = hp, playerTurn = true),
+                        CombatResolution.HIT
+                    )
                 }
             }
-            CombatAction.DEFEND -> enemyTurn(state.copy(playerTurn = false), CombatResolution.BLOCKED)
+            CombatAction.DEFEND -> error("handled above")
             CombatAction.FLEE -> error("handled above")
         }
     }

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.widget.Button
+import android.graphics.drawable.GradientDrawable
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -68,6 +69,8 @@ class MainActivity : Activity() {
     private var stage = Stage.HOME
     private var generated: com.mathadventure.core.flow.GeneratedTask? = null
     private var combatState: CombatState? = null
+    private var combatTaskIndex = 0
+    private var combatInputLocked = false
     private var sessionCorrect = 0
     private var sessionIncorrect = 0
 
@@ -125,34 +128,36 @@ class MainActivity : Activity() {
 
         val hud = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(28, 20, 28, 20)
+            setPadding(24, 18, 24, 12)
+            background = panelBackground(0xB81B2638.toInt(), 24f)
         }
-        title = textView(24f)
-        message = textView(17f)
+        title = textView(24f).apply { setTypeface(typeface, android.graphics.Typeface.BOLD) }
+        message = textView(16f).apply { setPadding(0, 8, 0, 4) }
         hud.addView(title)
         hud.addView(message)
 
         val bottom = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER
-            setPadding(28, 8, 28, 22)
+            setPadding(18, 8, 18, 18)
+            background = panelBackground(0xCC101722.toInt(), 26f)
         }
-        action = Button(this).apply { setOnClickListener { onPrimaryAction() } }
-        bottom.addView(action, LinearLayout.LayoutParams(-1, 62))
-        fleeButton = Button(this).apply {
-            text = "Убежать"
+        action = gameButton().apply { setOnClickListener { onPrimaryAction() } }
+        bottom.addView(action, LinearLayout.LayoutParams(-1, 56).apply { bottomMargin = 8 })
+        fleeButton = gameButton().apply {
+            text = "🏃 Убежать"
             setOnClickListener { flee() }
         }
-        bottom.addView(fleeButton, LinearLayout.LayoutParams(-1, 62))
-        equipmentButton = Button(this).apply { setOnClickListener { toggleWeapon() } }
-        bottom.addView(equipmentButton, LinearLayout.LayoutParams(-1, 62))
+        bottom.addView(fleeButton, LinearLayout.LayoutParams(-1, 52).apply { bottomMargin = 8 })
+        equipmentButton = gameButton().apply { setOnClickListener { toggleWeapon() } }
+        bottom.addView(equipmentButton, LinearLayout.LayoutParams(-1, 52).apply { bottomMargin = 8 })
 
         answers = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
             visibility = View.GONE
         }
-        bottom.addView(answers)
+        bottom.addView(answers, LinearLayout.LayoutParams(-1, 58))
 
         root.addView(hud, FrameLayout.LayoutParams(-1, -2))
         root.addView(bottom, FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM))
@@ -220,6 +225,8 @@ class MainActivity : Activity() {
     private fun startCombat() {
         val stats = equipmentCombatStatsResolver.resolve(itemEngine.getInventory(playerId), itemEngine.getEquipment(playerId))
         combatState = combatEngine.start("forest-encounter-01", heroHearts = 3 + stats.hearts, enemyHp = 3)
+        combatTaskIndex = 0
+        combatInputLocked = false
         stage = Stage.COMBAT
         renderer.setVictory(false)
         generateMathTask()
@@ -231,9 +238,12 @@ class MainActivity : Activity() {
             playerId = playerId,
             skillStates = skillStates(),
             availableSkills = setOf("ADD_BASIC", "ADD_CROSS_TEN"),
-            inputType = InputType.NUMERIC
+            inputType = InputType.NUMERIC,
+            generationContext = mapOf("taskIndex" to combatTaskIndex.toString())
         )
         showAnswerOptions(generated!!.task.answerSpec)
+        combatInputLocked = false
+        combatTaskIndex++
     }
 
     private fun showAnswerOptions(answerSpec: String) {
@@ -248,18 +258,43 @@ class MainActivity : Activity() {
             else -> listOf(values[2], values[3], values[0], values[1])
         }
         ordered.forEach { value ->
-            answers.addView(Button(this).apply {
-                text = value.toString()
-                setTextColor(Color.WHITE)
-                setOnClickListener { submitAttack(value.toString()) }
-            }, LinearLayout.LayoutParams(0, 62, 1f))
+            answers.addView(gameButton().apply {
+                text = "⚔ $value"
+                setTextSize(18f)
+                setOnClickListener {
+                    if (combatInputLocked) return@setOnClickListener
+                    combatInputLocked = true
+                    isEnabled = false
+                    submitAttack(value.toString())
+                }
+            }, LinearLayout.LayoutParams(0, 56, 1f).apply {
+                marginStart = 4
+                marginEnd = 4
+            })
         }
     }
 
     private fun textView(size: Float) = TextView(this).apply {
         textSize = size
         setTextColor(Color.WHITE)
-        setShadowLayer(6f, 2f, 2f, Color.BLACK)
+        setShadowLayer(5f, 2f, 2f, Color.BLACK)
+    }
+
+    private fun panelBackground(color: Int, radius: Float) =
+        GradientDrawable().apply {
+            setColor(color)
+            cornerRadius = radius
+        }
+
+    private fun gameButton() = Button(this).apply {
+        setTextColor(Color.WHITE)
+        textSize = 15f
+        isAllCaps = false
+        minHeight = 0
+        minimumHeight = 0
+        setPadding(10, 0, 10, 0)
+        background = panelBackground(0xE52D3A4A.toInt(), 22f)
+        stateListAnimator = null
     }
 
     private fun advance() {
@@ -274,7 +309,11 @@ class MainActivity : Activity() {
     }
 
     private fun submitAttack(value: String) {
-        val current = generated ?: return
+        if (stage != Stage.COMBAT || combatState?.active != true) {
+            combatInputLocked = false
+            return
+        }
+        val current = generated ?: run { combatInputLocked = false; return }
         val answered = flow.answer(
             playerId = playerId,
             generated = current,
@@ -335,7 +374,7 @@ class MainActivity : Activity() {
                     append(progression.rpgLevel)
                     append(".")
                 }
-                action.text = "Вернуться домой"
+                action.text = "↩ Вернуться домой"
             }
             CombatResolution.DEFEAT -> {
                 stage = Stage.RETURN_HOME
@@ -356,6 +395,8 @@ class MainActivity : Activity() {
     }
 
     private fun defend() {
+        if (stage != Stage.COMBAT || combatInputLocked) return
+        combatInputLocked = true
         val result = combatEngine.resolveMathAction(combatState ?: return, CombatAction.DEFEND, true)
         combatState = result.state
         if (result.resolution == CombatResolution.DEFEAT) {
@@ -367,11 +408,13 @@ class MainActivity : Activity() {
         } else {
             generateMathTask()
             renderStage()
-            message.text = "Ты защищаешься. Сердца: " + combatState!!.heroHearts + "/" + combatState!!.maxHeroHearts + ". Теперь твой ход."
+            message.text = "🛡 Защита сработала: урон не получен. Сердца: " + combatState!!.heroHearts + "/" + combatState!!.maxHeroHearts + ".\nТеперь новый вопрос — выбери ответ для атаки."
         }
     }
 
     private fun flee() {
+        if (stage != Stage.COMBAT || combatInputLocked) return
+        combatInputLocked = true
         combatState = combatEngine.resolveMathAction(combatState ?: return, CombatAction.FLEE, false).state
         stage = Stage.RETURN_HOME
         answers.visibility = View.GONE
@@ -427,6 +470,8 @@ class MainActivity : Activity() {
     }
 
     private fun renderStage() {
+        renderer.setStage(stage.ordinal)
+        fleeButton.visibility = if (stage == Stage.COMBAT) View.VISIBLE else View.GONE
         val equipment = itemEngine.getEquipment(playerId)
         val weaponVisualId = equipment.weaponInstanceId?.let { instanceId ->
             itemEngine.getInventory(playerId).firstOrNull { it.instanceId == instanceId }?.let { item ->
@@ -461,9 +506,9 @@ class MainActivity : Activity() {
             }
             Stage.COMBAT -> {
                 val state = combatState ?: return
-                title.text = "Бой • Сердца " + state.heroHearts + "/" + state.maxHeroHearts + " • Враг " + state.enemyHp + "/3"
-                message.text = generated?.task?.prompt ?: "Математическая атака"
-                action.text = "Защищаться"
+                title.text = "⚔ Бой с Тёмным гоблином • Сердца " + state.heroHearts + "/" + state.maxHeroHearts + " • Гоблин " + state.enemyHp + "/3"
+                message.text = (generated?.task?.prompt ?: "Математическая атака") + "\nВыбери ответ — это атака. 🛡 Защита не наносит урон и не получает урон. 🏃 Убежать завершает бой."
+                action.text = "🛡 Защита"
                 equipmentButton.visibility = View.GONE
                 answers.visibility = View.VISIBLE
                 fleeButton.visibility = View.VISIBLE

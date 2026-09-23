@@ -37,7 +37,8 @@ class CoreLearningFlow(
         playerId: String,
         skillStates: List<SkillState>,
         availableSkills: Set<String>,
-        inputType: InputType
+        inputType: InputType,
+        generationContext: Map<String, String> = emptyMap()
     ): GeneratedTask {
         val decision = adaptive.decideNext(playerId, skillStates, availableSkills)
         val blueprint = TaskBlueprint(
@@ -46,7 +47,7 @@ class CoreLearningFlow(
             difficulty = decision.difficulty,
             contextType = decision.contextType,
             inputType = inputType,
-            constraints = decision.constraints
+            constraints = decision.constraints + generationContext
         )
         val task = generator.generate(blueprint)
         check(validation.validate(task) is ValidationResult.Valid) {

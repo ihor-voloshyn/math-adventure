@@ -11,7 +11,7 @@ class CombatEngineTest {
     @Test fun correctAttackDamagesEnemy() {
         val result = engine.resolveMathAction(engine.start("c1"), CombatAction.ATTACK, true)
         assertEquals(2, result.state.enemyHp)
-        assertEquals(2, result.state.heroHearts)
+        assertEquals(3, result.state.heroHearts)
         assertTrue(result.state.playerTurn)
     }
 
@@ -21,7 +21,7 @@ class CombatEngineTest {
         assertEquals(5, state.maxHeroHearts)
 
         val result = engine.resolveMathAction(state, CombatAction.ATTACK, true)
-        assertEquals(4, result.state.heroHearts)
+        assertEquals(5, result.state.heroHearts)
         assertEquals(5, result.state.maxHeroHearts)
     }
 
@@ -30,8 +30,28 @@ class CombatEngineTest {
         val result = engine.resolveMathAction(state, CombatAction.ATTACK, true, attackDamage = 2)
 
         assertEquals(1, result.state.enemyHp)
-        assertEquals(2, result.state.heroHearts)
+        assertEquals(3, result.state.heroHearts)
         assertEquals(CombatResolution.HIT, result.resolution)
+    }
+
+
+    @Test fun defendBlocksEnemyDamage() {
+        val result = engine.resolveMathAction(engine.start("c1"), CombatAction.DEFEND, true)
+        assertEquals(3, result.state.heroHearts)
+        assertEquals(3, result.state.enemyHp)
+        assertEquals(CombatResolution.BLOCKED, result.resolution)
+        assertTrue(result.state.playerTurn)
+        assertTrue(result.state.active)
+    }
+
+
+
+    @Test fun defendBlocksDamageRegardlessOfAnswerFlag() {
+        val result = engine.resolveMathAction(engine.start("c1"), CombatAction.DEFEND, false)
+        assertEquals(3, result.state.heroHearts)
+        assertEquals(3, result.state.enemyHp)
+        assertEquals(CombatResolution.BLOCKED, result.resolution)
+        assertTrue(result.state.active)
     }
 
     @Test fun incorrectAnswerMissesButDoesNotInstantlyKill() {
@@ -40,6 +60,20 @@ class CombatEngineTest {
         assertEquals(3, result.state.enemyHp)
         assertEquals(CombatResolution.MISS, result.resolution)
         assertTrue(result.state.active)
+    }
+
+    @Test fun threeCorrectAttacksDefeatEnemyWithoutHeroDamage() {
+        var state = engine.start("c1")
+        repeat(2) {
+            val result = engine.resolveMathAction(state, CombatAction.ATTACK, true)
+            assertEquals(CombatResolution.HIT, result.resolution)
+            state = result.state
+        }
+        val victory = engine.resolveMathAction(state, CombatAction.ATTACK, true)
+        assertEquals(CombatResolution.VICTORY, victory.resolution)
+        assertEquals(0, victory.state.enemyHp)
+        assertEquals(3, victory.state.heroHearts)
+        assertFalse(victory.state.active)
     }
 
     @Test fun victoryEmitsCombatEvent() {
