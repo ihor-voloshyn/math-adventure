@@ -40,6 +40,7 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
         private var lastTouchX = 0f
         private var lastTouchY = 0f
         private lateinit var cube: Cube
+        private lateinit var gableRoof: GableRoof
 
         override fun onSurfaceCreated(
             gl: javax.microedition.khronos.opengles.GL10?,
@@ -48,6 +49,7 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             GLES20.glClearColor(0.38f, 0.62f, 0.86f, 1f)
             program = Shader.create()
             cube = Cube()
+            gableRoof = GableRoof()
             GLES20.glEnable(GLES20.GL_DEPTH_TEST)
         }
 
@@ -116,10 +118,17 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
         }
 
         private fun drawHome() {
-            cube(-2.5f, 1.1f, -1.8f, 3.4f, 2.5f, 2.8f, 0.78f, 0.48f, 0.30f)
-            cube(-2.5f, 2.65f, -1.8f, 3.8f, 0.45f, 3.1f, 0.72f, 0.16f, 0.12f)
-            cube(-2.5f, 0.75f, -0.33f, 0.75f, 1.25f, 0.15f, 0.20f, 0.10f, 0.05f)
-            cube(-3.2f, 0.2f, 0.0f, 1.0f, 0.3f, 0.7f, 0.62f, 0.42f, 0.20f)
+            // Warm cottage silhouette: wall mass + gabled roof + readable door/windows.
+            cube(-2.5f, 1.15f, -1.8f, 3.35f, 2.35f, 2.75f, 0.68f, 0.42f, 0.24f)
+            roof(-2.5f, 3.05f, -1.8f, 3.85f, 1.35f, 3.15f, 0.48f, 0.18f, 0.12f)
+            cube(-2.5f, 0.82f, -0.28f, 0.72f, 1.18f, 0.16f, 0.22f, 0.11f, 0.05f)
+            cube(-3.45f, 1.45f, -0.34f, 0.72f, 0.72f, 0.10f, 0.34f, 0.64f, 0.82f)
+            cube(-1.55f, 1.45f, -0.34f, 0.72f, 0.72f, 0.10f, 0.34f, 0.64f, 0.82f)
+            cube(-3.85f, 0.35f, -0.05f, 0.32f, 0.18f, 0.32f, 0.84f, 0.68f, 0.28f)
+            cube(-1.15f, 0.35f, -0.05f, 0.32f, 0.18f, 0.32f, 0.84f, 0.68f, 0.28f)
+            cube(-1.25f, 3.45f, -2.35f, 0.28f, 0.65f, 0.28f, 0.38f, 0.25f, 0.20f)
+            // Small pet-bed marker in the yard.
+            cube(-3.25f, 0.20f, 0.25f, 0.72f, 0.18f, 0.48f, 0.70f, 0.38f, 0.20f)
         }
 
         private fun drawVillage() {
@@ -177,6 +186,19 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             cube(x, y + 2.85f, z, 1.2f, 1.1f, 1.2f, 0.18f, 0.62f, 0.25f)
         }
 
+        private fun roof(
+            x: Float, y: Float, z: Float,
+            sx: Float, sy: Float, sz: Float,
+            r: Float, g: Float, b: Float
+        ) {
+            Matrix.setIdentityM(model, 0)
+            Matrix.translateM(model, 0, x, y, z)
+            Matrix.scaleM(model, 0, sx, sy, sz)
+            Matrix.multiplyMM(mvp, 0, view, 0, model, 0)
+            Matrix.multiplyMM(mvp, 0, projection, 0, mvp, 0)
+            gableRoof.draw(program, mvp, r, g, b)
+        }
+
         private fun cube(
             x: Float, y: Float, z: Float,
             sx: Float, sy: Float, sz: Float,
@@ -199,6 +221,41 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
         private val indices = shortArrayOf(
             0,1,2, 2,3,0, 1,5,6, 6,2,1, 5,4,7, 7,6,5,
             4,0,3, 3,7,4, 3,2,6, 6,7,3, 4,5,1, 1,0,4
+        )
+        private val buffer = java.nio.ByteBuffer.allocateDirect(vertices.size * 4)
+            .order(java.nio.ByteOrder.nativeOrder()).asFloatBuffer()
+        private val indexBuffer = java.nio.ByteBuffer.allocateDirect(indices.size * 2)
+            .order(java.nio.ByteOrder.nativeOrder()).asShortBuffer()
+
+        init {
+            buffer.put(vertices).position(0)
+            indexBuffer.put(indices).position(0)
+        }
+
+        fun draw(program: Int, mvp: FloatArray, r: Float, g: Float, b: Float) {
+            val pos = GLES20.glGetAttribLocation(program, "aPosition")
+            val matrix = GLES20.glGetUniformLocation(program, "uMvp")
+            val color = GLES20.glGetUniformLocation(program, "uColor")
+            GLES20.glUseProgram(program)
+            GLES20.glUniformMatrix4fv(matrix, 1, false, mvp, 0)
+            GLES20.glUniform4f(color, r, g, b, 1f)
+            GLES20.glEnableVertexAttribArray(pos)
+            GLES20.glVertexAttribPointer(pos, 3, GLES20.GL_FLOAT, false, 0, buffer)
+            GLES20.glDrawElements(GLES20.GL_TRIANGLES, indices.size, GLES20.GL_UNSIGNED_SHORT, indexBuffer)
+            GLES20.glDisableVertexAttribArray(pos)
+        }
+    }
+
+    private class GableRoof {
+        private val vertices = floatArrayOf(
+            -1f,0f,-1f, 1f,0f,-1f, 0f,1f,-1f,
+            -1f,0f,1f, 1f,0f,1f, 0f,1f,1f
+        )
+        private val indices = shortArrayOf(
+            0,1,2, 3,5,4,
+            0,3,4, 4,1,0,
+            1,4,5, 5,2,1,
+            2,5,3, 3,0,2
         )
         private val buffer = java.nio.ByteBuffer.allocateDirect(vertices.size * 4)
             .order(java.nio.ByteOrder.nativeOrder()).asFloatBuffer()
