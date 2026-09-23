@@ -2,6 +2,8 @@ package com.ihorvoloshyn.mathadventure
 
 import android.app.Activity
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.StateListDrawable
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
@@ -125,31 +127,33 @@ class MainActivity : Activity() {
 
         val hud = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(28, 20, 28, 20)
+            setPadding(24, 18, 24, 10)
         }
         title = textView(24f)
-        message = textView(17f)
+        message = textView(16f)
+        title.setPadding(18, 14, 18, 4)
+        message.setPadding(18, 2, 18, 14)
+        title.background = panelBackground()
+        message.background = panelBackground()
         hud.addView(title)
         hud.addView(message)
 
         val bottom = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER
-            setPadding(28, 8, 28, 22)
+            setPadding(24, 6, 24, 18)
         }
-        action = Button(this).apply { setOnClickListener { onPrimaryAction() } }
-        bottom.addView(action, LinearLayout.LayoutParams(-1, 62))
-        fleeButton = Button(this).apply {
-            text = "Убежать"
-            setOnClickListener { flee() }
-        }
-        bottom.addView(fleeButton, LinearLayout.LayoutParams(-1, 62))
-        equipmentButton = Button(this).apply { setOnClickListener { toggleWeapon() } }
-        bottom.addView(equipmentButton, LinearLayout.LayoutParams(-1, 62))
+        action = gameButton("Продолжить").apply { setOnClickListener { onPrimaryAction() } }
+        bottom.addView(action, LinearLayout.LayoutParams(-1, 58))
+        fleeButton = gameButton("Убежать").apply { setOnClickListener { flee() } }
+        bottom.addView(fleeButton, LinearLayout.LayoutParams(-1, 52))
+        equipmentButton = gameButton("Экипировать меч").apply { setOnClickListener { toggleWeapon() } }
+        bottom.addView(equipmentButton, LinearLayout.LayoutParams(-1, 52))
 
         answers = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
+            setPadding(0, 8, 0, 0)
             visibility = View.GONE
         }
         bottom.addView(answers)
@@ -248,18 +252,55 @@ class MainActivity : Activity() {
             else -> listOf(values[2], values[3], values[0], values[1])
         }
         ordered.forEach { value ->
-            answers.addView(Button(this).apply {
-                text = value.toString()
-                setTextColor(Color.WHITE)
+            answers.addView(gameButton(value.toString(), 18f).apply {
                 setOnClickListener { submitAttack(value.toString()) }
-            }, LinearLayout.LayoutParams(0, 62, 1f))
+            }, LinearLayout.LayoutParams(0, 58, 1f).apply {
+                setMargins(4, 0, 4, 0)
+            })
         }
     }
 
     private fun textView(size: Float) = TextView(this).apply {
         textSize = size
         setTextColor(Color.WHITE)
-        setShadowLayer(6f, 2f, 2f, Color.BLACK)
+        setShadowLayer(5f, 1f, 2f, Color.BLACK)
+    }
+
+    private fun panelBackground() = GradientDrawable(
+        GradientDrawable.Orientation.TOP_BOTTOM,
+        intArrayOf(Color.argb(205, 22, 31, 54), Color.argb(175, 11, 18, 34))
+    ).apply {
+        cornerRadius = 20f
+        setStroke(2, Color.argb(150, 214, 177, 88))
+    }
+
+    private fun gameButton(label: String, size: Float = 18f) = Button(this).apply {
+        text = label
+        textSize = size
+        isAllCaps = false
+        setTextColor(Color.WHITE)
+        setPadding(16, 0, 16, 0)
+        minHeight = 0
+        stateListAnimator = null
+        background = StateListDrawable().apply {
+            val normal = GradientDrawable(
+                GradientDrawable.Orientation.TOP_BOTTOM,
+                intArrayOf(Color.rgb(76, 107, 164), Color.rgb(38, 57, 99))
+            ).apply {
+                cornerRadius = 18f
+                setStroke(2, Color.rgb(214, 177, 88))
+            }
+            val pressed = GradientDrawable(
+                GradientDrawable.Orientation.TOP_BOTTOM,
+                intArrayOf(Color.rgb(105, 135, 190), Color.rgb(49, 70, 116))
+            ).apply {
+                cornerRadius = 18f
+                setStroke(3, Color.rgb(244, 213, 124))
+            }
+            addState(intArrayOf(android.R.attr.state_pressed), pressed)
+            addState(intArrayOf(), normal)
+        }
+        elevation = 5f
     }
 
     private fun advance() {
