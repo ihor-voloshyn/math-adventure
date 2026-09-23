@@ -431,6 +431,8 @@ class MainActivity : Activity() {
     }
 
     private fun renderStage() {
+        renderer.setStage(stage.ordinal)
+        fleeButton.visibility = if (stage == Stage.COMBAT) View.VISIBLE else View.GONE
         val equipment = itemEngine.getEquipment(playerId)
         val weaponVisualId = equipment.weaponInstanceId?.let { instanceId ->
             itemEngine.getInventory(playerId).firstOrNull { it.instanceId == instanceId }?.let { item ->
