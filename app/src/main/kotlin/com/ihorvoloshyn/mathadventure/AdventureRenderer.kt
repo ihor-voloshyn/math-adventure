@@ -167,30 +167,42 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
         }
 
         private fun drawPet(x: Float, y: Float, z: Float) {
-            val bob = sin(angle * 0.04f) * 0.08f
-            cube(x, y + 0.38f + bob, z, 0.75f, 0.55f, 0.7f, 0.82f, 0.62f, 0.22f)
-            cube(x, y + 0.75f + bob, z, 0.52f, 0.45f, 0.52f, 0.94f, 0.76f, 0.38f)
-            cube(x - 0.2f, y + 0.92f + bob, z, 0.12f, 0.18f, 0.12f, 0.94f, 0.76f, 0.38f)
-            cube(x + 0.2f, y + 0.92f + bob, z, 0.12f, 0.18f, 0.12f, 0.94f, 0.76f, 0.38f)
+            val bob = sin(angle * 0.05f) * 0.10f
+            // Friendly puppy/kitten-like silhouette with ears, muzzle and tail.
+            cube(x, y + 0.38f + bob, z, 0.68f, 0.48f, 0.62f, 0.82f, 0.62f, 0.22f)
+            cube(x, y + 0.78f + bob, z - 0.03f, 0.48f, 0.42f, 0.48f, 0.94f, 0.76f, 0.38f)
+            cube(x - 0.20f, y + 1.02f + bob, z, 0.14f, 0.22f, 0.14f, 0.72f, 0.48f, 0.20f)
+            cube(x + 0.20f, y + 1.02f + bob, z, 0.14f, 0.22f, 0.14f, 0.72f, 0.48f, 0.20f)
+            cube(x, y + 0.74f + bob, z - 0.25f, 0.22f, 0.16f, 0.10f, 0.88f, 0.66f, 0.30f)
+            cube(x + 0.48f, y + 0.48f + bob, z + 0.02f, 0.12f, 0.42f, 0.12f, 0.82f, 0.62f, 0.22f)
         }
 
         private fun drawNpc(x: Float, y: Float, z: Float) {
-            cube(x, y + 1.0f, z, 0.75f, 1.5f, 0.55f, 0.32f, 0.62f, 0.38f)
-            cube(x, y + 2.0f, z, 0.7f, 0.7f, 0.7f, 0.95f, 0.78f, 0.58f)
+            cube(x, y + 1.0f, z, 0.66f, 1.35f, 0.50f, 0.32f, 0.62f, 0.38f)
+            cube(x, y + 1.82f, z, 0.48f, 0.55f, 0.48f, 0.95f, 0.78f, 0.58f)
+            cube(x, y + 1.30f, z, 0.72f, 0.09f, 0.52f, 0.20f, 0.16f, 0.08f)
+            cube(x, y + 2.18f, z, 0.64f, 0.18f, 0.64f, 0.28f, 0.18f, 0.42f)
+            cube(x - 0.52f, y + 1.35f, z, 0.16f, 0.55f, 0.16f, 0.26f, 0.48f, 0.30f)
+            cube(x + 0.52f, y + 1.35f, z, 0.16f, 0.55f, 0.16f, 0.26f, 0.48f, 0.30f)
         }
 
         private fun drawEnemy(x: Float, y: Float, z: Float) {
-            val bounce = if (victory) -0.35f else 0f
-            cube(x, y + 0.8f + bounce, z, 1.1f, 1.2f, 0.9f, 0.44f, 0.62f, 0.24f)
-            cube(x, y + 1.7f + bounce, z, 0.9f, 0.75f, 0.9f, 0.38f, 0.55f, 0.20f)
-            cube(x - 0.38f, y + 2.25f + bounce, z, 0.18f, 0.55f, 0.18f, 0.38f, 0.55f, 0.20f)
-            cube(x + 0.38f, y + 2.25f + bounce, z, 0.18f, 0.55f, 0.18f, 0.38f, 0.55f, 0.20f)
+            val bounce = if (victory) -0.35f else sin(angle * 0.07f) * 0.08f
+            // Chunky friendly fantasy monster: horns, belly and feet.
+            cube(x, y + 0.82f + bounce, z, 0.92f, 0.95f, 0.72f, 0.44f, 0.62f, 0.24f)
+            cube(x, y + 1.58f + bounce, z, 0.66f, 0.58f, 0.62f, 0.38f, 0.55f, 0.20f)
+            cube(x - 0.34f, y + 2.02f + bounce, z, 0.14f, 0.42f, 0.14f, 0.38f, 0.55f, 0.20f)
+            cube(x + 0.34f, y + 2.02f + bounce, z, 0.14f, 0.42f, 0.14f, 0.38f, 0.55f, 0.20f)
+            cube(x - 0.34f, y + 0.16f + bounce, z, 0.20f, 0.28f, 0.28f, 0.30f, 0.40f, 0.16f)
+            cube(x + 0.34f, y + 0.16f + bounce, z, 0.20f, 0.28f, 0.28f, 0.30f, 0.40f, 0.16f)
+            cube(x, y + 0.95f + bounce, z - 0.38f, 0.44f, 0.28f, 0.08f, 0.66f, 0.48f, 0.18f)
         }
 
         private fun tree(x: Float, y: Float, z: Float) {
-            cube(x, y + 0.9f, z, 0.35f, 1.8f, 0.35f, 0.42f, 0.24f, 0.10f)
-            cube(x, y + 2.1f, z, 1.6f, 1.6f, 1.6f, 0.16f, 0.52f, 0.22f)
-            cube(x, y + 2.85f, z, 1.2f, 1.1f, 1.2f, 0.18f, 0.62f, 0.25f)
+            cube(x, y + 0.85f, z, 0.28f, 1.7f, 0.28f, 0.42f, 0.24f, 0.10f)
+            cube(x, y + 1.75f, z, 1.15f, 1.05f, 1.15f, 0.16f, 0.52f, 0.22f)
+            cube(x, y + 2.55f, z, 0.92f, 0.85f, 0.92f, 0.18f, 0.62f, 0.25f)
+            cube(x + 0.12f, y + 3.05f, z, 0.62f, 0.48f, 0.62f, 0.20f, 0.68f, 0.28f)
         }
 
         private fun roof(
