@@ -123,7 +123,7 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             }
 
             // The hero and pet are always visible so the player has a clear avatar identity.
-            characterYaw = if (stage == 3) Math.PI.toFloat() else 0f
+            characterYaw = 0f
             drawHero(-0.9f, 0f, 1.7f)
             drawPet(0.65f, 0f, 1.85f)
             characterYaw = 0f
