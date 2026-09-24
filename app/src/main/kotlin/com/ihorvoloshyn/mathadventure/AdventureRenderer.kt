@@ -138,7 +138,7 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
         private fun drawHome() {
             // House: walls + pitched roof + door + windows.
             cube(-2.6f, 0.95f, -2.2f, 3.2f, 1.9f, 2.2f, 0.78f, 0.48f, 0.30f)
-            cone(-2.6f, 2.65f, -2.2f, 2.35f, 1.20f, 0.86f, 0.18f, 0.12f)
+            cone(-2.6f, 2.75f, -1.88f, 2.35f, 1.35f, 0.86f, 0.18f, 0.12f)
             cube(-2.6f, 0.72f, 0.02f, 0.62f, 1.12f, 0.12f, 0.18f, 0.08f, 0.04f)
             cube(-1.35f, 1.25f, 0.04f, 0.55f, 0.65f, 0.08f, 0.24f, 0.62f, 0.82f)
             cube(-3.85f, 1.25f, 0.04f, 0.55f, 0.65f, 0.08f, 0.24f, 0.62f, 0.82f)
