@@ -407,7 +407,8 @@ class MainActivity : Activity() {
                 fleeButton.visibility = View.GONE
                 title.text = "Победа над врагом!"
                 message.text = buildString {
-                    append("Квест: ").append(bestScore("story_first_battle")).append("/").append(maxBattleScore).append(" баллов. Бой: ").append(battleScore).append("/").append(maxBattleScore).append(". ")\n                    append(if (commit != null) {
+                    append("Квест: ").append(bestScore("story_first_battle")).append("/").append(maxBattleScore).append(" баллов. Бой: ").append(battleScore).append("/").append(maxBattleScore).append(". ")
+                    append(if (commit != null) {
                         "Победа! +" + commit.reward.xpDelta + " XP, +" + commit.reward.coinsDelta + " монет."
                     } else {
                         "Победа! Награда за бой уже была получена."
@@ -475,7 +476,7 @@ class MainActivity : Activity() {
         taskPanel.visibility = View.GONE
         title.text = "Отступление"
         message.text = "Ты покинул бой без победы. Награда за победу не получена."
-        action.text = "Вернуться домой"
+        action.text = "↩ Вернуться в деревню"
     }
 
     private fun onPrimaryAction() {
