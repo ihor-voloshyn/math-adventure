@@ -159,8 +159,6 @@ class MainActivity : Activity() {
             gravity = Gravity.CENTER
             visibility = View.GONE
         }
-        bottom.addView(equipmentButton, LinearLayout.LayoutParams(-1, 52).apply { bottomMargin = 8 })
-
         root.addView(hud, FrameLayout.LayoutParams(-1, -2))
         taskPanel = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
