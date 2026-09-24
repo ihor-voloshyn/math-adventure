@@ -375,6 +375,7 @@ class MainActivity : Activity() {
                 val progression = gameProgressionStore.get(playerId)
                 stage = Stage.RETURN_HOME
                 answers.visibility = View.GONE
+                taskPanel.visibility = View.GONE
                 fleeButton.visibility = View.GONE
                 title.text = "Победа над врагом!"
                 message.text = buildString {
