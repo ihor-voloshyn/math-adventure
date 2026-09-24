@@ -87,6 +87,7 @@ class MainActivity : Activity() {
     private lateinit var taskText: TextView
     private lateinit var fleeButton: Button
     private lateinit var equipmentButton: Button
+    private lateinit var villageHomeButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -151,7 +152,7 @@ class MainActivity : Activity() {
         }
         action = gameButton().apply { setOnClickListener { onPrimaryAction() } }
         bottom.addView(action, LinearLayout.LayoutParams(-1, 56).apply { bottomMargin = 8 })
-        val villageHomeButton = gameButton().apply {
+        villageHomeButton = gameButton().apply {
             text = "↩ Вернуться домой"
             visibility = View.GONE
             setOnClickListener {
