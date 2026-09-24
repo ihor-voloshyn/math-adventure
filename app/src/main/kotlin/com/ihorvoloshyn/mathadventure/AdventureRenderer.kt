@@ -40,6 +40,7 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
         // Prototype defaults to a cat hero; the same renderer supports a dog hero.
         private val heroKind = HeroKind.CAT
         private var lastTouchY = 0f
+        private var characterYaw = 0f
 
         private lateinit var cube: Mesh
         private lateinit var sphere: Mesh
@@ -122,8 +123,10 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             }
 
             // The hero and pet are always visible so the player has a clear avatar identity.
+            characterYaw = if (stage == 3) Math.PI.toFloat() else 0f
             drawHero(-0.9f, 0f, 1.7f)
             drawPet(0.65f, 0f, 1.85f)
+            characterYaw = 0f
 
             when (stage) {
                 1 -> drawNpc(1.8f, 0f, -1.2f)
@@ -356,6 +359,7 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
         ) {
             Matrix.setIdentityM(model, 0)
             Matrix.translateM(model, 0, x, y, z)
+            if (characterYaw != 0f) Matrix.rotateM(model, 0, characterYaw * 180f / Math.PI.toFloat(), 0f, 1f, 0f)
             Matrix.scaleM(model, 0, sx, sy, sz)
             Matrix.multiplyMM(mvp, 0, view, 0, model, 0)
             Matrix.multiplyMM(mvp, 0, projection, 0, mvp, 0)
