@@ -73,6 +73,9 @@ class MainActivity : Activity() {
     private var combatInputLocked = false
     private var sessionCorrect = 0
     private var sessionIncorrect = 0
+    private lateinit var scorePreferences: android.content.SharedPreferences
+    private var battleScore = 0
+    private val maxBattleScore = 3
 
     private lateinit var renderer: AdventureRenderer
     private lateinit var title: TextView
@@ -87,6 +90,7 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         progressStore = PrototypeProgressStore(this)
+        scorePreferences = getSharedPreferences("math_adventure_scores", MODE_PRIVATE)
         gameProgressionStore = AndroidGameProgressionInventoryStore(this, PrototypeItemCatalog.definitions)
         gameProgression = CoreGameProgressionFlow(
             rewardPolicy = PrototypeGameRewardPolicy(),
@@ -240,10 +244,18 @@ class MainActivity : Activity() {
     private fun skillStates(): List<SkillState> =
         listOf("ADD_BASIC", "ADD_CROSS_TEN").map { masterySystem.getSkillState(playerId, it) }
 
+    private fun bestScore(key: String): Int = scorePreferences.getInt(key, 0)
+
+    private fun saveBestScore(key: String, score: Int) {
+        if (score > bestScore(key)) scorePreferences.edit().putInt(key, score).apply()
+    }
+
     private fun startCombat() {
         val stats = equipmentCombatStatsResolver.resolve(itemEngine.getInventory(playerId), itemEngine.getEquipment(playerId))
         combatState = combatEngine.start("forest-encounter-01", heroHearts = 3 + stats.hearts, enemyHp = 3)
         combatTaskIndex = 0
+        combatScore = 0
+        battleScore = 0
         combatInputLocked = false
         stage = Stage.COMBAT
         renderer.setVictory(false)
@@ -353,13 +365,16 @@ class MainActivity : Activity() {
             attackDamage = stats.attackPower
         )
         combatState = result.state
-        if (answered.evaluation.result == AnswerResult.CORRECT) progressStore.recordCorrect()
-        else progressStore.recordIncorrect()
+        if (answered.evaluation.result == AnswerResult.CORRECT) {
+            progressStore.recordCorrect()
+            battleScore = (battleScore + 1).coerceAtMost(maxBattleScore)
+        } else progressStore.recordIncorrect()
 
         when (result.resolution) {
             CombatResolution.VICTORY -> {
                 renderer.setVictory(true)
                 val questCommit = recordQuestObjective("story_first_battle", "win_first_battle")
+                saveBestScore("story_first_battle", battleScore)
                 val combatId = combatState!!.combatId
                 val commit = gameProgressionLoot.record(
                     GameProgressionEvent(
@@ -379,7 +394,7 @@ class MainActivity : Activity() {
                 fleeButton.visibility = View.GONE
                 title.text = "Победа над врагом!"
                 message.text = buildString {
-                    append(if (commit != null) {
+                    append("Квест: ").append(bestScore("story_first_battle")).append("/").append(maxBattleScore).append(" баллов. Бой: ").append(battleScore).append("/").append(maxBattleScore).append(". ")\n                    append(if (commit != null) {
                         "Победа! +" + commit.reward.xpDelta + " XP, +" + commit.reward.coinsDelta + " монет."
                     } else {
                         "Победа! Награда за бой уже была получена."
