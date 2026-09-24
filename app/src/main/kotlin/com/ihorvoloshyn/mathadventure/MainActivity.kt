@@ -76,6 +76,7 @@ class MainActivity : Activity() {
     private lateinit var scorePreferences: android.content.SharedPreferences
     private var battleScore = 0
     private val maxBattleScore = 3
+    private var postCombatForest = false
 
     private lateinit var renderer: AdventureRenderer
     private lateinit var title: TextView
@@ -150,6 +151,15 @@ class MainActivity : Activity() {
         }
         action = gameButton().apply { setOnClickListener { onPrimaryAction() } }
         bottom.addView(action, LinearLayout.LayoutParams(-1, 56).apply { bottomMargin = 8 })
+        val villageHomeButton = gameButton().apply {
+            text = "↩ Вернуться домой"
+            visibility = View.GONE
+            setOnClickListener {
+                stage = Stage.HOME
+                renderStage()
+            }
+        }
+        bottom.addView(villageHomeButton, LinearLayout.LayoutParams(-1, 52).apply { bottomMargin = 8 })
         fleeButton = gameButton().apply {
             text = "🏃 Убежать"
             setOnClickListener { flee() }
@@ -247,7 +257,8 @@ class MainActivity : Activity() {
     private fun bestScore(key: String): Int = scorePreferences.getInt(key, 0)
 
     private fun saveBestScore(key: String, score: Int) {
-        if (score > bestScore(key)) scorePreferences.edit().putInt(key, score).apply()
+        // A completed replay replaces the previous completed result, even if the new score is lower.
+        scorePreferences.edit().putInt(key, score).apply()
     }
 
     private fun startCombat() {
@@ -255,6 +266,7 @@ class MainActivity : Activity() {
         combatState = combatEngine.start("forest-encounter-01", heroHearts = 3 + stats.hearts, enemyHp = 3)
         combatTaskIndex = 0
         battleScore = 0
+        postCombatForest = false
         combatInputLocked = false
         stage = Stage.COMBAT
         renderer.setVictory(false)
@@ -387,7 +399,8 @@ class MainActivity : Activity() {
                     )
                 )
                 val progression = gameProgressionStore.get(playerId)
-                stage = Stage.RETURN_HOME
+                stage = Stage.FOREST
+                postCombatForest = true
                 answers.visibility = View.GONE
                 taskPanel.visibility = View.GONE
                 fleeButton.visibility = View.GONE
@@ -409,15 +422,16 @@ class MainActivity : Activity() {
                     append(progression.rpgLevel)
                     append(".")
                 }
-                action.text = "↩ Вернуться домой"
+                action.text = "↩ Вернуться в деревню"
             }
             CombatResolution.DEFEAT -> {
-                stage = Stage.RETURN_HOME
+                stage = Stage.FOREST
+                postCombatForest = true
                 answers.visibility = View.GONE
                 taskPanel.visibility = View.GONE
                 title.text = "Поражение"
                 message.text = "Ты потерял бой. Подтверждённый прогресс сохранён."
-                action.text = "Вернуться домой"
+                action.text = "↩ Вернуться в деревню"
             }
             else -> {
                 message.text = if (answered.evaluation.result == AnswerResult.CORRECT)
@@ -436,8 +450,10 @@ class MainActivity : Activity() {
         val result = combatEngine.resolveMathAction(combatState ?: return, CombatAction.DEFEND, true)
         combatState = result.state
         if (result.resolution == CombatResolution.DEFEAT) {
-            stage = Stage.RETURN_HOME
+            stage = Stage.FOREST
+            postCombatForest = true
             answers.visibility = View.GONE
+            taskPanel.visibility = View.GONE
             title.text = "Поражение"
             message.text = "Враг оказался сильнее. Подтверждённый прогресс сохранён."
             action.text = "Вернуться домой"
@@ -452,7 +468,8 @@ class MainActivity : Activity() {
         if (stage != Stage.COMBAT || combatInputLocked) return
         combatInputLocked = true
         combatState = combatEngine.resolveMathAction(combatState ?: return, CombatAction.FLEE, false).state
-        stage = Stage.RETURN_HOME
+        stage = Stage.FOREST
+        postCombatForest = true
         answers.visibility = View.GONE
         taskPanel.visibility = View.GONE
         title.text = "Отступление"
@@ -481,7 +498,15 @@ class MainActivity : Activity() {
                     message.text = "Квест завершён: +" + questCommit.reward.xpDelta + " XP, +" + questCommit.reward.coinsDelta + " монет."
                 }
             }
-            Stage.FOREST -> startCombat()
+            Stage.FOREST -> {
+                if (postCombatForest) {
+                    stage = Stage.VILLAGE
+                    postCombatForest = false
+                    renderStage()
+                } else {
+                    startCombat()
+                }
+            }
             Stage.COMBAT -> defend()
             Stage.RETURN_HOME -> {
                 ensureQuestStarted("story_return_home")
@@ -519,6 +544,7 @@ class MainActivity : Activity() {
         renderer.setEquippedWeapon(weaponVisualId)
         when (stage) {
             Stage.HOME -> {
+                villageHomeButton.visibility = View.GONE
                 title.text = "Дом героя"
                 val weapon = equipment.weaponInstanceId
                 val ownedSword = itemEngine.getInventory(playerId).any { it.itemId == "sword_sparks" }
@@ -531,16 +557,24 @@ class MainActivity : Activity() {
             Stage.VILLAGE -> {
                 title.text = "Деревенская площадь"
                 equipmentButton.visibility = View.GONE
-                message.text = "NPC просит проверить дорогу в лес."
+                message.text = "NPC просит проверить дорогу в лес. Из деревни можно продолжить в лес или вернуться домой."
                 action.text = "Идти в лес"
                 answers.visibility = View.GONE
+                villageHomeButton.visibility = View.VISIBLE
             }
             Stage.FOREST -> {
                 title.text = "Лес"
-                message.text = "Впереди маленькое существо."
-                action.text = "Начать бой"
+                if (postCombatForest) {
+                    message.text = "Бой завершён. Квест: ${bestScore("story_first_battle")}/${maxBattleScore} баллов. Можно вернуться в деревню."
+                    action.text = "↩ Вернуться в деревню"
+                } else {
+                    val previous = bestScore("story_first_battle")
+                    message.text = if (previous > 0) "Впереди маленькое существо. Предыдущий результат: $previous/$maxBattleScore баллов." else "Впереди маленькое существо."
+                    action.text = if (previous > 0) "Пройти заново" else "Начать бой"
+                }
                 equipmentButton.visibility = View.GONE
                 answers.visibility = View.GONE
+                villageHomeButton.visibility = View.GONE
             }
             Stage.COMBAT -> {
                 val state = combatState ?: return
@@ -550,6 +584,7 @@ class MainActivity : Activity() {
                 equipmentButton.visibility = View.GONE
                 answers.visibility = View.VISIBLE
                 fleeButton.visibility = View.VISIBLE
+                villageHomeButton.visibility = View.GONE
             }
             Stage.RETURN_HOME -> {
                 title.text = "Возвращение"
