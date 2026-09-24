@@ -254,7 +254,6 @@ class MainActivity : Activity() {
         val stats = equipmentCombatStatsResolver.resolve(itemEngine.getInventory(playerId), itemEngine.getEquipment(playerId))
         combatState = combatEngine.start("forest-encounter-01", heroHearts = 3 + stats.hearts, enemyHp = 3)
         combatTaskIndex = 0
-        combatScore = 0
         battleScore = 0
         combatInputLocked = false
         stage = Stage.COMBAT
