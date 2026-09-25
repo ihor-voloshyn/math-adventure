@@ -360,11 +360,15 @@ class MainActivity : Activity() {
         if (answeredCorrect) {
             progressStore.recordCorrect()
             message.text = "⚔ Атака! Герой наносит удар..."
+            renderer.setAttackActive(true)
             window.decorView.postDelayed({
                 if (stage != Stage.COMBAT) return@postDelayed
+                renderer.setAttackActive(false)
                 val resolved = flowCoordinator.resolvePendingAttack()
                 combatState = flowCoordinator.battleState?.combat
+                renderer.setHitFeedback(true)
                 finishResolvedAttack(resolved)
+                window.decorView.postDelayed({ renderer.setHitFeedback(false) }, 180L)
             }, 450L)
             return
         }
