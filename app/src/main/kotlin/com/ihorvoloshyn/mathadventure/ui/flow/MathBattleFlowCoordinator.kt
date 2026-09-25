@@ -27,6 +27,7 @@ class MathBattleFlowCoordinator(
     private var pendingOutcome: com.mathadventure.core.combat.CombatOutcome? = null
 
     fun startCombat(combat: CombatState) {
+        pendingOutcome = null
         battleState = battleStateMachine.ready(combat)
         mathState = null
     }
