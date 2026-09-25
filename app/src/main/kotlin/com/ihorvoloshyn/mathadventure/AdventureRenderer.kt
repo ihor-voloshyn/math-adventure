@@ -20,6 +20,8 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
     fun setStage(stage: Int) { scene.stage = stage }
     fun setVictory(value: Boolean) { scene.victory = value }
     fun setEquippedWeapon(visualId: String?) { scene.equippedWeaponVisualId = visualId }
+    fun setAttackActive(value: Boolean) { scene.attackActive = value }
+    fun setHitFeedback(value: Boolean) { scene.hitFeedback = value }
 
     override fun onTouchEvent(event: MotionEvent): Boolean = scene.handleTouch(event)
 
@@ -27,6 +29,8 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
         var stage = 0
         var victory = false
         var equippedWeaponVisualId: String? = null
+        @Volatile var attackActive = false
+        @Volatile var hitFeedback = false
 
         private var program = 0
         private val projection = FloatArray(16)
@@ -124,14 +128,15 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
 
             // The hero and pet are always visible so the player has a clear avatar identity.
             characterYaw = if (stage == 3) Math.PI.toFloat() else 0f
-            drawHero(-0.9f, 0f, 1.7f)
+            val attackLunge = if (attackActive && stage == 3) 0.48f else 0f
+            drawHero(-0.9f + attackLunge, 0f, 1.7f)
             drawPet(0.65f, 0f, 1.85f)
             characterYaw = 0f
 
             when (stage) {
                 1 -> drawNpc(1.8f, 0f, -1.2f)
                 2 -> drawEnemy(2.2f, 0f, -1.0f)
-                3 -> drawCombatEnemy(2.5f, 0f, -1.4f)
+                3 -> drawCombatEnemy(2.5f + if (hitFeedback) 0.10f else 0f, 0f, -1.4f)
             }
         }
 
