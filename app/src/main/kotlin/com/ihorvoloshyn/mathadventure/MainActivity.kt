@@ -47,10 +47,7 @@ import com.mathadventure.core.validation.LogicalTaskValidator
 import com.mathadventure.core.validation.MathematicalTaskValidator
 import com.mathadventure.core.validation.StructuralTaskValidator
 import com.mathadventure.core.validation.TaskValidationPipeline
-import com.ihorvoloshyn.mathadventure.ui.battle.BattleStateMachine
-import com.ihorvoloshyn.mathadventure.ui.battle.BattleUiState
 import com.ihorvoloshyn.mathadventure.ui.flow.MathBattleFlowCoordinator
-import com.ihorvoloshyn.mathadventure.ui.math.MathTaskStateMachine
 import com.ihorvoloshyn.mathadventure.ui.math.MathTaskUiState
 
 class MainActivity : Activity() {
@@ -166,8 +163,6 @@ class MainActivity : Activity() {
             gravity = Gravity.CENTER
             visibility = View.GONE
         }
-        bottom.addView(equipmentButton, LinearLayout.LayoutParams(-1, 52).apply { bottomMargin = 8 })
-
         root.addView(hud, FrameLayout.LayoutParams(-1, -2))
         taskPanel = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
