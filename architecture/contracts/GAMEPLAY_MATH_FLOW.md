@@ -12,7 +12,7 @@ The contract maps the approved Figma flow:
 
 `Math Task → Answer → Math Engine → Gameplay Action → Battle → Reward`
 
-It does not replace the authoritative mathematical contracts. It defines how the UI/gameplay layer consumes them.
+It does not replace the authoritative mathematical or combat contracts. It defines how the UI/gameplay layer consumes them.
 
 ## 2. Authoritative boundaries
 
@@ -23,7 +23,7 @@ The existing architecture remains authoritative:
 - Structural and logical validation validate the generated task.
 - Math Engine validates mathematical truth and evaluates the learner attempt.
 - Mastery System owns Mastery updates.
-- Game Engine consumes gameplay-relevant results.
+- Combat/Game Engine consumes validated gameplay-relevant results.
 - Economy/Reward logic applies rewards.
 
 The UI must not duplicate these responsibilities.
@@ -46,7 +46,7 @@ Player Answer
 Math Engine
       ↓
 Attempt Result
-      ├── INCORRECT → retry / hint / next policy decision
+      ├── INCORRECT → Combat Policy / retry / hint
       │
       └── CORRECT
              ↓
@@ -105,12 +105,12 @@ Example:
 
 MVP behavior:
 
-- allow retry according to the active task/input contract;
-- allow/use a hint when available;
+- show clear feedback;
+- allow retry/hint according to the active task and Combat Policy;
 - do not treat one error as complete loss of Mastery;
-- do not remove a gameplay heart merely because the mathematical answer was incorrect.
+- do not interpret INCORRECT as a successful attack.
 
-The exact Mastery update remains owned by Mastery System.
+The combat consequence of the failed action is owned by Combat Policy, not by the UI or Math Engine.
 
 ## 5. Attempt contract
 
@@ -152,12 +152,15 @@ Math Engine
     ↓
 INCORRECT
     ↓
-Math Task UI
-    ├── retry
-    └── hint
+Combat Policy
+    ├── miss / action loss
+    ├── enemy response
+    └── other configured consequence
 ```
 
 The game does not launch a successful attack.
+
+Incorrect-answer consequences follow the approved Combat System contract and must not be invented by the Math UI.
 
 ### Correct
 
@@ -187,8 +190,10 @@ The MVP Battle screen exposes four conceptual steps:
 
 1. **SUBMIT** — the accepted mathematical answer enters gameplay.
 2. **ATTACK** — the hero performs a class-appropriate action.
-3. **DAMAGE** — the target's gameplay state changes.
+3. **DAMAGE** — the target's gameplay state changes when the action succeeds.
 4. **REWARD** — XP/progress/reward state is updated when the applicable gameplay condition is met.
+
+For an incorrect attack, Combat Policy may resolve a miss, action loss, enemy response, or another configured consequence. The Math UI must not resolve that consequence itself.
 
 The visual implementation may later use animation and VFX between these states.
 
@@ -236,7 +241,7 @@ Avoid:
 
 ## 10. Error and retry behavior
 
-A wrong answer is a learning event, not a combat failure by itself.
+A wrong answer is a learning event and a combat result, but it is not mathematical defeat by itself.
 
 MVP:
 
@@ -245,14 +250,15 @@ INCORRECT
    ↓
 feedback
    ↓
-retry / hint
-   ↓
-next attempt
+Combat Policy
+   ├── retry / next task
+   ├── miss / action loss
+   └── configured enemy response
 ```
 
-No automatic heart loss is attached to the mathematical error.
+Combat damage/loss remains a Combat/Game Engine concern.
 
-Gameplay damage/loss remains a separate Game Engine concern.
+The Math Engine does not change Hearts, HP, Damage, or other gameplay values.
 
 ## 11. State ownership
 
@@ -266,8 +272,8 @@ Gameplay damage/loss remains a separate Game Engine concern.
 | Mastery evidence | Math Engine |
 | Mastery update | Mastery System |
 | Retry/next pedagogical step | Adaptive Engine |
-| Attack presentation | Game Engine |
-| Enemy gameplay state | Game Engine |
+| Attack resolution | Combat System |
+| Enemy gameplay state | Combat/Game Engine |
 | XP / item reward | Economy / Reward logic |
 | UI presentation | Android UI |
 
@@ -280,7 +286,8 @@ The Android UI must not contain:
 - Difficulty selection rules;
 - Mastery update rules;
 - reward calculation rules;
-- independent definitions of mathematical correctness.
+- independent definitions of mathematical correctness;
+- direct manipulation of Hearts/HP as a consequence of mathematical correctness.
 
 The UI renders domain state and sends user actions to the appropriate domain layer.
 
@@ -290,13 +297,13 @@ The MVP must later test at minimum:
 
 1. Correct answer → exactly one successful gameplay action.
 2. Incorrect answer → no successful attack.
-3. Incorrect answer → no automatic heart loss.
-4. Correct answer → enemy gameplay state changes exactly once.
+3. Incorrect answer → consequence is resolved only by Combat Policy.
+4. Correct answer → enemy gameplay state changes exactly once when the action succeeds.
 5. Duplicate submit is rejected/ignored after the attempt is resolved.
 6. Hint usage is recorded in the attempt evidence.
 7. Mastery is updated by Mastery System, not UI.
 8. Task Generator cannot change Mastery.
-9. Game Engine cannot reinterpret mathematical correctness.
+9. Game/Combat Engine cannot reinterpret mathematical correctness.
 10. Same validated answer cannot produce duplicate rewards.
 11. Task progress advances only after the intended result.
 12. Offline/local replay does not allow duplicate reward application.
@@ -340,6 +347,8 @@ ATTEMPT_RECORDED
       ↓
 [INCORRECT]
       ↓
+COMBAT_RESOLVED
+      ↓
 FEEDBACK_SHOWN
 ```
 
@@ -354,12 +363,25 @@ This document extends, but does not replace:
 - `docs/07_TASK_GENERATOR.md`
 - `docs/08_MASTERY_SYSTEM.md`
 - `docs/09_ADAPTIVE_ENGINE.md`
+- `docs/14_COMBAT_SYSTEM.md`
 
 ## 16. Implementation consequence
 
-The Android implementation should expose the math/game boundary as domain contracts first, then connect Compose/UI state to those contracts.
+The repository already contains the core learning flow that connects:
 
-The first implementation slice should therefore be:
+```
+Adaptive Engine
+    ↓
+Task Generator
+    ↓
+Validation
+    ↓
+Math Engine
+    ↓
+Mastery System
+```
+
+The next Android implementation slice should expose the UI/game boundary without duplicating that logic:
 
 ```
 TaskInstance
@@ -370,7 +392,9 @@ SubmitAnswer
     ↓
 AttemptResult
     ↓
-GameplayAction
+CombatResolution
+    ↓
+Gameplay/Reward state
 ```
 
 The concrete Android framework and package structure must follow the repository's existing implementation baseline rather than introducing a parallel architecture.
