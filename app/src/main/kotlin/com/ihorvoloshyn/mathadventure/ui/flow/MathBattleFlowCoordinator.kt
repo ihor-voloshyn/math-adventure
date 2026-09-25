@@ -24,6 +24,8 @@ class MathBattleFlowCoordinator(
     var battleState: BattleUiState? = null
         private set
 
+    private var pendingOutcome: com.mathadventure.core.combat.CombatOutcome? = null
+
     fun startCombat(combat: CombatState) {
         battleState = battleStateMachine.ready(combat)
         mathState = null
@@ -67,7 +69,20 @@ class MathBattleFlowCoordinator(
             evaluation.result == AnswerResult.CORRECT,
             attackDamage
         )
+        if (evaluation.result == AnswerResult.CORRECT) {
+            pendingOutcome = outcome
+        } else {
+            battleState = battleStateMachine.resolve(started, outcome.state, outcome.resolution)
+        }
+        return outcome.resolution
+    }
+
+    fun resolvePendingAttack(): CombatResolution {
+        val started = battleState as? BattleUiState.AttackStarted
+            ?: error("No pending attack")
+        val outcome = pendingOutcome ?: error("No pending combat outcome")
         battleState = battleStateMachine.resolve(started, outcome.state, outcome.resolution)
+        pendingOutcome = null
         return outcome.resolution
     }
 
