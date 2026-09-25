@@ -59,4 +59,15 @@ class MathTaskUiStateTest {
         assertIs<MathTaskUiState.Incorrect>(state)
         assertEquals("11", state.selectedAnswer)
     }
+
+    @Test
+    fun skippedEvaluationProducesSkippedState() {
+        val selected = machine.select(machine.present(task, 2, 5), "12")
+        val state = machine.resolve(
+            selected,
+            AttemptEvaluation(AnswerResult.SKIPPED)
+        )
+        assertIs<MathTaskUiState.Skipped>(state)
+        assertEquals(AnswerResult.SKIPPED, state.evaluation.result)
+    }
 }
