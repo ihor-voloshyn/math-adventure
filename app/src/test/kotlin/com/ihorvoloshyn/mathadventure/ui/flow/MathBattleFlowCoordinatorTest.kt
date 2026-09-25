@@ -58,6 +58,8 @@ class MathBattleFlowCoordinatorTest {
         val resolution = coordinator.evaluate("player", generated, "attempt-1", generated.task.answerSpec, 1L, emptyMap(), 1)
         assertEquals(CombatResolution.HIT, resolution)
         assertIs<com.ihorvoloshyn.mathadventure.ui.math.MathTaskUiState.Correct>(coordinator.mathState)
+        assertIs<com.ihorvoloshyn.mathadventure.ui.battle.BattleUiState.AttackStarted>(coordinator.battleState)
+        assertEquals(CombatResolution.HIT, coordinator.resolvePendingAttack())
         assertIs<com.ihorvoloshyn.mathadventure.ui.battle.BattleUiState.AttackResolved>(coordinator.battleState)
         coordinator.rewardCurrentBattle()
         assertIs<com.ihorvoloshyn.mathadventure.ui.battle.BattleUiState.Rewarded>(coordinator.battleState)
