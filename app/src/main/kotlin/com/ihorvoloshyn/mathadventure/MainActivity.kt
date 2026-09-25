@@ -340,7 +340,10 @@ class MainActivity : Activity() {
             return
         }
         val current = generated ?: run { combatInputLocked = false; return }
-        val stats = equipmentCombatStatsResolver.resolve(itemEngine.getInventory(playerId), itemEngine.getEquipment(playerId))
+        val stats = equipmentCombatStatsResolver.resolve(
+            itemEngine.getInventory(playerId),
+            itemEngine.getEquipment(playerId)
+        )
         val resolution = flowCoordinator.evaluate(
             playerId = playerId,
             generated = current,
@@ -353,11 +356,31 @@ class MainActivity : Activity() {
             ),
             attackDamage = stats.attackPower
         )
-        combatState = flowCoordinator.battleState?.combat
         val answeredCorrect = flowCoordinator.mathState is MathTaskUiState.Correct
-        if (answeredCorrect) progressStore.recordCorrect()
-        else progressStore.recordIncorrect()
+        if (answeredCorrect) {
+            progressStore.recordCorrect()
+            message.text = "⚔ Атака! Герой наносит удар..."
+            window.decorView.postDelayed({
+                if (stage != Stage.COMBAT) return@postDelayed
+                val resolved = flowCoordinator.resolvePendingAttack()
+                combatState = flowCoordinator.battleState?.combat
+                finishResolvedAttack(resolved)
+            }, 450L)
+            return
+        }
 
+        progressStore.recordIncorrect()
+        combatState = flowCoordinator.battleState?.combat
+        combatInputLocked = false
+        showAnswerOptions(current.task.answerSpec)
+        message.text = "Промах. Попробуй ещё раз — эта задача остаётся активной."
+        title.text = "⚔ Бой с Тёмным гоблином • Сердца " +
+            combatState!!.heroHearts + "/" + combatState!!.maxHeroHearts +
+            " • Гоблин " + combatState!!.enemyHp + "/3"
+    }
+
+    private fun finishResolvedAttack(resolution: CombatResolution) {
+        combatState = flowCoordinator.battleState?.combat
         when (resolution) {
             CombatResolution.VICTORY -> {
                 renderer.setVictory(true)
@@ -399,8 +422,8 @@ class MainActivity : Activity() {
                 }
                 action.text = "↩ Вернуться домой"
             }
+
             CombatResolution.DEFEAT -> {
-                flowCoordinator.rewardCurrentBattle()
                 stage = Stage.RETURN_HOME
                 answers.visibility = View.GONE
                 taskPanel.visibility = View.GONE
@@ -408,11 +431,12 @@ class MainActivity : Activity() {
                 message.text = "Ты потерял бой. Подтверждённый прогресс сохранён."
                 action.text = "Вернуться домой"
             }
+
             else -> {
-                message.text = if (answeredCorrect)
-                    "Попадание! Враг: " + combatState!!.enemyHp + "/3 HP. Сердца: " + combatState!!.heroHearts + "/" + combatState!!.maxHeroHearts + "."
-                else
-                    "Промах. Враг атакует! Сердца: " + combatState!!.heroHearts + "/" + combatState!!.maxHeroHearts + "."
+                message.text = "💥 Попадание! Враг: " + combatState!!.enemyHp +
+                    "/3 HP. Сердца: " + combatState!!.heroHearts +
+                    "/" + combatState!!.maxHeroHearts + "."
+                combatInputLocked = false
                 generateMathTask()
                 renderStage()
             }
