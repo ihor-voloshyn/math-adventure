@@ -49,6 +49,19 @@ sealed interface MathTaskUiState {
             }
         }
     }
+
+    data class Skipped(
+        override val task: TaskInstance,
+        override val taskIndex: Int,
+        override val totalTasks: Int,
+        val evaluation: AttemptEvaluation
+    ) : MathTaskUiState {
+        init {
+            require(evaluation.result == AnswerResult.SKIPPED) {
+                "Skipped state requires a SKIPPED evaluation"
+            }
+        }
+    }
 }
 
 class MathTaskStateMachine {
@@ -84,7 +97,12 @@ class MathTaskStateMachine {
                 selectedAnswer = state.selectedAnswer,
                 evaluation = evaluation
             )
-            AnswerResult.SKIPPED -> state.copy()
+            AnswerResult.SKIPPED -> MathTaskUiState.Skipped(
+                task = state.task,
+                taskIndex = state.taskIndex,
+                totalTasks = state.totalTasks,
+                evaluation = evaluation
+            )
         }
     }
 }
