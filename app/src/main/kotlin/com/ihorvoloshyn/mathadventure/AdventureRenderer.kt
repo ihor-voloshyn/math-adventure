@@ -283,7 +283,10 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             sphere(x, y + 0.82f + bob, z + 0.50f, 0.09f, 0.09f, 0.05f, 0.90f, 0.70f, 0.16f)
             sphere(x - 0.24f, y + 0.42f + bob, z - 0.01f, 0.18f, 0.16f, 0.18f, 0.26f, 0.32f, 0.40f)
             sphere(x + 0.24f, y + 0.42f + bob, z - 0.01f, 0.18f, 0.16f, 0.18f, 0.26f, 0.32f, 0.40f)
-            if (equippedWeaponVisualId != null) {
+            if (heroClass == HeroClass.MAGE) {
+                drawMageRobe(x, y + bob, z)
+                drawMagicStaff(x + 0.68f, y + 0.72f + bob, z - 0.05f, attackProgress)
+            } else if (equippedWeaponVisualId != null) {
                 drawSword(
                     x + 0.67f + strikeLean * 0.16f,
                     y + 0.96f + bob + anticipation * 0.18f,
@@ -291,6 +294,23 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
                     equippedWeaponVisualId == "weapon_sword_sparks",
                     strikeLean
                 )
+            }
+        }
+
+        private fun drawMageRobe(x: Float, y: Float, z: Float) {
+            // Presentation-only mage silhouette.
+            cone(x, y + 0.72f, z - 0.02f, 0.62f, 0.95f, 0.24f, 0.20f, 0.46f)
+            cylinder(x, y + 1.10f, z + 0.02f, 0.34f, 0.08f, 0.72f, 0.52f, 0.16f)
+        }
+
+        private fun drawMagicStaff(x: Float, y: Float, z: Float, progress: Float) {
+            val cast = if (progress > 0f) sin(progress * Math.PI.toFloat()) else 0f
+            val staffLean = 0.18f + cast * 0.12f
+            cylinder(x, y + 0.02f, z, 0.055f, 1.55f, 0.36f, 0.20f, 0.08f)
+            sphere(x, y + 0.88f + cast * 0.18f, z, 0.14f, 0.14f, 0.14f, 0.42f, 0.78f, 1.0f)
+            if (progress > 0.25f && progress < 0.85f) {
+                sphere(x + staffLean, y + 0.96f + cast * 0.18f, z + 0.02f, 0.07f, 0.07f, 0.07f, 0.55f, 0.88f, 1.0f)
+                sphere(x + staffLean * 1.7f, y + 0.96f + cast * 0.18f, z + 0.02f, 0.045f, 0.045f, 0.045f, 0.75f, 0.94f, 1.0f)
             }
         }
 
