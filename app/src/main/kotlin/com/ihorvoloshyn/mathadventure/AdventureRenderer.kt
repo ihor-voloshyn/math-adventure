@@ -158,7 +158,52 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             when (stage) {
                 1 -> drawNpc(1.8f, 0f, -1.2f)
                 2 -> drawEnemy(2.2f, 0f, -1.0f)
-                3 -> drawCombatEnemy(2.5f + hitKnockback(hitClock), 0f, -1.4f)
+                3 -> {
+                    drawCombatEnemy(2.5f + hitKnockback(hitClock), 0f, -1.4f)
+                    drawAttackVfx(-0.9f + attackLunge(attackProgress), 1.35f, 1.62f, attackProgress, hitClock)
+                }
+            }
+        }
+
+        private fun drawAttackVfx(heroX: Float, heroY: Float, heroZ: Float, attackProgress: Float, hitProgress: Float) {
+            if (heroClass == HeroClass.MAGE && attackProgress > 0.18f) {
+                // Mage: readable magical projectile travelling from staff toward the enemy.
+                val t = ((attackProgress - 0.18f) / 0.82f).coerceIn(0f, 1f)
+                val eased = t * t * (3f - 2f * t)
+                val x = heroX + 0.85f + eased * 1.85f
+                val y = heroY + 0.10f + sin(t * Math.PI.toFloat()) * 0.28f
+                val z = heroZ - 0.03f
+                val pulse = 0.09f + sin(t * Math.PI.toFloat()) * 0.035f
+                sphere(x, y, z, pulse, pulse, pulse, 0.30f, 0.78f, 1.0f)
+                sphere(x, y, z + 0.025f, pulse * 0.48f, pulse * 0.48f, pulse * 0.48f, 0.82f, 0.96f, 1.0f)
+                if (t > 0.18f) {
+                    sphere(x - 0.14f, y + 0.08f, z, pulse * 0.35f, pulse * 0.35f, pulse * 0.35f, 0.50f, 0.86f, 1.0f)
+                    sphere(x - 0.22f, y - 0.06f, z, pulse * 0.25f, pulse * 0.25f, pulse * 0.25f, 0.72f, 0.92f, 1.0f)
+                }
+            } else if (heroClass == HeroClass.KNIGHT && attackProgress > 0.58f && attackProgress < 0.88f) {
+                // Knight: short physical impact burst at the enemy.
+                val t = ((attackProgress - 0.58f) / 0.30f).coerceIn(0f, 1f)
+                val radius = 0.10f + t * 0.38f
+                val y = 1.28f + t * 0.18f
+                sphere(2.35f, y, -1.42f, radius, radius * 0.42f, radius * 0.22f, 0.95f, 0.78f, 0.26f)
+                sphere(2.35f - radius * 0.8f, y + radius * 0.45f, -1.40f, radius * 0.16f, radius * 0.16f, radius * 0.16f, 1.0f, 0.92f, 0.50f)
+                sphere(2.35f + radius * 0.7f, y - radius * 0.25f, -1.44f, radius * 0.12f, radius * 0.12f, radius * 0.12f, 1.0f, 0.84f, 0.34f)
+            }
+
+            if (hitProgress > 0f && hitProgress < 0.82f) {
+                // Shared hit feedback: brief impact ring/particles; presentation only.
+                val t = (hitProgress / 0.82f).coerceIn(0f, 1f)
+                val radius = 0.10f + t * 0.48f
+                val y = 1.22f + t * 0.22f
+                if (heroClass == HeroClass.MAGE) {
+                    sphere(2.48f, y, -1.44f, radius, radius, radius, 0.38f, 0.82f, 1.0f)
+                    sphere(2.48f - radius * 0.85f, y + radius * 0.30f, -1.42f, radius * 0.14f, radius * 0.14f, radius * 0.14f, 0.72f, 0.94f, 1.0f)
+                    sphere(2.48f + radius * 0.75f, y - radius * 0.20f, -1.46f, radius * 0.11f, radius * 0.11f, radius * 0.11f, 0.56f, 0.88f, 1.0f)
+                } else {
+                    sphere(2.48f, y, -1.44f, radius, radius * 0.30f, radius * 0.18f, 0.96f, 0.72f, 0.22f)
+                    sphere(2.48f - radius * 0.80f, y + radius * 0.40f, -1.42f, radius * 0.13f, radius * 0.13f, radius * 0.13f, 1.0f, 0.92f, 0.48f)
+                    sphere(2.48f + radius * 0.72f, y - radius * 0.25f, -1.46f, radius * 0.10f, radius * 0.10f, radius * 0.10f, 1.0f, 0.82f, 0.30f)
+                }
             }
         }
 
