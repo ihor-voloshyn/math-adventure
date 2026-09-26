@@ -22,6 +22,7 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
     fun setEquippedWeapon(visualId: String?) { scene.equippedWeaponVisualId = visualId }
     fun setAttackActive(value: Boolean) { scene.attackActive = value }
     fun setHitFeedback(value: Boolean) { scene.hitFeedback = value }
+    fun setHeroClass(value: String) { scene.heroClass = if (value.equals("MAGE", ignoreCase = true)) SceneRenderer.HeroClass.MAGE else SceneRenderer.HeroClass.KNIGHT }
 
     override fun onTouchEvent(event: MotionEvent): Boolean = scene.handleTouch(event)
 
@@ -31,6 +32,7 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
         var equippedWeaponVisualId: String? = null
         @Volatile var attackActive = false
         @Volatile var hitFeedback = false
+        var heroClass = HeroClass.KNIGHT
 
         private var program = 0
         private val projection = FloatArray(16)
@@ -56,6 +58,7 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
         private lateinit var cone: Mesh
 
         private enum class HeroKind { CAT, DOG }
+        enum class HeroClass { KNIGHT, MAGE }
 
         override fun onSurfaceCreated(
             gl: javax.microedition.khronos.opengles.GL10?,
