@@ -17,10 +17,18 @@ android {
 
     buildFeatures { buildConfig = true }
 
+    testOptions {
+        unitTests.all { it.useJUnitPlatform() }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
 
     kotlinOptions { jvmTarget = "21" }
+}
+
+dependencies {
+    testImplementation(kotlin("test"))
 }
