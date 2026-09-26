@@ -22,6 +22,7 @@ import com.mathadventure.core.validation.StructuralTaskValidator
 import com.mathadventure.core.validation.TaskValidationPipeline
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
 
 class MathBattleFlowCoordinatorTest {
@@ -63,6 +64,27 @@ class MathBattleFlowCoordinatorTest {
         assertIs<com.ihorvoloshyn.mathadventure.ui.battle.BattleUiState.AttackResolved>(coordinator.battleState)
         coordinator.rewardCurrentBattle()
         assertIs<com.ihorvoloshyn.mathadventure.ui.battle.BattleUiState.Rewarded>(coordinator.battleState)
+    }
+
+    @Test
+    fun pendingAttackCanBeResolvedOnlyOnce() {
+        val coordinator = MathBattleFlowCoordinator(flow, CombatEngine())
+        val combat = CombatEngine().start("test", heroHearts = 3, enemyHp = 3)
+        coordinator.startCombat(combat)
+        val generated = flow.generateNext(
+            playerId = "player",
+            skillStates = listOf(SkillState("ADD_BASIC", 0)),
+            availableSkills = setOf("ADD_BASIC"),
+            inputType = InputType.NUMERIC,
+            generationContext = mapOf("taskIndex" to "0")
+        )
+        coordinator.presentTask(generated, 1, 3)
+        coordinator.evaluate("player", generated, "attempt-once", generated.task.answerSpec, 1L, emptyMap(), 1)
+
+        assertEquals(CombatResolution.HIT, coordinator.resolvePendingAttack())
+        assertFailsWith<IllegalStateException> {
+            coordinator.resolvePendingAttack()
+        }
     }
 
     @Test
