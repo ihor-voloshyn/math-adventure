@@ -38,6 +38,10 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
         private val model = FloatArray(16)
         private val mvp = FloatArray(16)
         private var angle = 0f
+        private var attackClock = 0f
+        private var hitClock = 0f
+        private var previousAttackActive = false
+        private var previousHitFeedback = false
         private var cameraYaw = 0f
         private var cameraPitch = 0.62f
         private var lastTouchX = 0f
@@ -78,6 +82,23 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
 
         override fun onDrawFrame(gl: javax.microedition.khronos.opengles.GL10?) {
             angle += 0.08f
+
+            if (attackActive) {
+                if (!previousAttackActive) attackClock = 0f
+                attackClock = (attackClock + 0.055f).coerceAtMost(1f)
+            } else {
+                attackClock = 0f
+            }
+            previousAttackActive = attackActive
+
+            if (hitFeedback) {
+                if (!previousHitFeedback) hitClock = 0f
+                hitClock = (hitClock + 0.085f).coerceAtMost(1f)
+            } else {
+                hitClock = 0f
+            }
+            previousHitFeedback = hitFeedback
+
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
 
             val horizontalDistance = 12f
@@ -114,7 +135,6 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
 
         private fun drawWorld() {
             cube(0f, -0.25f, 0f, 14f, 0.35f, 14f, 0.12f, 0.25f, 0.16f)
-            // Small stones break up the flat ground and make the scene read as a game world.
             stone(-5.0f, 0f, -0.8f, 0.24f, 0.14f, 0.18f)
             stone(5.1f, 0f, -1.8f, 0.30f, 0.16f, 0.22f)
             stone(4.2f, 0f, 3.1f, 0.20f, 0.12f, 0.16f)
@@ -126,22 +146,42 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
                 3 -> drawForest(true)
             }
 
-            // The hero and pet are always visible so the player has a clear avatar identity.
             characterYaw = if (stage == 3) Math.PI.toFloat() else 0f
-            val attackLunge = if (attackActive && stage == 3) 0.48f else 0f
-            drawHero(-0.9f + attackLunge, 0f, 1.7f)
+            val attackProgress = if (attackActive && stage == 3) attackClock else 0f
+            drawHero(-0.9f + attackLunge(attackProgress), 0f, 1.7f, attackProgress)
             drawPet(0.65f, 0f, 1.85f)
             characterYaw = 0f
 
             when (stage) {
                 1 -> drawNpc(1.8f, 0f, -1.2f)
                 2 -> drawEnemy(2.2f, 0f, -1.0f)
-                3 -> drawCombatEnemy(2.5f + if (hitFeedback) 0.10f else 0f, 0f, -1.4f)
+                3 -> drawCombatEnemy(2.5f + hitKnockback(hitClock), 0f, -1.4f)
             }
         }
 
+        private fun attackLunge(progress: Float): Float {
+            if (progress <= 0f) return 0f
+            // Anticipation -> forward strike -> recoil. The impact is near 70% of the timeline.
+            return when {
+                progress < 0.22f -> -0.08f * (progress / 0.22f)
+                progress < 0.72f -> {
+                    val t = (progress - 0.22f) / 0.50f
+                    -0.08f + 0.64f * (t * t * (3f - 2f * t))
+                }
+                else -> {
+                    val t = ((progress - 0.72f) / 0.28f).coerceIn(0f, 1f)
+                    0.56f * (1f - t)
+                }
+            }
+        }
+
+        private fun hitKnockback(progress: Float): Float {
+            if (progress <= 0f) return 0f
+            // Fast impact displacement followed by recovery.
+            return 0.18f * sin(progress * Math.PI.toFloat())
+        }
+
         private fun drawHome() {
-            // House: walls + pitched roof + door + windows.
             cube(-2.6f, 0.95f, -2.2f, 3.2f, 1.9f, 2.2f, 0.78f, 0.48f, 0.30f)
             cone(-2.6f, 2.65f, -2.2f, 2.35f, 1.20f, 0.86f, 0.18f, 0.12f)
             cube(-2.6f, 0.72f, 0.02f, 0.62f, 1.12f, 0.12f, 0.18f, 0.08f, 0.04f)
@@ -171,7 +211,6 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             tree(2.8f, 0f, -3.0f)
             tree(-4.0f, 0f, 2.7f)
             if (combat) {
-                // A distinct battle clearing: raised ring, stones, torches and a worn path.
                 cylinder(0.8f, 0.04f, -1.2f, 2.8f, 0.08f, 0.35f, 0.52f, 0.28f)
                 cylinder(0.8f, 0.10f, -1.2f, 2.15f, 0.06f, 0.48f, 0.60f, 0.34f)
                 cylinder(0.8f, 0.16f, -1.2f, 1.72f, 0.05f, 0.30f, 0.42f, 0.22f)
@@ -187,14 +226,24 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             }
         }
 
-        private fun drawHero(x: Float, y: Float, z: Float) {
+        private fun drawHero(x: Float, y: Float, z: Float, attackProgress: Float = 0f) {
             val bob = sin(angle) * 0.025f
             val furR = if (heroKind == HeroKind.CAT) 0.68f else 0.50f
             val furG = if (heroKind == HeroKind.CAT) 0.48f else 0.32f
             val furB = if (heroKind == HeroKind.CAT) 0.30f else 0.18f
-            sphere(x, y + 0.92f + bob, z, 0.56f, 0.78f, 0.46f, furR, furG, furB)
-            sphere(x, y + 1.66f + bob, z + 0.02f, 0.50f, 0.48f, 0.46f, furR, furG, furB)
-            sphere(x, y + 1.56f + bob, z + 0.40f, 0.30f, 0.24f, 0.24f, 0.82f, 0.62f, 0.46f)
+
+            val anticipation = if (attackProgress in 0.01f..0.22f) {
+                sin((attackProgress / 0.22f) * Math.PI.toFloat()) * 0.10f
+            } else 0f
+            val strikeLean = when {
+                attackProgress < 0.22f -> 0f
+                attackProgress < 0.72f -> (attackProgress - 0.22f) / 0.50f
+                else -> (1f - attackProgress) / 0.28f
+            }.coerceIn(0f, 1f)
+
+            sphere(x, y + 0.92f + bob - anticipation * 0.15f, z, 0.56f, 0.78f, 0.46f, furR, furG, furB)
+            sphere(x, y + 1.66f + bob - anticipation * 0.10f, z + 0.02f, 0.50f, 0.48f, 0.46f, furR, furG, furB)
+            sphere(x, y + 1.56f + bob + anticipation * 0.10f, z + 0.40f, 0.30f, 0.24f, 0.24f, 0.82f, 0.62f, 0.46f)
             if (heroKind == HeroKind.CAT) {
                 cone(x - 0.30f, y + 2.10f + bob, z, 0.22f, 0.52f, furR, furG, furB)
                 cone(x + 0.30f, y + 2.10f + bob, z, 0.22f, 0.52f, furR, furG, furB)
@@ -209,10 +258,8 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             sphere(x - 0.17f, y + 1.72f + bob, z + 0.43f, 0.07f, 0.07f, 0.05f, 0.03f, 0.03f, 0.03f)
             sphere(x + 0.17f, y + 1.72f + bob, z + 0.43f, 0.07f, 0.07f, 0.05f, 0.03f, 0.03f, 0.03f)
             sphere(x, y + 1.58f + bob, z + 0.64f, 0.07f, 0.06f, 0.05f, 0.12f, 0.05f, 0.04f)
-            // Facial pads and collar improve the animal silhouette.
             sphere(x - 0.20f, y + 1.52f + bob, z + 0.60f, 0.12f, 0.10f, 0.08f, 0.72f, 0.50f, 0.36f)
             sphere(x + 0.20f, y + 1.52f + bob, z + 0.60f, 0.12f, 0.10f, 0.08f, 0.72f, 0.50f, 0.36f)
-            // Whiskers give the cat a readable face even at the gameplay camera distance.
             cylinder(x - 0.30f, y + 1.55f + bob, z + 0.67f, 0.018f, 0.34f, 0.88f, 0.82f, 0.72f)
             cylinder(x + 0.30f, y + 1.55f + bob, z + 0.67f, 0.018f, 0.34f, 0.88f, 0.82f, 0.72f)
             cylinder(x, y + 1.27f + bob, z + 0.02f, 0.31f, 0.08f, 0.82f, 0.64f, 0.12f)
@@ -225,7 +272,6 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             cylinder(x + 0.23f, y + 0.24f, z, 0.15f, 0.62f, furR, furG, furB)
             sphere(x - 0.23f, y + 0.02f, z + 0.02f, 0.18f, 0.10f, 0.28f, 0.12f, 0.12f, 0.14f)
             sphere(x + 0.23f, y + 0.02f, z + 0.02f, 0.18f, 0.10f, 0.28f, 0.12f, 0.12f, 0.14f)
-            // Layered armor details: shoulder plates, chest emblem, belt buckle and leg guards.
             sphere(x - 0.52f, y + 1.17f + bob, z + 0.02f, 0.24f, 0.20f, 0.28f, 0.34f, 0.40f, 0.50f)
             sphere(x + 0.52f, y + 1.17f + bob, z + 0.02f, 0.24f, 0.20f, 0.28f, 0.34f, 0.40f, 0.50f)
             cube(x, y + 1.08f + bob, z + 0.50f, 0.20f, 0.22f, 0.06f, 0.70f, 0.58f, 0.18f)
@@ -236,22 +282,23 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             sphere(x + 0.24f, y + 0.42f + bob, z - 0.01f, 0.18f, 0.16f, 0.18f, 0.26f, 0.32f, 0.40f)
             if (equippedWeaponVisualId != null) {
                 drawSword(
-                    x + 0.67f,
-                    y + 0.96f + bob,
+                    x + 0.67f + strikeLean * 0.16f,
+                    y + 0.96f + bob + anticipation * 0.18f,
                     z - 0.05f,
-                    equippedWeaponVisualId == "weapon_sword_sparks"
+                    equippedWeaponVisualId == "weapon_sword_sparks",
+                    strikeLean
                 )
             }
         }
 
-        private fun drawSword(x: Float, y: Float, z: Float, enchanted: Boolean) {
+        private fun drawSword(x: Float, y: Float, z: Float, enchanted: Boolean, strikeLean: Float = 0f) {
             // Readable weapon silhouette: grip + guard + blade + pommel.
+            val swing = -32f * strikeLean
             cylinder(x, y - 0.36f, z, 0.065f, 0.42f, 0.24f, 0.12f, 0.06f)
             cylinder(x, y - 0.10f, z, 0.16f, 0.09f, 0.76f, 0.58f, 0.16f)
             cone(x, y + 0.50f, z, 0.12f, 0.95f, 0.72f, 0.76f, 0.82f)
             sphere(x, y - 0.58f, z, 0.10f, 0.10f, 0.10f, 0.56f, 0.38f, 0.12f)
             if (enchanted) {
-                // Enchanted blade: rune-like guards and a small magical trail.
                 sphere(x, y + 0.72f, z - 0.03f, 0.07f, 0.07f, 0.07f, 0.45f, 0.78f, 1.0f)
                 sphere(x, y + 0.42f, z - 0.03f, 0.045f, 0.045f, 0.045f, 0.75f, 0.92f, 1.0f)
                 sphere(x - 0.12f, y + 0.22f, z - 0.03f, 0.035f, 0.06f, 0.035f, 0.40f, 0.82f, 1.0f)
@@ -270,11 +317,9 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             sphere(x + 0.15f, y + 1.03f + bob, z + 0.42f, 0.06f, 0.06f, 0.04f, 0.02f, 0.02f, 0.02f)
             cylinder(x + 0.62f, y + 0.62f + bob, z + 0.02f, 0.08f, 0.52f, 0.22f, 0.54f, 0.66f)
             sphere(x + 0.62f, y + 0.36f + bob, z + 0.02f, 0.13f, 0.10f, 0.16f, 0.16f, 0.34f, 0.42f)
-            // Pet equipment: a small adventure harness and luminous tag.
             cylinder(x, y + 0.54f + bob, z + 0.02f, 0.40f, 0.07f, 0.12f, 0.18f, 0.24f)
             sphere(x, y + 0.56f + bob, z + 0.43f, 0.07f, 0.09f, 0.04f, 0.72f, 0.52f, 0.16f)
             sphere(x, y + 0.34f + bob, z + 0.48f, 0.045f, 0.05f, 0.035f, 0.55f, 0.88f, 1.0f)
-            // Pet collar, tag and paws distinguish it from the hero while keeping it compact.
             cylinder(x, y + 0.82f + bob, z + 0.43f, 0.23f, 0.07f, 0.10f, 0.24f, 0.30f)
             sphere(x, y + 0.72f + bob, z + 0.50f, 0.08f, 0.09f, 0.05f, 0.92f, 0.68f, 0.16f)
             sphere(x - 0.36f, y + 0.08f + bob, z + 0.28f, 0.18f, 0.10f, 0.22f, 0.14f, 0.36f, 0.44f)
@@ -287,7 +332,6 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             cylinder(x, y + 0.82f, z, 0.58f, 1.25f, 0.30f, 0.58f, 0.38f)
             sphere(x, y + 1.72f, z, 0.48f, 0.88f, 0.72f, 0.55f, 0.38f, 0.28f)
             cone(x, y + 2.20f, z, 0.62f, 0.45f, 0.22f, 0.34f, 0.20f)
-            // Friendly village NPC: face, belt and satchel make the role readable.
             sphere(x - 0.16f, y + 1.80f, z - 0.66f, 0.07f, 0.07f, 0.05f, 0.04f, 0.04f, 0.04f)
             sphere(x + 0.16f, y + 1.80f, z - 0.66f, 0.07f, 0.07f, 0.05f, 0.04f, 0.04f, 0.04f)
             sphere(x, y + 1.60f, z - 0.72f, 0.08f, 0.06f, 0.05f, 0.38f, 0.12f, 0.10f)
@@ -308,7 +352,6 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             cylinder(x + 0.32f, y + 0.18f + bob, z, 0.16f, 0.52f, 0.25f, 0.14f, 0.09f)
             sphere(x - 0.20f, y + 1.58f + bob, z - 0.50f, 0.09f, 0.09f, 0.05f, 0.95f, 0.76f, 0.08f)
             sphere(x + 0.20f, y + 1.58f + bob, z - 0.50f, 0.09f, 0.09f, 0.05f, 0.95f, 0.76f, 0.08f)
-            // Goblin teeth and cheek plates.
             sphere(x - 0.30f, y + 1.40f + bob, z - 0.55f, 0.16f, 0.12f, 0.10f, 0.52f, 0.30f, 0.18f)
             sphere(x + 0.30f, y + 1.40f + bob, z - 0.55f, 0.16f, 0.12f, 0.10f, 0.52f, 0.30f, 0.18f)
             sphere(x, y + 1.38f + bob, z - 0.56f, 0.10f, 0.07f, 0.05f, 0.08f, 0.03f, 0.02f)
@@ -333,8 +376,6 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             cylinder(x + 1.12f, y + 0.98f + bounce, z - 0.12f, 0.11f, 1.15f, 0.22f, 0.11f, 0.05f)
             sphere(x + 1.12f, y + 1.52f + bounce, z - 0.12f, 0.23f, 0.20f, 0.22f, 0.30f, 0.16f, 0.07f)
             sphere(x - 0.58f, y + 1.20f + bounce, z - 0.02f, 0.22f, 0.16f, 0.30f, 0.25f, 0.12f, 0.07f)
-
-            // Battle silhouette details: belt, shoulder armor, horn bands and a clearer club head.
             cylinder(x, y + 1.18f + bounce, z - 0.02f, 0.78f, 0.14f, 0.12f, 0.07f, 0.035f)
             sphere(x - 0.78f, y + 1.18f + bounce, z - 0.02f, 0.30f, 0.22f, 0.34f, 0.18f, 0.10f, 0.06f)
             sphere(x + 0.78f, y + 1.18f + bounce, z - 0.02f, 0.30f, 0.22f, 0.34f, 0.18f, 0.10f, 0.06f)
