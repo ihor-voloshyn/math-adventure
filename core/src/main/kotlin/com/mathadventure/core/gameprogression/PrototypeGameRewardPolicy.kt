@@ -11,7 +11,7 @@ class PrototypeGameRewardPolicy : GameRewardPolicy {
                 state = state,
                 xp = 100L,
                 coins = 25L,
-                lootIds = listOf("sword_sparks"),
+                lootIds = listOf("sword_sparks", "guardian_vest"),
                 rewardReason = "first_combat_victory"
             )
             GameEventType.QUEST_COMPLETED -> {
