@@ -55,7 +55,6 @@ class MainActivity : Activity() {
     private val playerId = "prototype-player"
     private val mathEngine = BasicMathEngine()
     private val combatEngine = CombatEngine()
-    private val equipmentCombatStatsResolver = EquipmentCombatStatsResolver(PrototypeItemCatalog.definitions)
     private lateinit var masteryStore: MasteryStateStore
     private lateinit var masterySystem: PolicyDrivenMasterySystem
     private lateinit var flow: CoreLearningFlow
@@ -242,8 +241,7 @@ class MainActivity : Activity() {
         listOf("ADD_BASIC", "ADD_CROSS_TEN").map { masterySystem.getSkillState(playerId, it) }
 
     private fun startCombat() {
-        val stats = equipmentCombatStatsResolver.resolve(itemEngine.getInventory(playerId), itemEngine.getEquipment(playerId))
-        combatState = combatEngine.start("forest-encounter-01", heroHearts = 3 + stats.hearts, enemyHp = 3)
+        combatState = combatEngine.start("forest-encounter-01", heroHearts = 4, enemyHp = 3)
         combatTaskIndex = 0
         combatInputLocked = false
         stage = Stage.COMBAT
@@ -337,10 +335,6 @@ class MainActivity : Activity() {
             return
         }
         val current = generated ?: run { combatInputLocked = false; return }
-        val stats = equipmentCombatStatsResolver.resolve(
-            itemEngine.getInventory(playerId),
-            itemEngine.getEquipment(playerId)
-        )
         val resolution = flowCoordinator.evaluate(
             playerId = playerId,
             generated = current,
@@ -351,7 +345,7 @@ class MainActivity : Activity() {
                 "difficultyBand" to if (current.task.difficulty <= 1) "INTRO" else "NORMAL",
                 "evidenceDiverse" to "false"
             ),
-            attackDamage = stats.attackPower
+            attackDamage = 1
         )
         val answeredCorrect = flowCoordinator.mathState is MathTaskUiState.Correct
         if (answeredCorrect) {
@@ -521,19 +515,8 @@ class MainActivity : Activity() {
         renderer.setStage(stage.ordinal)
         fleeButton.visibility = if (stage == Stage.COMBAT) View.VISIBLE else View.GONE
         taskPanel.visibility = if (stage == Stage.COMBAT) View.VISIBLE else View.GONE
-        val equipment = itemEngine.getEquipment(playerId)
-        val weaponVisualId = equipment.weaponInstanceId?.let { instanceId ->
-            itemEngine.getInventory(playerId).firstOrNull { it.instanceId == instanceId }?.let { item ->
-                itemEngine.getItemDefinition(item.itemId).visualId
-            }
-        }
-        renderer.setEquippedWeapon(weaponVisualId)
-        val armorVisualId = equipment.armorInstanceId?.let { instanceId ->
-            itemEngine.getInventory(playerId).firstOrNull { it.instanceId == instanceId }?.let { item ->
-                itemEngine.getItemDefinition(item.itemId).visualId
-            }
-        }
-        renderer.setEquippedArmor(armorVisualId)
+        renderer.setEquippedWeapon("weapon_sword_sparks")
+        renderer.setEquippedArmor("armor_guardian_vest")
         applyCharacterVariant()
         when (stage) {
             Stage.HOME -> {
@@ -555,7 +538,7 @@ class MainActivity : Activity() {
             }
             Stage.FOREST -> {
                 title.text = "Лес"
-                message.text = "Впереди маленькое существо."
+                message.text = "Впереди Тёмный гоблин."
                 action.text = "Начать бой"
                 equipmentButton.visibility = View.GONE
                 armorButton.visibility = View.GONE
