@@ -74,7 +74,7 @@ class MathBattleFlowCoordinatorTest {
         val generated = flow.generateNext(
             playerId = "player",
             skillStates = listOf(SkillState("ADD_BASIC", 0)),
-            availableSkills = setOf(SkillState("ADD_BASIC", 0)),
+            availableSkills = setOf("ADD_BASIC"),
             inputType = InputType.NUMERIC,
             generationContext = mapOf("taskIndex" to "0")
         )
@@ -93,7 +93,7 @@ class MathBattleFlowCoordinatorTest {
         val generated = flow.generateNext(
             playerId = "player",
             skillStates = listOf(SkillState("ADD_BASIC", 0)),
-            availableSkills = setOf("ADD_BASIC"),
+            availableSkills = setOf(SkillState("ADD_BASIC", 0)),
             inputType = InputType.NUMERIC,
             generationContext = mapOf("taskIndex" to "0")
         )
