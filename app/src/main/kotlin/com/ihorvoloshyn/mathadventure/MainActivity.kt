@@ -85,9 +85,6 @@ class MainActivity : Activity() {
     private lateinit var taskPanel: LinearLayout
     private lateinit var taskText: TextView
     private lateinit var fleeButton: Button
-    private lateinit var equipmentButton: Button
-    private lateinit var armorButton: Button
-    private lateinit var characterButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -157,16 +154,6 @@ class MainActivity : Activity() {
             setOnClickListener { flee() }
         }
         bottom.addView(fleeButton, LinearLayout.LayoutParams(-1, 52).apply { bottomMargin = 8 })
-        equipmentButton = gameButton().apply { setOnClickListener { toggleWeapon() } }
-        bottom.addView(equipmentButton, LinearLayout.LayoutParams(-1, 52).apply { bottomMargin = 8 })
-        armorButton = gameButton().apply { setOnClickListener { toggleArmor() } }
-        bottom.addView(armorButton, LinearLayout.LayoutParams(-1, 52).apply { bottomMargin = 8 })
-        characterButton = gameButton().apply {
-            setOnClickListener {
-                startActivity(android.content.Intent(this@MainActivity, CharacterEquipmentActivity::class.java))
-            }
-        }
-        bottom.addView(characterButton, LinearLayout.LayoutParams(-1, 52).apply { bottomMargin = 8 })
 
         answers = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -524,32 +511,11 @@ class MainActivity : Activity() {
 
     private fun applyCharacterVariant() {
         // MVP: one fixed playable character — knight.
-        renderer.setHeroKind("CAT")
         renderer.setHeroClass("KNIGHT")
-        characterButton.text = "⚔ Рыцарь"
+        renderer.setEquippedWeapon("weapon_sword_sparks")
+        renderer.setEquippedArmor("armor_guardian_vest")
     }
 
-    private fun toggleWeapon() {
-        val equipment = itemEngine.getEquipment(playerId)
-        if (equipment.weaponInstanceId != null) {
-            itemEngine.unequip(playerId, com.mathadventure.core.items.EquipmentSlot.WEAPON)
-        } else {
-            val sword = itemEngine.getInventory(playerId).firstOrNull { it.itemId == "sword_sparks" } ?: return
-            itemEngine.equip(playerId, sword.instanceId, gameProgressionStore.get(playerId).rpgLevel)
-        }
-        renderStage()
-    }
-
-    private fun toggleArmor() {
-        val equipment = itemEngine.getEquipment(playerId)
-        if (equipment.armorInstanceId != null) {
-            itemEngine.unequip(playerId, com.mathadventure.core.items.EquipmentSlot.ARMOR)
-        } else {
-            val vest = itemEngine.getInventory(playerId).firstOrNull { it.itemId == "guardian_vest" } ?: return
-            itemEngine.equip(playerId, vest.instanceId, gameProgressionStore.get(playerId).rpgLevel)
-        }
-        renderStage()
-    }
 
     private fun renderStage() {
         renderer.setStage(stage.ordinal)
