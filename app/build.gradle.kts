@@ -30,6 +30,7 @@ android {
 }
 
 dependencies {
-    testImplementation(kotlin("test"))
-    testImplementation(kotlin("test-junit5"))
+    testImplementation("org.jetbrains.kotlin:kotlin-test:2.2.20")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:2.2.20")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.13.4")
 }
