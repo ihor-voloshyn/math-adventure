@@ -167,9 +167,7 @@ class MainActivity : Activity() {
         bottom.addView(armorButton, LinearLayout.LayoutParams(-1, 52).apply { bottomMargin = 8 })
         characterButton = gameButton().apply {
             setOnClickListener {
-                characterVariant = (characterVariant + 1) % 4
-                characterPreferences.edit().putInt("variant", characterVariant).apply()
-                renderStage()
+                startActivity(android.content.Intent(this@MainActivity, CharacterEquipmentActivity::class.java))
             }
         }
         bottom.addView(characterButton, LinearLayout.LayoutParams(-1, 52).apply { bottomMargin = 8 })
