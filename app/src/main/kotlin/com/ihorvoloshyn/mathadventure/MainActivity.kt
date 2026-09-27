@@ -588,12 +588,8 @@ class MainActivity : Activity() {
                 val ownedSword = itemEngine.getInventory(playerId).any { it.itemId == "sword_sparks" }
                 message.text = if (weapon != null) "Питомец ждёт нового приключения. Оружие экипировано." else "Питомец ждёт нового приключения."
                 action.text = "Идти в деревню"
-                equipmentButton.visibility = if (ownedSword) View.VISIBLE else View.GONE
-                equipmentButton.text = if (weapon != null) "Снять меч" else "Экипировать меч"
-                val armor = equipment.armorInstanceId
-                val ownedArmor = itemEngine.getInventory(playerId).any { it.itemId == "guardian_vest" }
-                armorButton.visibility = if (ownedArmor) View.VISIBLE else View.GONE
-                armorButton.text = if (armor != null) "Снять кирасу" else "Экипировать кирасу"
+                equipmentButton.visibility = View.GONE
+                armorButton.visibility = View.GONE
                 answers.visibility = View.GONE
             }
             Stage.VILLAGE -> {
