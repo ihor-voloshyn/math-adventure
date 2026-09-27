@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.graphics.drawable.GradientDrawable
+import com.mathadventure.core.combat.EquipmentCombatStatsResolver
 
 class CharacterEquipmentActivity : Activity() {
     private val playerId = "prototype-player"
