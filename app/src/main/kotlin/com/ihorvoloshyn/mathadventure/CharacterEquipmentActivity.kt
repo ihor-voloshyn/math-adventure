@@ -16,16 +16,13 @@ class CharacterEquipmentActivity : Activity() {
     private lateinit var gameProgressionStore: AndroidGameProgressionInventoryStore
     private lateinit var itemEngine: com.mathadventure.core.items.ItemEngine
     private lateinit var characterPreferences: android.content.SharedPreferences
-    private var characterVariant = 0
     private lateinit var summary: TextView
     private lateinit var weaponButton: Button
     private lateinit var armorButton: Button
-    private lateinit var variantButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         characterPreferences = getSharedPreferences("math_adventure_character", MODE_PRIVATE)
-        characterVariant = characterPreferences.getInt("variant", 0)
         gameProgressionStore = AndroidGameProgressionInventoryStore(this, PrototypeItemCatalog.definitions)
         itemEngine = com.mathadventure.core.items.ItemEngine(PrototypeItemCatalog.definitions, gameProgressionStore)
 
@@ -64,11 +61,6 @@ class CharacterEquipmentActivity : Activity() {
         card.addView(summary)
         root.addView(card, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = 10 })
 
-        variantButton = gameButton().apply {
-            setOnClickListener { cycleCharacterVariant() }
-        }
-        root.addView(variantButton, LinearLayout.LayoutParams(-1, 54).apply { bottomMargin = 8 })
-
         weaponButton = gameButton().apply {
             gravity = Gravity.START or Gravity.CENTER_VERTICAL
             setOnClickListener { toggleWeapon() }
@@ -82,12 +74,6 @@ class CharacterEquipmentActivity : Activity() {
         root.addView(armorButton, LinearLayout.LayoutParams(-1, 64))
 
         setContentView(root)
-        render()
-    }
-
-    private fun cycleCharacterVariant() {
-        characterVariant = (characterVariant + 1) % 4
-        characterPreferences.edit().putInt("variant", characterVariant).apply()
         render()
     }
 
@@ -114,13 +100,9 @@ class CharacterEquipmentActivity : Activity() {
     }
 
     private fun render() {
-        val heroKind = if (characterVariant >= 2) "DOG" else "CAT"
-        val heroClass = if (characterVariant % 2 == 1) "MAGE" else "KNIGHT"
-        val petKind = if (heroKind == "DOG") "PUPPY" else "KITTEN"
         renderer.setStage(0)
-        renderer.setHeroKind(heroKind)
-        renderer.setHeroClass(heroClass)
-        renderer.setPetKind(petKind)
+        renderer.setHeroKind("CAT")
+        renderer.setHeroClass("KNIGHT")
 
         val inventory = itemEngine.getInventory(playerId)
         val equipment = itemEngine.getEquipment(playerId)
@@ -132,26 +114,18 @@ class CharacterEquipmentActivity : Activity() {
             inventory.firstOrNull { it.instanceId == id }?.let { itemEngine.getItemDefinition(it.itemId).visualId }
         })
 
-        val hero = when (characterVariant) {
-            0 -> "🐱 Кот • Рыцарь"
-            1 -> "🐱 Кот • Маг"
-            2 -> "🐶 Щенок • Рыцарь"
-            else -> "🐶 Щенок • Маг"
-        }
         val level = gameProgressionStore.get(playerId).rpgLevel
-        summary.text = hero + "\n🐾 Питомец: " + (if (petKind == "PUPPY") "щенок" else "котёнок") +
-            "    ❤️ " + stats.hearts + "    ⚔ " + stats.attackPower + "    ⭐ Уровень " + level
+        summary.text = "⚔ Рыцарь    ❤️ " + stats.hearts + "    ⚔ " + stats.attackPower + "    ⭐ Уровень " + level
 
-        variantButton.text = "Сменить героя • " + hero
         weaponButton.text = if (equipment.weaponInstanceId != null) {
-            "⚔ Меч Искры — экипирован\nНажми, чтобы снять"
+            "⚔ Меч Искры — экипирован\\nНажми, чтобы снять"
         } else {
-            "⚔ Меч Искры — в инвентаре\nНажми, чтобы экипировать"
+            "⚔ Меч Искры — в инвентаре\\nНажми, чтобы экипировать"
         }
         armorButton.text = if (equipment.armorInstanceId != null) {
-            "🛡 Кирасa стража — экипирована\nНажми, чтобы снять"
+            "🛡 Кирасa стража — экипирована\\nНажми, чтобы снять"
         } else {
-            "🛡 Кирасa стража — в инвентаре\nНажми, чтобы экипировать"
+            "🛡 Кирасa стража — в инвентаре\\nНажми, чтобы экипировать"
         }
     }
 
