@@ -5,9 +5,10 @@ import com.mathadventure.core.model.AnswerResult
 import com.mathadventure.core.model.InputType
 import com.mathadventure.core.model.TaskInstance
 import com.mathadventure.core.model.TaskMode
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertIs
+import kotlin.test.assertTrue
 
 class MathTaskUiStateTest {
     private val task = TaskInstance(
@@ -27,7 +28,7 @@ class MathTaskUiStateTest {
     @Test
     fun presentStartsInIdle() {
         val state = machine.present(task, 2, 5)
-        assertTrue(state is MathTaskUiState.Idle)
+        assertIs<MathTaskUiState.Idle>(state)
         assertEquals(2, state.taskIndex)
         assertEquals(5, state.totalTasks)
     }
@@ -45,7 +46,7 @@ class MathTaskUiStateTest {
             selected,
             AttemptEvaluation(AnswerResult.CORRECT)
         )
-        assertTrue(state is MathTaskUiState.Correct)
+        assertIs<MathTaskUiState.Correct>(state)
         assertEquals("12", state.selectedAnswer)
     }
 
@@ -56,7 +57,7 @@ class MathTaskUiStateTest {
             selected,
             AttemptEvaluation(AnswerResult.INCORRECT)
         )
-        assertTrue(state is MathTaskUiState.Incorrect)
+        assertIs<MathTaskUiState.Incorrect>(state)
         assertEquals("11", state.selectedAnswer)
     }
 
@@ -67,7 +68,7 @@ class MathTaskUiStateTest {
             selected,
             AttemptEvaluation(AnswerResult.SKIPPED)
         )
-        assertTrue(state is MathTaskUiState.Skipped)
-        assertTrue(state is MathTaskUiState.Skipped && state.evaluation.result == AnswerResult.SKIPPED)
+        assertIs<MathTaskUiState.Skipped>(state)
+        assertEquals(AnswerResult.SKIPPED, state.evaluation.result)
     }
 }
