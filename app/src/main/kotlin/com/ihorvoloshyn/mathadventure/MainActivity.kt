@@ -585,7 +585,6 @@ class MainActivity : Activity() {
             Stage.HOME -> {
                 title.text = "Дом героя"
                 val weapon = equipment.weaponInstanceId
-                val ownedSword = itemEngine.getInventory(playerId).any { it.itemId == "sword_sparks" }
                 message.text = if (weapon != null) "Питомец ждёт нового приключения. Оружие экипировано." else "Питомец ждёт нового приключения."
                 action.text = "Идти в деревню"
                 equipmentButton.visibility = View.GONE
