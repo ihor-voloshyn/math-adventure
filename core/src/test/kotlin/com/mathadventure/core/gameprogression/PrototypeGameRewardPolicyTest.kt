@@ -25,6 +25,7 @@ class PrototypeGameRewardPolicyTest {
         assertTrue(result.eligible)
         assertEquals(100L, result.reward.xpDelta)
         assertEquals(25L, result.reward.coinsDelta)
+        assertEquals(listOf("sword_sparks", "guardian_vest"), result.reward.lootIds)
         assertEquals("forest-encounter-01", result.bestResultAfter?.sourceId)
     }
 
