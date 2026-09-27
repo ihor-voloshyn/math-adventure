@@ -30,6 +30,6 @@ android {
 }
 
 dependencies {
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.13.4")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.13.4")
+    testImplementation(kotlin("test"))
+    testImplementation(kotlin("test-junit5"))
 }
