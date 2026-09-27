@@ -20,10 +20,10 @@ import com.mathadventure.core.validation.LogicalTaskValidator
 import com.mathadventure.core.validation.MathematicalTaskValidator
 import com.mathadventure.core.validation.StructuralTaskValidator
 import com.mathadventure.core.validation.TaskValidationPipeline
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.assertIs
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 
 class MathBattleFlowCoordinatorTest {
     private val mastery = PolicyDrivenMasterySystem(InMemoryMasteryStateStore(), ApprovedMasteryPolicy())
@@ -82,7 +82,7 @@ class MathBattleFlowCoordinatorTest {
         coordinator.evaluate("player", generated, "attempt-once", generated.task.answerSpec, 1L, emptyMap(), 1)
 
         assertEquals(CombatResolution.HIT, coordinator.resolvePendingAttack())
-        assertFailsWith<IllegalStateException> {
+        assertThrows(IllegalStateException::class.java) {
             coordinator.resolvePendingAttack()
         }
     }
