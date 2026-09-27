@@ -5,10 +5,10 @@ import com.mathadventure.core.model.AnswerResult
 import com.mathadventure.core.model.InputType
 import com.mathadventure.core.model.TaskInstance
 import com.mathadventure.core.model.TaskMode
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertIs
-import kotlin.test.assertTrue
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertInstanceOf
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
 
 class MathTaskUiStateTest {
     private val task = TaskInstance(
@@ -36,7 +36,7 @@ class MathTaskUiStateTest {
     fun correctEvaluationProducesCorrectState() {
         val selected = machine.select(machine.present(task, 2, 5), "12")
         val state = machine.resolve(selected, AttemptEvaluation(AnswerResult.CORRECT))
-        val correct = assertIs<MathTaskUiState.Correct>(state)
+        val correct = assertInstanceOf(MathTaskUiState.Correct::class.java, state)
         assertEquals("12", correct.selectedAnswer)
     }
 
@@ -44,7 +44,7 @@ class MathTaskUiStateTest {
     fun incorrectEvaluationProducesIncorrectState() {
         val selected = machine.select(machine.present(task, 2, 5), "11")
         val state = machine.resolve(selected, AttemptEvaluation(AnswerResult.INCORRECT))
-        val incorrect = assertIs<MathTaskUiState.Incorrect>(state)
+        val incorrect = assertInstanceOf(MathTaskUiState.Incorrect::class.java, state)
         assertEquals("11", incorrect.selectedAnswer)
     }
 
@@ -52,7 +52,7 @@ class MathTaskUiStateTest {
     fun skippedEvaluationProducesSkippedState() {
         val selected = machine.select(machine.present(task, 2, 5), "12")
         val state = machine.resolve(selected, AttemptEvaluation(AnswerResult.SKIPPED))
-        val skipped = assertIs<MathTaskUiState.Skipped>(state)
+        val skipped = assertInstanceOf(MathTaskUiState.Skipped::class.java, state)
         assertEquals(AnswerResult.SKIPPED, skipped.evaluation.result)
     }
 }
