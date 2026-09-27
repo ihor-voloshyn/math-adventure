@@ -88,14 +88,10 @@ class MainActivity : Activity() {
     private lateinit var equipmentButton: Button
     private lateinit var armorButton: Button
     private lateinit var characterButton: Button
-    private var characterVariant = 0
-    private lateinit var characterPreferences: android.content.SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         progressStore = PrototypeProgressStore(this)
-        characterPreferences = getSharedPreferences("math_adventure_character", MODE_PRIVATE)
-        characterVariant = characterPreferences.getInt("variant", 0)
         gameProgressionStore = AndroidGameProgressionInventoryStore(this, PrototypeItemCatalog.definitions)
         gameProgression = CoreGameProgressionFlow(
             rewardPolicy = PrototypeGameRewardPolicy(),
@@ -527,18 +523,10 @@ class MainActivity : Activity() {
     }
 
     private fun applyCharacterVariant() {
-        val heroKind = if (characterVariant >= 2) "DOG" else "CAT"
-        val heroClass = if (characterVariant % 2 == 1) "MAGE" else "KNIGHT"
-        val petKind = if (heroKind == "DOG") "PUPPY" else "KITTEN"
-        renderer.setHeroKind(heroKind)
-        renderer.setHeroClass(heroClass)
-        renderer.setPetKind(petKind)
-        characterButton.text = when (characterVariant) {
-            0 -> "🐱 Кот • Рыцарь"
-            1 -> "🐱 Кот • Маг"
-            2 -> "🐶 Щенок • Рыцарь"
-            else -> "🐶 Щенок • Маг"
-        }
+        // MVP: one fixed playable character — knight.
+        renderer.setHeroKind("CAT")
+        renderer.setHeroClass("KNIGHT")
+        characterButton.text = "⚔ Рыцарь"
     }
 
     private fun toggleWeapon() {
@@ -585,7 +573,7 @@ class MainActivity : Activity() {
             Stage.HOME -> {
                 title.text = "Дом героя"
                 val weapon = equipment.weaponInstanceId
-                message.text = if (weapon != null) "Питомец ждёт нового приключения. Оружие экипировано." else "Питомец ждёт нового приключения."
+                message.text = if (weapon != null) "Герой готов к новому приключению. Оружие экипировано." else "Герой готов к новому приключению."
                 action.text = "Идти в деревню"
                 equipmentButton.visibility = View.GONE
                 armorButton.visibility = View.GONE
