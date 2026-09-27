@@ -158,12 +158,11 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             characterYaw = if (stage == 3) Math.PI.toFloat() else 0f
             val attackProgress = if (attackActive && stage == 3) attackClock else 0f
             drawHero(-0.9f + attackLunge(attackProgress), 0f, 1.7f, attackProgress)
-            drawPet(0.65f, 0f, 1.85f)
             characterYaw = 0f
 
             when (stage) {
                 1 -> drawNpc(1.8f, 0f, -1.2f)
-                2 -> drawEnemy(2.2f, 0f, -1.0f)
+                2 -> drawCombatEnemy(2.5f, 0f, -1.4f)
                 3 -> {
                     drawCombatEnemy(2.5f + hitKnockback(hitClock), 0f, -1.4f)
                     drawAttackVfx(-0.9f + attackLunge(attackProgress), 1.35f, 1.62f, attackProgress, hitClock)
