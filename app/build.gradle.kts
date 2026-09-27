@@ -1,7 +1,6 @@
 plugins {
     id("com.android.application")
     kotlin("android")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.13.4")
 }
 
 android {
@@ -33,5 +32,5 @@ android {
 dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test:2.2.20")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:2.2.20")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.13.4")
 }
-
