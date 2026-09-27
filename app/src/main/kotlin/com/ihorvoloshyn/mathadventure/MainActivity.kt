@@ -562,6 +562,12 @@ class MainActivity : Activity() {
             }
         }
         renderer.setEquippedWeapon(weaponVisualId)
+        val armorVisualId = equipment.armorInstanceId?.let { instanceId ->
+            itemEngine.getInventory(playerId).firstOrNull { it.instanceId == instanceId }?.let { item ->
+                itemEngine.getItemDefinition(item.itemId).visualId
+            }
+        }
+        renderer.setEquippedArmor(armorVisualId)
         applyCharacterVariant()
         when (stage) {
             Stage.HOME -> {
