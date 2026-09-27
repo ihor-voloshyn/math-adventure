@@ -20,10 +20,10 @@ import com.mathadventure.core.validation.LogicalTaskValidator
 import com.mathadventure.core.validation.MathematicalTaskValidator
 import com.mathadventure.core.validation.StructuralTaskValidator
 import com.mathadventure.core.validation.TaskValidationPipeline
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.assertIs
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.assertThrows
 
 class MathBattleFlowCoordinatorTest {
     private val mastery = PolicyDrivenMasterySystem(InMemoryMasteryStateStore(), ApprovedMasteryPolicy())
@@ -58,12 +58,12 @@ class MathBattleFlowCoordinatorTest {
         coordinator.presentTask(generated, 1, 3)
         val resolution = coordinator.evaluate("player", generated, "attempt-1", generated.task.answerSpec, 1L, emptyMap(), 1)
         assertEquals(CombatResolution.HIT, resolution)
-        assertIs<com.ihorvoloshyn.mathadventure.ui.math.MathTaskUiState.Correct>(coordinator.mathState)
-        assertIs<com.ihorvoloshyn.mathadventure.ui.battle.BattleUiState.AttackStarted>(coordinator.battleState)
+        assertTrue(coordinator.mathState is com.ihorvoloshyn.mathadventure.ui.math.MathTaskUiState.Correct)
+        assertTrue(coordinator.battleState is com.ihorvoloshyn.mathadventure.ui.battle.BattleUiState.AttackStarted)
         assertEquals(CombatResolution.HIT, coordinator.resolvePendingAttack())
-        assertIs<com.ihorvoloshyn.mathadventure.ui.battle.BattleUiState.AttackResolved>(coordinator.battleState)
+        assertTrue(coordinator.battleState is com.ihorvoloshyn.mathadventure.ui.battle.BattleUiState.AttackResolved)
         coordinator.rewardCurrentBattle()
-        assertIs<com.ihorvoloshyn.mathadventure.ui.battle.BattleUiState.Rewarded>(coordinator.battleState)
+        assertTrue(coordinator.battleState is com.ihorvoloshyn.mathadventure.ui.battle.BattleUiState.Rewarded)
     }
 
     @Test
@@ -82,9 +82,7 @@ class MathBattleFlowCoordinatorTest {
         coordinator.evaluate("player", generated, "attempt-once", generated.task.answerSpec, 1L, emptyMap(), 1)
 
         assertEquals(CombatResolution.HIT, coordinator.resolvePendingAttack())
-        assertFailsWith<IllegalStateException> {
-            coordinator.resolvePendingAttack()
-        }
+        assertThrows(IllegalStateException::class.java) { coordinator.resolvePendingAttack() }
     }
 
     @Test
@@ -103,6 +101,6 @@ class MathBattleFlowCoordinatorTest {
         val wrong = (generated.task.answerSpec.toInt() + 1).toString()
         val resolution = coordinator.evaluate("player", generated, "attempt-2", wrong, 2L, emptyMap(), 1)
         assertEquals(CombatResolution.MISS, resolution)
-        assertIs<com.ihorvoloshyn.mathadventure.ui.math.MathTaskUiState.Incorrect>(coordinator.mathState)
+        assertTrue(coordinator.mathState is com.ihorvoloshyn.mathadventure.ui.math.MathTaskUiState.Incorrect)
     }
 }
