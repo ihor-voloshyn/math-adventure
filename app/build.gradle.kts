@@ -16,11 +16,6 @@ android {
     }
 
     buildFeatures { buildConfig = true }
-
-    testOptions {
-        unitTests.all { it.useJUnitPlatform() }
-    }
-
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
@@ -30,7 +25,5 @@ android {
 }
 
 dependencies {
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.13.4")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.13.4")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("junit:junit:4.13.2")
 }
