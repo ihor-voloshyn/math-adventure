@@ -29,6 +29,7 @@ android {
     kotlinOptions { jvmTarget = "21" }
 }
 
+// MVP Android unit tests use Kotlin Test with the JUnit 5 adapter.
 dependencies {
     testImplementation(kotlin("test"))
     testImplementation(kotlin("test-junit5"))
