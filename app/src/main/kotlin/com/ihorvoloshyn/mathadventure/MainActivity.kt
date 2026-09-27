@@ -86,6 +86,7 @@ class MainActivity : Activity() {
     private lateinit var taskText: TextView
     private lateinit var fleeButton: Button
     private lateinit var equipmentButton: Button
+    private lateinit var armorButton: Button
     private lateinit var characterButton: Button
     private var characterVariant = 0
     private lateinit var characterPreferences: android.content.SharedPreferences
@@ -162,6 +163,8 @@ class MainActivity : Activity() {
         bottom.addView(fleeButton, LinearLayout.LayoutParams(-1, 52).apply { bottomMargin = 8 })
         equipmentButton = gameButton().apply { setOnClickListener { toggleWeapon() } }
         bottom.addView(equipmentButton, LinearLayout.LayoutParams(-1, 52).apply { bottomMargin = 8 })
+        armorButton = gameButton().apply { setOnClickListener { toggleArmor() } }
+        bottom.addView(armorButton, LinearLayout.LayoutParams(-1, 52).apply { bottomMargin = 8 })
         characterButton = gameButton().apply {
             setOnClickListener {
                 characterVariant = (characterVariant + 1) % 4
@@ -551,6 +554,17 @@ class MainActivity : Activity() {
         renderStage()
     }
 
+    private fun toggleArmor() {
+        val equipment = itemEngine.getEquipment(playerId)
+        if (equipment.armorInstanceId != null) {
+            itemEngine.unequip(playerId, com.mathadventure.core.items.EquipmentSlot.ARMOR)
+        } else {
+            val vest = itemEngine.getInventory(playerId).firstOrNull { it.itemId == "guardian_vest" } ?: return
+            itemEngine.equip(playerId, vest.instanceId, gameProgressionStore.get(playerId).rpgLevel)
+        }
+        renderStage()
+    }
+
     private fun renderStage() {
         renderer.setStage(stage.ordinal)
         fleeButton.visibility = if (stage == Stage.COMBAT) View.VISIBLE else View.GONE
@@ -578,11 +592,16 @@ class MainActivity : Activity() {
                 action.text = "Идти в деревню"
                 equipmentButton.visibility = if (ownedSword) View.VISIBLE else View.GONE
                 equipmentButton.text = if (weapon != null) "Снять меч" else "Экипировать меч"
+                val armor = equipment.armorInstanceId
+                val ownedArmor = itemEngine.getInventory(playerId).any { it.itemId == "guardian_vest" }
+                armorButton.visibility = if (ownedArmor) View.VISIBLE else View.GONE
+                armorButton.text = if (armor != null) "Снять кирасу" else "Экипировать кирасу"
                 answers.visibility = View.GONE
             }
             Stage.VILLAGE -> {
                 title.text = "Деревенская площадь"
                 equipmentButton.visibility = View.GONE
+                armorButton.visibility = View.GONE
                 message.text = "NPC просит проверить дорогу в лес."
                 action.text = "Идти в лес"
                 answers.visibility = View.GONE
@@ -592,6 +611,7 @@ class MainActivity : Activity() {
                 message.text = "Впереди маленькое существо."
                 action.text = "Начать бой"
                 equipmentButton.visibility = View.GONE
+                armorButton.visibility = View.GONE
                 answers.visibility = View.GONE
             }
             Stage.COMBAT -> {
@@ -600,6 +620,7 @@ class MainActivity : Activity() {
                 message.text = "Выбери ответ для атаки. 🛡 Защита не наносит урон и не получает урон. 🏃 Убежать завершает бой."
                 action.text = "🛡 Защита"
                 equipmentButton.visibility = View.GONE
+                armorButton.visibility = View.GONE
                 answers.visibility = View.VISIBLE
                 fleeButton.visibility = View.VISIBLE
             }
@@ -608,6 +629,7 @@ class MainActivity : Activity() {
                 message.text = "Игровой цикл завершён. Правильных ответов в сохранении: ${progressStore.totalCorrect}."
                 action.text = "Вернуться домой"
                 equipmentButton.visibility = View.GONE
+                armorButton.visibility = View.GONE
                 answers.visibility = View.GONE
             }
         }
