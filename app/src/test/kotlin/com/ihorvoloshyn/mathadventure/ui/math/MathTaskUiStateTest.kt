@@ -7,18 +7,16 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class MathTaskUiStateTest {
-    private val task = TaskInstance(
-        "task-1", "ADD_BASIC", TaskMode.DIRECT, 1, "BATTLE",
-        "7 + 5 = ?", InputType.SELECTION, "12", "COUNT ON FROM 7"
-    )
+    private val task = TaskInstance("task-1", "ADD_BASIC", TaskMode.DIRECT, 1, "BATTLE", "7 + 5 = ?", InputType.SELECTION, "12", "COUNT ON FROM 7")
     private val machine = MathTaskStateMachine()
 
     @Test
     fun presentStartsInIdle() {
         val state = machine.present(task, 2, 5)
         assertTrue(state is MathTaskUiState.Idle)
-        assertEquals(2, state.taskIndex)
-        assertEquals(5, state.totalTasks)
+        val idle = state as MathTaskUiState.Idle
+        assertEquals(2, idle.taskIndex)
+        assertEquals(5, idle.totalTasks)
     }
 
     @Test
@@ -28,31 +26,22 @@ class MathTaskUiStateTest {
 
     @Test
     fun correctEvaluationProducesCorrectState() {
-        val state = machine.resolve(
-            machine.select(machine.present(task, 2, 5), "12"),
-            AttemptEvaluation(AnswerResult.CORRECT)
-        )
+        val state = machine.resolve(machine.select(machine.present(task, 2, 5), "12"), AttemptEvaluation(AnswerResult.CORRECT))
         assertTrue(state is MathTaskUiState.Correct)
-        assertEquals("12", state.selectedAnswer)
+        assertEquals("12", (state as MathTaskUiState.Correct).selectedAnswer)
     }
 
     @Test
     fun incorrectEvaluationProducesIncorrectState() {
-        val state = machine.resolve(
-            machine.select(machine.present(task, 2, 5), "11"),
-            AttemptEvaluation(AnswerResult.INCORRECT)
-        )
+        val state = machine.resolve(machine.select(machine.present(task, 2, 5), "11"), AttemptEvaluation(AnswerResult.INCORRECT))
         assertTrue(state is MathTaskUiState.Incorrect)
-        assertEquals("11", state.selectedAnswer)
+        assertEquals("11", (state as MathTaskUiState.Incorrect).selectedAnswer)
     }
 
     @Test
     fun skippedEvaluationProducesSkippedState() {
-        val state = machine.resolve(
-            machine.select(machine.present(task, 2, 5), "12"),
-            AttemptEvaluation(AnswerResult.SKIPPED)
-        )
+        val state = machine.resolve(machine.select(machine.present(task, 2, 5), "12"), AttemptEvaluation(AnswerResult.SKIPPED))
         assertTrue(state is MathTaskUiState.Skipped)
-        assertEquals(AnswerResult.SKIPPED, state.evaluation.result)
+        assertEquals(AnswerResult.SKIPPED, (state as MathTaskUiState.Skipped).evaluation.result)
     }
 }
