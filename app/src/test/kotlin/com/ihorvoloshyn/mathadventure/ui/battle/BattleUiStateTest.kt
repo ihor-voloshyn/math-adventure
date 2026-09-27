@@ -15,10 +15,10 @@ class BattleUiStateTest {
         val started = machine.attackStarted(machine.ready(combat), 1)
         val outcome = engine.resolveMathAction(combat, CombatAction.ATTACK, true, 1)
         val state = machine.resolve(started, outcome.state, outcome.resolution)
-
         assertTrue(state is BattleUiState.AttackResolved)
-        assertEquals(CombatResolution.HIT, state.resolution)
-        assertEquals(2, state.combat.enemyHp)
+        val resolved = state as BattleUiState.AttackResolved
+        assertEquals(CombatResolution.HIT, resolved.resolution)
+        assertEquals(2, resolved.combat.enemyHp)
     }
 
     @Test
@@ -28,8 +28,7 @@ class BattleUiStateTest {
         val outcome = engine.resolveMathAction(combat, CombatAction.ATTACK, true, 1)
         val resolved = machine.resolve(started, outcome.state, outcome.resolution)
         val rewarded = machine.reward(resolved)
-
         assertTrue(rewarded is BattleUiState.Rewarded)
-        assertEquals(CombatResolution.VICTORY, rewarded.resolution)
+        assertEquals(CombatResolution.VICTORY, (rewarded as BattleUiState.Rewarded).resolution)
     }
 }
