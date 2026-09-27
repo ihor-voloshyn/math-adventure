@@ -146,7 +146,144 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
                 val t = (hitProgress / 0.82f).coerceIn(0f, 1f)
                 val radius = 0.10f + t * 0.48f
                 val y = 1.22f + t * 0.22f
-                if (equippedWeaponVisualId != null) {
+                if (heroClass == HeroClass.MAGE) {
+                    sphere(2.48f, y, -1.44f, radius, radius, radius, 0.38f, 0.82f, 1.0f)
+                    sphere(2.48f - radius * 0.85f, y + radius * 0.30f, -1.42f, radius * 0.14f, radius * 0.14f, radius * 0.14f, 0.72f, 0.94f, 1.0f)
+                    sphere(2.48f + radius * 0.75f, y - radius * 0.20f, -1.46f, radius * 0.11f, radius * 0.11f, radius * 0.11f, 0.56f, 0.88f, 1.0f)
+                } else {
+                    sphere(2.48f, y, -1.44f, radius, radius * 0.30f, radius * 0.18f, 0.96f, 0.72f, 0.22f)
+                    sphere(2.48f - radius * 0.80f, y + radius * 0.40f, -1.42f, radius * 0.13f, radius * 0.13f, radius * 0.13f, 1.0f, 0.92f, 0.48f)
+                    sphere(2.48f + radius * 0.72f, y - radius * 0.25f, -1.46f, radius * 0.10f, radius * 0.10f, radius * 0.10f, 1.0f, 0.82f, 0.30f)
+                }
+            }
+        }
+
+        private fun attackLunge(progress: Float): Float {
+            if (progress <= 0f) return 0f
+            // Anticipation -> forward strike -> recoil. The impact is near 70% of the timeline.
+            return when {
+                progress < 0.22f -> -0.08f * (progress / 0.22f)
+                progress < 0.72f -> {
+                    val t = (progress - 0.22f) / 0.50f
+                    -0.08f + 0.64f * (t * t * (3f - 2f * t))
+                }
+                else -> {
+                    val t = ((progress - 0.72f) / 0.28f).coerceIn(0f, 1f)
+                    0.56f * (1f - t)
+                }
+            }
+        }
+
+        private fun hitKnockback(progress: Float): Float {
+            if (progress <= 0f) return 0f
+            // Fast impact displacement followed by recovery.
+            return 0.18f * sin(progress * Math.PI.toFloat())
+        }
+
+        private fun drawHome() {
+            cube(-2.6f, 0.95f, -2.2f, 3.2f, 1.9f, 2.2f, 0.78f, 0.48f, 0.30f)
+            cone(-2.6f, 2.65f, -2.2f, 2.35f, 1.20f, 0.86f, 0.18f, 0.12f)
+            cube(-2.6f, 0.72f, 0.02f, 0.62f, 1.12f, 0.12f, 0.18f, 0.08f, 0.04f)
+            cube(-1.35f, 1.25f, 0.04f, 0.55f, 0.65f, 0.08f, 0.24f, 0.62f, 0.82f)
+            cube(-3.85f, 1.25f, 0.04f, 0.55f, 0.65f, 0.08f, 0.24f, 0.62f, 0.82f)
+            cylinder(-2.6f, 2.85f, -2.2f, 0.18f, 0.70f, 0.32f, 0.32f, 0.34f)
+            cube(-2.6f, 2.50f, 0.04f, 2.8f, 0.08f, 0.10f, 0.58f, 0.34f, 0.18f)
+            cylinder(-0.8f, 0.22f, 0.6f, 0.55f, 0.32f, 0.62f, 0.38f, 0.22f)
+            cylinder(-1.45f, 0.22f, 0.55f, 0.22f, 0.72f, 0.42f, 0.22f, 0.09f)
+            cylinder(-1.05f, 0.18f, 0.62f, 0.20f, 0.62f, 0.50f, 0.27f, 0.11f)
+            sphere(-1.75f, 0.78f, -0.36f, 0.10f, 0.14f, 0.10f, 0.92f, 0.68f, 0.18f)
+        }
+
+        private fun drawVillage() {
+            cube(2.6f, 0.45f, -2.0f, 2.7f, 0.9f, 2.4f, 0.72f, 0.50f, 0.34f)
+            cone(2.6f, 1.35f, -2.0f, 2.15f, 0.85f, 0.78f, 0.18f, 0.12f)
+            cylinder(2.6f, 1.0f, -0.35f, 0.7f, 0.95f, 0.25f, 0.25f, 0.32f)
+            tree(-3.0f, 0f, -2.8f)
+            tree(3.8f, 0f, 2.3f)
+            tree(-4.2f, 0f, 1.4f)
+        }
+
+        private fun drawForest(combat: Boolean) {
+            tree(-3.2f, 0f, -2.0f)
+            tree(-1.0f, 0f, -3.2f)
+            tree(3.8f, 0f, 1.7f)
+            tree(2.8f, 0f, -3.0f)
+            tree(-4.0f, 0f, 2.7f)
+            if (combat) {
+                cylinder(0.8f, 0.04f, -1.2f, 2.8f, 0.08f, 0.35f, 0.52f, 0.28f)
+                cylinder(0.8f, 0.10f, -1.2f, 2.15f, 0.06f, 0.48f, 0.60f, 0.34f)
+                cylinder(0.8f, 0.16f, -1.2f, 1.72f, 0.05f, 0.30f, 0.42f, 0.22f)
+                stone(-1.15f, 0.10f, -2.25f, 0.26f, 0.12f, 0.20f)
+                stone(2.65f, 0.10f, -0.55f, 0.22f, 0.14f, 0.18f)
+                stone(0.25f, 0.10f, -2.65f, 0.18f, 0.10f, 0.16f)
+                cylinder(-1.15f, 0.58f, -1.20f, 0.08f, 0.92f, 0.22f, 0.12f, 0.06f)
+                sphere(-1.15f, 1.12f, -1.20f, 0.18f, 0.20f, 0.18f, 0.88f, 0.42f, 0.08f)
+                cylinder(2.75f, 0.58f, -1.20f, 0.08f, 0.92f, 0.22f, 0.12f, 0.06f)
+                sphere(2.75f, 1.12f, -1.20f, 0.18f, 0.20f, 0.18f, 0.88f, 0.42f, 0.08f)
+                cylinder(0.8f, 0.17f, 1.00f, 0.34f, 0.05f, 0.30f, 0.25f, 0.16f)
+                cylinder(0.8f, 0.18f, 0.45f, 0.26f, 0.05f, 0.34f, 0.28f, 0.18f)
+            }
+        }
+
+        private fun drawHero(x: Float, y: Float, z: Float, attackProgress: Float = 0f) {
+            val bob = sin(angle) * 0.025f
+            val furR = if (heroKind == HeroKind.CAT) 0.68f else 0.50f
+            val furG = if (heroKind == HeroKind.CAT) 0.48f else 0.32f
+            val furB = if (heroKind == HeroKind.CAT) 0.30f else 0.18f
+
+            val anticipation = if (attackProgress in 0.01f..0.22f) {
+                sin((attackProgress / 0.22f) * Math.PI.toFloat()) * 0.10f
+            } else 0f
+            val strikeLean = when {
+                attackProgress < 0.22f -> 0f
+                attackProgress < 0.72f -> (attackProgress - 0.22f) / 0.50f
+                else -> (1f - attackProgress) / 0.28f
+            }.coerceIn(0f, 1f)
+
+            sphere(x, y + 0.92f + bob - anticipation * 0.15f, z, 0.56f, 0.78f, 0.46f, furR, furG, furB)
+            if (equippedArmorVisualId == "armor_guardian_vest") drawGuardianVest(x, y + bob - anticipation * 0.12f, z)
+            sphere(x, y + 1.66f + bob - anticipation * 0.10f, z + 0.02f, 0.50f, 0.48f, 0.46f, furR, furG, furB)
+            sphere(x, y + 1.56f + bob + anticipation * 0.10f, z + 0.40f, 0.30f, 0.24f, 0.24f, 0.82f, 0.62f, 0.46f)
+            if (heroKind == HeroKind.CAT) {
+                cone(x - 0.30f, y + 2.10f + bob, z, 0.22f, 0.52f, furR, furG, furB)
+                cone(x + 0.30f, y + 2.10f + bob, z, 0.22f, 0.52f, furR, furG, furB)
+                cylinder(x - 0.48f, y + 0.92f + bob, z + 0.05f, 0.10f, 0.65f, furR, furG, furB)
+                cone(x - 0.48f, y + 1.30f + bob, z + 0.05f, 0.11f, 0.42f, furR, furG, furB)
+            } else {
+                sphere(x - 0.43f, y + 1.75f + bob, z, 0.18f, 0.34f, 0.22f, 0.34f, 0.20f, 0.12f)
+                sphere(x + 0.43f, y + 1.75f + bob, z, 0.18f, 0.34f, 0.22f, 0.34f, 0.20f, 0.12f)
+                sphere(x, y + 1.52f + bob, z - 0.48f, 0.24f, 0.16f, 0.18f, 0.20f, 0.12f, 0.08f)
+                cylinder(x + 0.48f, y + 0.98f + bob, z + 0.04f, 0.10f, 0.62f, furR, furG, furB)
+            }
+            sphere(x - 0.17f, y + 1.72f + bob, z + 0.43f, 0.07f, 0.07f, 0.05f, 0.03f, 0.03f, 0.03f)
+            sphere(x + 0.17f, y + 1.72f + bob, z + 0.43f, 0.07f, 0.07f, 0.05f, 0.03f, 0.03f, 0.03f)
+            sphere(x, y + 1.58f + bob, z + 0.64f, 0.07f, 0.06f, 0.05f, 0.12f, 0.05f, 0.04f)
+            sphere(x - 0.20f, y + 1.52f + bob, z + 0.60f, 0.12f, 0.10f, 0.08f, 0.72f, 0.50f, 0.36f)
+            sphere(x + 0.20f, y + 1.52f + bob, z + 0.60f, 0.12f, 0.10f, 0.08f, 0.72f, 0.50f, 0.36f)
+            cylinder(x - 0.30f, y + 1.55f + bob, z + 0.67f, 0.018f, 0.34f, 0.88f, 0.82f, 0.72f)
+            cylinder(x + 0.30f, y + 1.55f + bob, z + 0.67f, 0.018f, 0.34f, 0.88f, 0.82f, 0.72f)
+            cylinder(x, y + 1.27f + bob, z + 0.02f, 0.31f, 0.08f, 0.82f, 0.64f, 0.12f)
+            sphere(x, y + 1.25f + bob, z + 0.34f, 0.06f, 0.06f, 0.04f, 0.95f, 0.72f, 0.10f)
+            cube(x, y + 1.02f + bob, z - 0.04f, 0.58f, 0.10f, 0.48f, 0.18f, 0.24f, 0.34f)
+            sphere(x - 0.43f, y + 1.12f + bob, z, 0.18f, 0.13f, 0.25f, 0.22f, 0.30f, 0.40f)
+            sphere(x + 0.43f, y + 1.12f + bob, z, 0.18f, 0.13f, 0.25f, 0.22f, 0.30f, 0.40f)
+            sphere(x, y + 1.05f + bob, z + 0.31f, 0.11f, 0.11f, 0.05f, 0.86f, 0.64f, 0.16f)
+            cylinder(x - 0.23f, y + 0.24f, z, 0.15f, 0.62f, furR, furG, furB)
+            cylinder(x + 0.23f, y + 0.24f, z, 0.15f, 0.62f, furR, furG, furB)
+            sphere(x - 0.23f, y + 0.02f, z + 0.02f, 0.18f, 0.10f, 0.28f, 0.12f, 0.12f, 0.14f)
+            sphere(x + 0.23f, y + 0.02f, z + 0.02f, 0.18f, 0.10f, 0.28f, 0.12f, 0.12f, 0.14f)
+            sphere(x - 0.52f, y + 1.17f + bob, z + 0.02f, 0.24f, 0.20f, 0.28f, 0.34f, 0.40f, 0.50f)
+            sphere(x + 0.52f, y + 1.17f + bob, z + 0.02f, 0.24f, 0.20f, 0.28f, 0.34f, 0.40f, 0.50f)
+            cube(x, y + 1.08f + bob, z + 0.50f, 0.20f, 0.22f, 0.06f, 0.70f, 0.58f, 0.18f)
+            sphere(x, y + 1.10f + bob, z + 0.57f, 0.08f, 0.08f, 0.04f, 0.92f, 0.78f, 0.22f)
+            cylinder(x, y + 0.82f + bob, z + 0.02f, 0.46f, 0.08f, 0.10f, 0.14f, 0.20f)
+            sphere(x, y + 0.82f + bob, z + 0.50f, 0.09f, 0.09f, 0.05f, 0.90f, 0.70f, 0.16f)
+            sphere(x - 0.24f, y + 0.42f + bob, z - 0.01f, 0.18f, 0.16f, 0.18f, 0.26f, 0.32f, 0.40f)
+            sphere(x + 0.24f, y + 0.42f + bob, z - 0.01f, 0.18f, 0.16f, 0.18f, 0.26f, 0.32f, 0.40f)
+            if (heroClass == HeroClass.MAGE) {
+                drawMageRobe(x, y + bob, z)
+                drawMagicStaff(x + 0.68f, y + 0.72f + bob, z - 0.05f, attackProgress)
+            } else if (equippedWeaponVisualId != null) {
                 drawSword(
                     x + 0.67f + strikeLean * 0.16f,
                     y + 0.96f + bob + anticipation * 0.18f,
@@ -197,6 +334,36 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             }
         }
 
+        private fun drawPet(x: Float, y: Float, z: Float) {
+            val bob = sin(angle * 1.5f) * 0.08f
+            val puppy = petKind == PetKind.PUPPY
+            val bodyR = if (puppy) 0.62f else 0.22f
+            val bodyG = if (puppy) 0.42f else 0.54f
+            val bodyB = if (puppy) 0.24f else 0.66f
+            sphere(x, y + 0.45f + bob, z, 0.62f, 0.46f, 0.78f, bodyR, bodyG, bodyB)
+            sphere(x, y + 0.95f + bob, z + 0.02f, 0.44f, 0.42f, 0.48f, bodyR + 0.08f, bodyG + 0.08f, bodyB + 0.06f)
+            sphere(x, y + 0.90f + bob, z + 0.40f, 0.24f, 0.20f, 0.18f, 0.82f, 0.74f, 0.60f)
+            if (puppy) {
+                sphere(x - 0.28f, y + 1.16f + bob, z + 0.02f, 0.18f, 0.30f, 0.16f, 0.48f, 0.28f, 0.16f)
+                sphere(x + 0.28f, y + 1.16f + bob, z + 0.02f, 0.18f, 0.30f, 0.16f, 0.48f, 0.28f, 0.16f)
+            } else {
+                cone(x - 0.28f, y + 1.30f + bob, z, 0.18f, 0.42f, bodyR, bodyG, bodyB)
+                cone(x + 0.28f, y + 1.30f + bob, z, 0.18f, 0.42f, bodyR, bodyG, bodyB)
+            }
+            cylinder(x + 0.62f, y + 0.62f + bob, z + 0.02f, 0.08f, 0.52f, bodyR, bodyG, bodyB)
+            sphere(x - 0.15f, y + 1.03f + bob, z + 0.42f, 0.06f, 0.06f, 0.04f, 0.02f, 0.02f, 0.02f)
+            sphere(x + 0.15f, y + 1.03f + bob, z + 0.42f, 0.06f, 0.06f, 0.04f, 0.02f, 0.02f, 0.02f)
+            sphere(x, y + 0.34f + bob, z + 0.48f, 0.045f, 0.05f, 0.035f, 0.55f, 0.88f, 1.0f)
+            cylinder(x, y + 0.54f + bob, z + 0.02f, 0.40f, 0.07f, 0.12f, 0.18f, 0.24f)
+            sphere(x, y + 0.56f + bob, z + 0.43f, 0.07f, 0.09f, 0.04f, 0.72f, 0.52f, 0.16f)
+            cylinder(x, y + 0.82f + bob, z + 0.43f, 0.23f, 0.07f, 0.10f, 0.24f, 0.30f)
+            sphere(x, y + 0.72f + bob, z + 0.50f, 0.08f, 0.09f, 0.05f, 0.92f, 0.68f, 0.16f)
+            sphere(x + 0.62f, y + 0.36f + bob, z + 0.02f, 0.13f, 0.10f, 0.16f, 0.16f, 0.34f, 0.42f)
+            sphere(x - 0.36f, y + 0.08f + bob, z + 0.28f, 0.18f, 0.10f, 0.22f, 0.14f, 0.36f, 0.44f)
+            sphere(x + 0.36f, y + 0.08f + bob, z + 0.28f, 0.18f, 0.10f, 0.22f, 0.14f, 0.36f, 0.44f)
+            sphere(x - 0.18f, y + 0.82f + bob, z + 0.49f, 0.07f, 0.05f, 0.04f, 0.08f, 0.08f, 0.08f)
+            sphere(x + 0.18f, y + 0.82f + bob, z + 0.49f, 0.07f, 0.05f, 0.04f, 0.08f, 0.08f, 0.08f)
+        }
         private fun drawNpc(x: Float, y: Float, z: Float) {
             cylinder(x, y + 0.82f, z, 0.58f, 1.25f, 0.30f, 0.58f, 0.38f)
             sphere(x, y + 1.72f, z, 0.48f, 0.88f, 0.72f, 0.55f, 0.38f, 0.28f)
