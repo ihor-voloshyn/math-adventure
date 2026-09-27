@@ -20,6 +20,7 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
     fun setStage(stage: Int) { scene.stage = stage }
     fun setVictory(value: Boolean) { scene.victory = value }
     fun setEquippedWeapon(visualId: String?) { scene.equippedWeaponVisualId = visualId }
+    fun setEquippedArmor(visualId: String?) { scene.equippedArmorVisualId = visualId }
     fun setAttackActive(value: Boolean) { scene.attackActive = value }
     fun setHitFeedback(value: Boolean) { scene.hitFeedback = value }
     fun setHeroClass(value: String) { scene.heroClass = if (value.equals("MAGE", ignoreCase = true)) SceneRenderer.HeroClass.MAGE else SceneRenderer.HeroClass.KNIGHT }
@@ -32,6 +33,7 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
         var stage = 0
         var victory = false
         var equippedWeaponVisualId: String? = null
+        var equippedArmorVisualId: String? = null
         @Volatile var attackActive = false
         @Volatile var hitFeedback = false
         var heroClass = HeroClass.KNIGHT
@@ -294,6 +296,7 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             }.coerceIn(0f, 1f)
 
             sphere(x, y + 0.92f + bob - anticipation * 0.15f, z, 0.56f, 0.78f, 0.46f, furR, furG, furB)
+            if (equippedArmorVisualId == "armor_guardian_vest") drawGuardianVest(x, y + bob - anticipation * 0.12f, z)
             sphere(x, y + 1.66f + bob - anticipation * 0.10f, z + 0.02f, 0.50f, 0.48f, 0.46f, furR, furG, furB)
             sphere(x, y + 1.56f + bob + anticipation * 0.10f, z + 0.40f, 0.30f, 0.24f, 0.24f, 0.82f, 0.62f, 0.46f)
             if (heroKind == HeroKind.CAT) {
@@ -344,6 +347,14 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
                     strikeLean
                 )
             }
+        }
+
+        private fun drawGuardianVest(x: Float, y: Float, z: Float) {
+            cube(x, y + 0.98f, z - 0.01f, 0.88f, 0.92f, 0.56f, 0.18f, 0.28f, 0.42f)
+            sphere(x - 0.46f, y + 1.02f, z, 0.16f, 0.34f, 0.18f, 0.14f, 0.24f, 0.36f)
+            sphere(x + 0.46f, y + 1.02f, z, 0.16f, 0.34f, 0.18f, 0.14f, 0.24f, 0.36f)
+            cylinder(x, y + 0.58f, z + 0.30f, 0.055f, 0.48f, 0.72f, 0.56f, 0.18f)
+            sphere(x, y + 1.05f, z + 0.31f, 0.12f, 0.14f, 0.08f, 0.82f, 0.66f, 0.22f)
         }
 
         private fun drawMageRobe(x: Float, y: Float, z: Float) {
