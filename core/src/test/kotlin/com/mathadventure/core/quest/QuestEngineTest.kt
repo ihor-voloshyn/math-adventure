@@ -62,4 +62,25 @@ class QuestEngineTest {
         assertEquals(200L, completion.completedAtEpochMillis)
         assertNull(engine.completion("p1", "story_village_to_forest", "instance-2"))
     }
+    @Test
+    fun failedQuestBecomesAvailableAgainButCompletedQuestStaysClosed() {
+        val store = MemoryStore()
+        val engine = QuestEngine(
+            FirstQuestChain.definitions.associateBy { it.id },
+            store,
+            CompletedPrerequisites()
+        )
+
+        engine.start("p1", "story_first_battle", "session-1", 100L)
+        engine.fail("p1", "story_first_battle", 200L)
+        assertEquals(QuestState.AVAILABLE, engine.availability("p1", "story_first_battle"))
+
+        engine.start("p1", "story_first_battle", "session-2", 300L)
+        val completed = engine.recordObjectiveProgress(
+            "p1", "story_first_battle", "win_first_battle", nowEpochMillis = 400L
+        )
+        assertEquals(QuestState.COMPLETED, completed.state)
+        assertEquals(QuestState.COMPLETED, engine.availability("p1", "story_first_battle"))
+    }
+
 }
