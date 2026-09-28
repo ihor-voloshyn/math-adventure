@@ -232,7 +232,7 @@ class MainActivity : Activity() {
         listOf("ADD_BASIC", "ADD_CROSS_TEN").map { masterySystem.getSkillState(playerId, it) }
 
     private fun startCombat() {
-        combatState = combatEngine.start("forest-encounter-01", heroHearts = 4, enemyHp = 3)
+        combatState = combatEngine.start("forest-encounter-01", heroHearts = 1, enemyHp = 1)
         combatTaskIndex = 0
         combatInputLocked = false
         stage = Stage.COMBAT
@@ -356,20 +356,30 @@ class MainActivity : Activity() {
         }
 
         progressStore.recordIncorrect()
-        combatState = flowCoordinator.battleState?.combat
-        combatInputLocked = false
-        showAnswerOptions(current.task.answerSpec)
-        message.text = "Промах. Попробуй ещё раз — эта задача остаётся активной."
-        title.text = "⚔ Бой с Тёмным гоблином • Сердца " +
-            combatState!!.heroHearts + "/" + combatState!!.maxHeroHearts +
-            " • Гоблин " + combatState!!.enemyHp + "/3"
-    }
+        questEngine.fail(
+            playerId = playerId,
+            questId = "story_first_battle",
+            nowEpochMillis = System.currentTimeMillis()
+        )
+        combatInputLocked = true
+        combatState = null
+        renderer.setVictory(false)
+        renderer.setMonsterPresent(true)
+        stage = Stage.FOREST
+        answers.visibility = View.GONE
+        taskPanel.visibility = View.GONE
+        title.text = "Задача не решена"
+        message.text = "Квест проигран. Тёмный гоблин остался в лесу. Можно повторить квест."
+        action.visibility = View.VISIBLE
+        action.text = "Повторить квест"
+
 
     private fun finishResolvedAttack(resolution: CombatResolution) {
         combatState = flowCoordinator.battleState?.combat
         when (resolution) {
             CombatResolution.VICTORY -> {
                 renderer.setVictory(true)
+                renderer.setMonsterPresent(false)
                 renderer.setMonsterPresent(false)
                 val questCommit = recordQuestObjective("story_first_battle", "win_first_battle")
                 val combatId = combatState!!.combatId
@@ -388,7 +398,6 @@ class MainActivity : Activity() {
                 flowCoordinator.rewardCurrentBattle()
                 stage = Stage.RETURN_HOME
                 answers.visibility = View.GONE
-                fleeButton.visibility = View.GONE
                 title.text = "Победа над врагом!"
                 message.text = buildString {
                     append(if (commit != null) {
@@ -428,36 +437,6 @@ class MainActivity : Activity() {
                 renderStage()
             }
         }
-    }
-
-    private fun defend() {
-        if (stage != Stage.COMBAT || combatInputLocked) return
-        combatInputLocked = true
-        val result = combatEngine.resolveMathAction(combatState ?: return, CombatAction.DEFEND, true)
-        combatState = result.state
-        if (result.resolution == CombatResolution.DEFEAT) {
-            stage = Stage.RETURN_HOME
-            answers.visibility = View.GONE
-            title.text = "Поражение"
-            message.text = "Враг оказался сильнее. Подтверждённый прогресс сохранён."
-            action.text = "Вернуться домой"
-        } else {
-            generateMathTask()
-            renderStage()
-            message.text = "🛡 Защита сработала: урон не получен. Сердца: " + combatState!!.heroHearts + "/" + combatState!!.maxHeroHearts + ".\nНовая задача — выбери правильный ответ."
-        }
-    }
-
-    private fun flee() {
-        if (stage != Stage.COMBAT || combatInputLocked) return
-        combatInputLocked = true
-        combatState = combatEngine.resolveMathAction(combatState ?: return, CombatAction.FLEE, false).state
-        stage = Stage.RETURN_HOME
-        answers.visibility = View.GONE
-        taskPanel.visibility = View.GONE
-        title.text = "Отступление"
-        message.text = "Ты покинул бой без победы. Награда за победу не получена."
-        action.text = "Вернуться домой"
     }
 
     private fun onPrimaryAction() {
