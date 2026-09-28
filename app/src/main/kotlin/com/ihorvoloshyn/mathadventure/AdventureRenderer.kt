@@ -19,6 +19,7 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
 
     fun setStage(stage: Int) { scene.stage = stage }
     fun setVictory(value: Boolean) { scene.victory = value }
+    fun setMonsterPresent(value: Boolean) { scene.monsterPresent = value }
     fun setEquippedWeapon(visualId: String?) { scene.equippedWeaponVisualId = visualId }
     fun setEquippedArmor(visualId: String?) { scene.equippedArmorVisualId = visualId }
     fun setAttackActive(value: Boolean) { scene.attackActive = value }
@@ -110,7 +111,7 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
                 1 -> drawNpc(1.8f, 0f, -1.2f)
                 2 -> drawCombatEnemy(2.5f, 0f, -1.4f)
                 3 -> {
-                    drawCombatEnemy(2.5f + hitKnockback(hitClock), 0f, -1.4f)
+                    if (monsterPresent) drawCombatEnemy(2.5f + hitKnockback(hitClock), 0f, -1.4f)
                     drawAttackVfx(-0.9f + attackLunge(attackProgress), 1.35f, 1.62f, attackProgress, hitClock)
                 }
             }
@@ -334,36 +335,6 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             }
         }
 
-        private fun drawPet(x: Float, y: Float, z: Float) {
-            val bob = sin(angle * 1.5f) * 0.08f
-            val puppy = petKind == PetKind.PUPPY
-            val bodyR = if (puppy) 0.62f else 0.22f
-            val bodyG = if (puppy) 0.42f else 0.54f
-            val bodyB = if (puppy) 0.24f else 0.66f
-            sphere(x, y + 0.45f + bob, z, 0.62f, 0.46f, 0.78f, bodyR, bodyG, bodyB)
-            sphere(x, y + 0.95f + bob, z + 0.02f, 0.44f, 0.42f, 0.48f, bodyR + 0.08f, bodyG + 0.08f, bodyB + 0.06f)
-            sphere(x, y + 0.90f + bob, z + 0.40f, 0.24f, 0.20f, 0.18f, 0.82f, 0.74f, 0.60f)
-            if (puppy) {
-                sphere(x - 0.28f, y + 1.16f + bob, z + 0.02f, 0.18f, 0.30f, 0.16f, 0.48f, 0.28f, 0.16f)
-                sphere(x + 0.28f, y + 1.16f + bob, z + 0.02f, 0.18f, 0.30f, 0.16f, 0.48f, 0.28f, 0.16f)
-            } else {
-                cone(x - 0.28f, y + 1.30f + bob, z, 0.18f, 0.42f, bodyR, bodyG, bodyB)
-                cone(x + 0.28f, y + 1.30f + bob, z, 0.18f, 0.42f, bodyR, bodyG, bodyB)
-            }
-            cylinder(x + 0.62f, y + 0.62f + bob, z + 0.02f, 0.08f, 0.52f, bodyR, bodyG, bodyB)
-            sphere(x - 0.15f, y + 1.03f + bob, z + 0.42f, 0.06f, 0.06f, 0.04f, 0.02f, 0.02f, 0.02f)
-            sphere(x + 0.15f, y + 1.03f + bob, z + 0.42f, 0.06f, 0.06f, 0.04f, 0.02f, 0.02f, 0.02f)
-            sphere(x, y + 0.34f + bob, z + 0.48f, 0.045f, 0.05f, 0.035f, 0.55f, 0.88f, 1.0f)
-            cylinder(x, y + 0.54f + bob, z + 0.02f, 0.40f, 0.07f, 0.12f, 0.18f, 0.24f)
-            sphere(x, y + 0.56f + bob, z + 0.43f, 0.07f, 0.09f, 0.04f, 0.72f, 0.52f, 0.16f)
-            cylinder(x, y + 0.82f + bob, z + 0.43f, 0.23f, 0.07f, 0.10f, 0.24f, 0.30f)
-            sphere(x, y + 0.72f + bob, z + 0.50f, 0.08f, 0.09f, 0.05f, 0.92f, 0.68f, 0.16f)
-            sphere(x + 0.62f, y + 0.36f + bob, z + 0.02f, 0.13f, 0.10f, 0.16f, 0.16f, 0.34f, 0.42f)
-            sphere(x - 0.36f, y + 0.08f + bob, z + 0.28f, 0.18f, 0.10f, 0.22f, 0.14f, 0.36f, 0.44f)
-            sphere(x + 0.36f, y + 0.08f + bob, z + 0.28f, 0.18f, 0.10f, 0.22f, 0.14f, 0.36f, 0.44f)
-            sphere(x - 0.18f, y + 0.82f + bob, z + 0.49f, 0.07f, 0.05f, 0.04f, 0.08f, 0.08f, 0.08f)
-            sphere(x + 0.18f, y + 0.82f + bob, z + 0.49f, 0.07f, 0.05f, 0.04f, 0.08f, 0.08f, 0.08f)
-        }
         private fun drawNpc(x: Float, y: Float, z: Float) {
             cylinder(x, y + 0.82f, z, 0.58f, 1.25f, 0.30f, 0.58f, 0.38f)
             sphere(x, y + 1.72f, z, 0.48f, 0.88f, 0.72f, 0.55f, 0.38f, 0.28f)
