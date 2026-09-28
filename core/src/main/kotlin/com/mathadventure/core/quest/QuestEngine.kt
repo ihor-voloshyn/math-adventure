@@ -10,6 +10,7 @@ class QuestEngine(
         val current = store.get(playerId, questId)
         return when {
             current?.state == QuestState.COMPLETED && definition.repeatability == QuestRepeatability.ONE_TIME -> QuestState.COMPLETED
+            current?.state == QuestState.FAILED -> QuestState.AVAILABLE
             current?.state == QuestState.ACTIVE -> QuestState.ACTIVE
             prerequisiteChecker.isSatisfied(playerId, definition.prerequisites) -> QuestState.AVAILABLE
             else -> QuestState.LOCKED
@@ -57,6 +58,17 @@ class QuestEngine(
         )
         store.save(updated)
         return updated
+    }
+
+    fun fail(playerId: String, questId: String, nowEpochMillis: Long): QuestInstance {
+        val current = store.get(playerId, questId) ?: error("quest instance does not exist: $questId")
+        require(current.state == QuestState.ACTIVE) { "quest is not active: $questId" }
+        val failed = current.copy(
+            state = QuestState.FAILED,
+            completedAtEpochMillis = nowEpochMillis
+        )
+        store.save(failed)
+        return failed
     }
 
     fun completion(playerId: String, questId: String, instanceId: String): QuestCompletion? {

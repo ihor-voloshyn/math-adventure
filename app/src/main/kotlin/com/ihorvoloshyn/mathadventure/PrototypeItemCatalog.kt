@@ -18,6 +18,17 @@ object PrototypeItemCatalog {
             stats = ItemStats(attackPower = 1),
             equipmentSlot = EquipmentSlot.WEAPON,
             requiredRpgLevel = 1
+        ),
+        ItemDefinition(
+            itemId = "guardian_vest",
+            nameKey = "item.guardian_vest.name",
+            category = ItemCategory.ARMOR,
+            rarity = ItemRarity.COMMON,
+            descriptionKey = "item.guardian_vest.description",
+            visualId = "armor_guardian_vest",
+            stats = ItemStats(hearts = 1),
+            equipmentSlot = EquipmentSlot.ARMOR,
+            requiredRpgLevel = 1
         )
     ).associateBy { it.itemId }
 }
