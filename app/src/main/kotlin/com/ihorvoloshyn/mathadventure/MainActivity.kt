@@ -458,7 +458,17 @@ class MainActivity : Activity() {
                     message.text = "Квест завершён: +" + questCommit.reward.xpDelta + " XP, +" + questCommit.reward.coinsDelta + " монет."
                 }
             }
-            Stage.FOREST -> startCombat()
+            Stage.FOREST -> {
+                when (questEngine.availability(playerId, "story_first_battle")) {
+                    QuestState.COMPLETED -> renderStage()
+                    QuestState.AVAILABLE -> {
+                        ensureQuestStarted("story_first_battle")
+                        startCombat()
+                    }
+                    QuestState.ACTIVE -> startCombat()
+                    else -> renderStage()
+                }
+            }
             Stage.COMBAT -> Unit
             Stage.RETURN_HOME -> {
                 ensureQuestStarted("story_return_home")
@@ -493,8 +503,13 @@ class MainActivity : Activity() {
             }
             Stage.FOREST -> {
                 title.text = "Лес"
-                message.text = "Впереди маленькое существо."
-                action.text = "Начать бой"
+                if (questEngine.availability(playerId, "story_first_battle") == QuestState.COMPLETED) {
+                    message.text = "Квест уже завершён. Существо больше не появляется."
+                    action.text = "Вернуться домой"
+                } else {
+                    message.text = "Впереди маленькое существо."
+                    action.text = "Решить задачу"
+                }
                 answers.visibility = View.GONE
             }
             Stage.COMBAT -> {
@@ -508,7 +523,6 @@ class MainActivity : Activity() {
                 title.text = "Возвращение"
                 message.text = "Игровой цикл завершён. Правильных ответов в сохранении: ${progressStore.totalCorrect}."
                 action.text = "Вернуться домой"
-                equipmentButton.visibility = View.GONE
                 answers.visibility = View.GONE
             }
         }
