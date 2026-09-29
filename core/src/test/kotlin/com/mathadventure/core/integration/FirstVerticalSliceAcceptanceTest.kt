@@ -1,6 +1,5 @@
 package com.mathadventure.core.integration
 
-import com.mathadventure.core.combat.CombatAction
 import com.mathadventure.core.combat.CombatEngine
 import com.mathadventure.core.combat.CombatResolution
 import com.mathadventure.core.gameprogression.CoreGameProgressionFlow
@@ -21,7 +20,6 @@ import com.mathadventure.core.quest.QuestState
 import com.mathadventure.core.quest.QuestStore
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class FirstVerticalSliceAcceptanceTest {
     @Test
@@ -47,13 +45,10 @@ class FirstVerticalSliceAcceptanceTest {
         completeObjective(questEngine, playerId, "story_village_to_forest", "talk_to_npc", 200L)
         completeAndReward(questEngine, coordinator, playerId, "story_village_to_forest", "reach_forest", 300L)
 
-        var state = combat.start("forest-encounter-01", enemyHp = 3)
-        repeat(2) {
-            val outcome = combat.resolveMathAction(state, CombatAction.ATTACK, true)
-            assertTrue(outcome.resolution == CombatResolution.HIT)
-            state = outcome.state
-        }
-        val victory = combat.resolveMathAction(state, CombatAction.ATTACK, true)
+        val victory = combat.resolveMathAnswer(
+            combat.start("forest-encounter-01"),
+            true
+        )
         assertEquals(CombatResolution.VICTORY, victory.resolution)
         assertEquals("COMBAT_VICTORY", victory.gameEventType)
 
