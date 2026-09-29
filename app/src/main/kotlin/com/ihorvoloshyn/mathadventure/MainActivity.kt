@@ -2,6 +2,7 @@ package com.ihorvoloshyn.mathadventure
 
 import android.app.Activity
 import android.graphics.Color
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
@@ -9,6 +10,7 @@ import android.widget.Button
 import android.graphics.drawable.GradientDrawable
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import android.widget.ImageView
 import android.widget.TextView
 import com.mathadventure.core.adaptive.AdaptiveCandidate
 import com.mathadventure.core.adaptive.AdaptivePolicy
@@ -81,6 +83,8 @@ class MainActivity : Activity() {
     private lateinit var answers: LinearLayout
     private lateinit var taskPanel: LinearLayout
     private lateinit var taskText: TextView
+    private lateinit var heroImage: ImageView
+    private lateinit var enemyImage: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -126,6 +130,25 @@ class MainActivity : Activity() {
         val root = FrameLayout(this)
         renderer = AdventureRenderer(this)
         root.addView(renderer)
+
+        heroImage = ImageView(this).apply {
+            setImageBitmap(BitmapFactory.decodeResource(resources, R.drawable.hero_character))
+            scaleType = ImageView.ScaleType.FIT_CENTER
+            alpha = 0.98f
+        }
+        enemyImage = ImageView(this).apply {
+            setImageBitmap(BitmapFactory.decodeResource(resources, R.drawable.enemy_character))
+            scaleType = ImageView.ScaleType.FIT_CENTER
+            alpha = 0.98f
+        }
+        root.addView(heroImage, FrameLayout.LayoutParams(210, 260, Gravity.CENTER_VERTICAL or Gravity.START).apply {
+            leftMargin = 8
+            topMargin = 40
+        })
+        root.addView(enemyImage, FrameLayout.LayoutParams(210, 260, Gravity.CENTER_VERTICAL or Gravity.END).apply {
+            rightMargin = 8
+            topMargin = 40
+        })
 
         val hud = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
@@ -450,6 +473,8 @@ class MainActivity : Activity() {
     private fun renderStage() {
         renderer.setStage(stage.ordinal)
         taskPanel.visibility = if (stage == Stage.COMBAT) View.VISIBLE else View.GONE
+        heroImage.visibility = if (stage == Stage.COMBAT) View.VISIBLE else View.GONE
+        enemyImage.visibility = if (stage == Stage.COMBAT) View.VISIBLE else View.GONE
         renderer.setEquippedWeapon("weapon_sword_sparks")
         when (stage) {
             Stage.HOME -> {
