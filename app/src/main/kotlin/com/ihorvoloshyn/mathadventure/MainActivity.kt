@@ -14,11 +14,9 @@ import com.mathadventure.core.adaptive.AdaptiveCandidate
 import com.mathadventure.core.adaptive.AdaptivePolicy
 import com.mathadventure.core.adaptive.AdaptivePriority
 import com.mathadventure.core.adaptive.RuleBasedAdaptiveEngine
-import com.mathadventure.core.combat.CombatAction
 import com.mathadventure.core.combat.CombatEngine
 import com.mathadventure.core.combat.CombatResolution
 import com.mathadventure.core.combat.CombatState
-import com.mathadventure.core.combat.EquipmentCombatStatsResolver
 import com.mathadventure.core.curriculum.Curriculum
 import com.mathadventure.core.flow.CoreLearningFlow
 import com.mathadventure.core.gameprogression.CoreGameProgressionFlow
@@ -55,7 +53,6 @@ class MainActivity : Activity() {
     private val playerId = "prototype-player"
     private val mathEngine = BasicMathEngine()
     private val combatEngine = CombatEngine()
-    private val equipmentCombatStatsResolver = EquipmentCombatStatsResolver(PrototypeItemCatalog.definitions)
     private lateinit var masteryStore: MasteryStateStore
     private lateinit var masterySystem: PolicyDrivenMasterySystem
     private lateinit var flow: CoreLearningFlow
@@ -84,8 +81,6 @@ class MainActivity : Activity() {
     private lateinit var answers: LinearLayout
     private lateinit var taskPanel: LinearLayout
     private lateinit var taskText: TextView
-    private lateinit var fleeButton: Button
-    private lateinit var equipmentButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -150,14 +145,6 @@ class MainActivity : Activity() {
         }
         action = gameButton().apply { setOnClickListener { onPrimaryAction() } }
         bottom.addView(action, LinearLayout.LayoutParams(-1, 56).apply { bottomMargin = 8 })
-        fleeButton = gameButton().apply {
-            text = "🏃 Убежать"
-            setOnClickListener { flee() }
-        }
-        bottom.addView(fleeButton, LinearLayout.LayoutParams(-1, 52).apply { bottomMargin = 8 })
-        equipmentButton = gameButton().apply { setOnClickListener { toggleWeapon() } }
-        bottom.addView(equipmentButton, LinearLayout.LayoutParams(-1, 52).apply { bottomMargin = 8 })
-
         answers = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
@@ -245,8 +232,7 @@ class MainActivity : Activity() {
         listOf("ADD_BASIC", "ADD_CROSS_TEN").map { masterySystem.getSkillState(playerId, it) }
 
     private fun startCombat() {
-        val stats = equipmentCombatStatsResolver.resolve(itemEngine.getInventory(playerId), itemEngine.getEquipment(playerId))
-        combatState = combatEngine.start("forest-encounter-01", heroHearts = 3 + stats.hearts, enemyHp = 3)
+        combatState = combatEngine.start("forest-encounter-01", heroHearts = 3)
         combatTaskIndex = 0
         combatInputLocked = false
         stage = Stage.COMBAT
@@ -291,7 +277,7 @@ class MainActivity : Activity() {
                     if (combatInputLocked) return@setOnClickListener
                     combatInputLocked = true
                     isEnabled = false
-                    submitAttack(value.toString())
+                    submitAnswer(value.toString())
                 }
             }, LinearLayout.LayoutParams(0, 56, 1f).apply {
                 marginStart = 4
@@ -334,16 +320,12 @@ class MainActivity : Activity() {
         renderStage()
     }
 
-    private fun submitAttack(value: String) {
+    private fun submitAnswer(value: String) {
         if (stage != Stage.COMBAT || combatState?.active != true) {
             combatInputLocked = false
             return
         }
         val current = generated ?: run { combatInputLocked = false; return }
-        val stats = equipmentCombatStatsResolver.resolve(
-            itemEngine.getInventory(playerId),
-            itemEngine.getEquipment(playerId)
-        )
         val resolution = flowCoordinator.evaluate(
             playerId = playerId,
             generated = current,
@@ -353,40 +335,32 @@ class MainActivity : Activity() {
             evidenceMetadata = mapOf(
                 "difficultyBand" to if (current.task.difficulty <= 1) "INTRO" else "NORMAL",
                 "evidenceDiverse" to "false"
-            ),
-            attackDamage = stats.attackPower
+            )
         )
-        val answeredCorrect = flowCoordinator.mathState is MathTaskUiState.Correct
-        if (answeredCorrect) {
-            progressStore.recordCorrect()
-            message.text = "⚔ Атака! Герой наносит удар..."
-            renderer.setAttackActive(true)
-            window.decorView.postDelayed({
-                if (stage != Stage.COMBAT) return@postDelayed
-                renderer.setAttackActive(false)
-                val resolved = flowCoordinator.resolvePendingAttack()
-                combatState = flowCoordinator.battleState?.combat
-                renderer.setHitFeedback(true)
-                finishResolvedAttack(resolved)
-                window.decorView.postDelayed({ renderer.setHitFeedback(false) }, 180L)
-            }, 450L)
-            return
-        }
-
-        progressStore.recordIncorrect()
-        combatState = flowCoordinator.battleState?.combat
-        combatInputLocked = false
-        showAnswerOptions(current.task.answerSpec)
-        message.text = "Промах. Попробуй ещё раз — эта задача остаётся активной."
-        title.text = "⚔ Бой с Тёмным гоблином • Сердца " +
-            combatState!!.heroHearts + "/" + combatState!!.maxHeroHearts +
-            " • Гоблин " + combatState!!.enemyHp + "/3"
-    }
-
-    private fun finishResolvedAttack(resolution: CombatResolution) {
         combatState = flowCoordinator.battleState?.combat
         when (resolution) {
-            CombatResolution.VICTORY -> {
+            CombatResolution.VICTORY, CombatResolution.CORRECT -> {
+                progressStore.recordCorrect()
+                finishResolvedAnswer(CombatResolution.VICTORY)
+            }
+            CombatResolution.INCORRECT -> {
+                progressStore.recordIncorrect()
+                combatInputLocked = false
+                showAnswerOptions(current.task.answerSpec)
+                title.text = "🧠 Задача • Сердца " + combatState!!.heroHearts + "/" + combatState!!.maxHeroHearts
+                message.text = "Неверно. Попробуй ещё раз — эта же задача остаётся активной."
+            }
+            CombatResolution.DEFEAT -> {
+                progressStore.recordIncorrect()
+                finishResolvedAnswer(resolution)
+            }
+        }
+    }
+
+    private fun finishResolvedAnswer(resolution: CombatResolution) {
+        combatState = flowCoordinator.battleState?.combat
+        when (resolution) {
+            CombatResolution.VICTORY, CombatResolution.CORRECT -> {
                 renderer.setVictory(true)
                 val questCommit = recordQuestObjective("story_first_battle", "win_first_battle")
                 val combatId = combatState!!.combatId
@@ -405,13 +379,13 @@ class MainActivity : Activity() {
                 flowCoordinator.rewardCurrentBattle()
                 stage = Stage.RETURN_HOME
                 answers.visibility = View.GONE
-                fleeButton.visibility = View.GONE
-                title.text = "Победа над врагом!"
+                title.text = "Задача решена!"
                 message.text = buildString {
                     append(if (commit != null) {
-                        "Победа! +" + commit.reward.xpDelta + " XP, +" + commit.reward.coinsDelta + " монет."
+                        "Победа! Задача решена с " + combatState!!.attemptsUsed.coerceAtLeast(1) +
+                            " попытки. +" + commit.reward.xpDelta + " XP, +" + commit.reward.coinsDelta + " монет."
                     } else {
-                        "Победа! Награда за бой уже была получена."
+                        "Задача уже была завершена. Награда за неё уже получена."
                     })
                     if (questCommit != null) {
                         append(" Квест завершён: +")
@@ -426,55 +400,16 @@ class MainActivity : Activity() {
                 }
                 action.text = "↩ Вернуться домой"
             }
-
             CombatResolution.DEFEAT -> {
                 stage = Stage.RETURN_HOME
                 answers.visibility = View.GONE
                 taskPanel.visibility = View.GONE
-                title.text = "Поражение"
-                message.text = "Ты потерял бой. Подтверждённый прогресс сохранён."
+                title.text = "Квест не решён"
+                message.text = "Все 3 попытки использованы. Квест можно повторить позже."
                 action.text = "Вернуться домой"
             }
-
-            else -> {
-                message.text = "💥 Попадание! Враг: " + combatState!!.enemyHp +
-                    "/3 HP. Сердца: " + combatState!!.heroHearts +
-                    "/" + combatState!!.maxHeroHearts + "."
-                combatInputLocked = false
-                generateMathTask()
-                renderStage()
-            }
+            CombatResolution.INCORRECT -> Unit
         }
-    }
-
-    private fun defend() {
-        if (stage != Stage.COMBAT || combatInputLocked) return
-        combatInputLocked = true
-        val result = combatEngine.resolveMathAction(combatState ?: return, CombatAction.DEFEND, true)
-        combatState = result.state
-        if (result.resolution == CombatResolution.DEFEAT) {
-            stage = Stage.RETURN_HOME
-            answers.visibility = View.GONE
-            title.text = "Поражение"
-            message.text = "Враг оказался сильнее. Подтверждённый прогресс сохранён."
-            action.text = "Вернуться домой"
-        } else {
-            generateMathTask()
-            renderStage()
-            message.text = "🛡 Защита сработала: урон не получен. Сердца: " + combatState!!.heroHearts + "/" + combatState!!.maxHeroHearts + ".\nНовая задача — выбери правильный ответ."
-        }
-    }
-
-    private fun flee() {
-        if (stage != Stage.COMBAT || combatInputLocked) return
-        combatInputLocked = true
-        combatState = combatEngine.resolveMathAction(combatState ?: return, CombatAction.FLEE, false).state
-        stage = Stage.RETURN_HOME
-        answers.visibility = View.GONE
-        taskPanel.visibility = View.GONE
-        title.text = "Отступление"
-        message.text = "Ты покинул бой без победы. Награда за победу не получена."
-        action.text = "Вернуться домой"
     }
 
     private fun onPrimaryAction() {
@@ -499,7 +434,7 @@ class MainActivity : Activity() {
                 }
             }
             Stage.FOREST -> startCombat()
-            Stage.COMBAT -> defend()
+            Stage.COMBAT -> Unit
             Stage.RETURN_HOME -> {
                 ensureQuestStarted("story_return_home")
                 val questCommit = recordQuestObjective("story_return_home", "return_home")
@@ -512,42 +447,19 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun toggleWeapon() {
-        val equipment = itemEngine.getEquipment(playerId)
-        if (equipment.weaponInstanceId != null) {
-            itemEngine.unequip(playerId, com.mathadventure.core.items.EquipmentSlot.WEAPON)
-        } else {
-            val sword = itemEngine.getInventory(playerId).firstOrNull { it.itemId == "sword_sparks" } ?: return
-            itemEngine.equip(playerId, sword.instanceId, gameProgressionStore.get(playerId).rpgLevel)
-        }
-        renderStage()
-    }
-
     private fun renderStage() {
         renderer.setStage(stage.ordinal)
-        fleeButton.visibility = if (stage == Stage.COMBAT) View.VISIBLE else View.GONE
         taskPanel.visibility = if (stage == Stage.COMBAT) View.VISIBLE else View.GONE
-        val equipment = itemEngine.getEquipment(playerId)
-        val weaponVisualId = equipment.weaponInstanceId?.let { instanceId ->
-            itemEngine.getInventory(playerId).firstOrNull { it.instanceId == instanceId }?.let { item ->
-                itemEngine.getItemDefinition(item.itemId).visualId
-            }
-        }
-        renderer.setEquippedWeapon(weaponVisualId)
+        renderer.setEquippedWeapon("weapon_sword_sparks")
         when (stage) {
             Stage.HOME -> {
                 title.text = "Дом героя"
-                val weapon = equipment.weaponInstanceId
-                val ownedSword = itemEngine.getInventory(playerId).any { it.itemId == "sword_sparks" }
-                message.text = if (weapon != null) "Питомец ждёт нового приключения. Оружие экипировано." else "Питомец ждёт нового приключения."
+                message.text = "Рыцарь готов к приключению. Оружие и броня уже экипированы."
                 action.text = "Идти в деревню"
-                equipmentButton.visibility = if (ownedSword) View.VISIBLE else View.GONE
-                equipmentButton.text = if (weapon != null) "Снять меч" else "Экипировать меч"
                 answers.visibility = View.GONE
             }
             Stage.VILLAGE -> {
                 title.text = "Деревенская площадь"
-                equipmentButton.visibility = View.GONE
                 message.text = "NPC просит проверить дорогу в лес."
                 action.text = "Идти в лес"
                 answers.visibility = View.GONE
@@ -561,12 +473,11 @@ class MainActivity : Activity() {
             }
             Stage.COMBAT -> {
                 val state = combatState ?: return
-                title.text = "⚔ Бой с Тёмным гоблином • Сердца " + state.heroHearts + "/" + state.maxHeroHearts + " • Гоблин " + state.enemyHp + "/3"
-                message.text = "Выбери ответ для атаки. 🛡 Защита не наносит урон и не получает урон. 🏃 Убежать завершает бой."
-                action.text = "🛡 Защита"
+                title.text = "🧠 Задача • Сердца " + state.heroHearts + "/" + state.maxHeroHearts
+                message.text = "Реши задачу. Правильный ответ сразу завершает квест. Ошибка снимает одно сердце."
+                action.text = ""
                 equipmentButton.visibility = View.GONE
                 answers.visibility = View.VISIBLE
-                fleeButton.visibility = View.VISIBLE
             }
             Stage.RETURN_HOME -> {
                 title.text = "Возвращение"
