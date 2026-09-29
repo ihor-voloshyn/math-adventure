@@ -85,7 +85,6 @@ class MathBattleFlowCoordinatorTest {
     }
 
     @Test
-    @Test
     fun thirdIncorrectAnswerDefeatsEncounter() {
         val coordinator = MathBattleFlowCoordinator(flow, CombatEngine())
         val combat = CombatEngine().start("test")
