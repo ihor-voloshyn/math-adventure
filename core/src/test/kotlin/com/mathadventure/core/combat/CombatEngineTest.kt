@@ -39,10 +39,22 @@ class CombatEngineTest {
         assertFalse(defeat.state.active)
     }
 
-    @Test fun customHeartLimitIsPreserved() {
-        val state = engine.start("c1", heroHearts = 5)
-        assertEquals(5, state.heroHearts)
-        assertEquals(5, state.maxHeroHearts)
-        assertEquals(CombatResolution.INCORRECT, engine.resolveMathAnswer(state, false).resolution)
+    @Test fun everyEncounterStartsWithExactlyThreeHearts() {
+        val first = engine.start("c1")
+        val second = engine.start("c2")
+        assertEquals(3, first.heroHearts)
+        assertEquals(3, first.maxHeroHearts)
+        assertEquals(3, second.heroHearts)
+        assertEquals(3, second.maxHeroHearts)
+    }
+
+    @Test fun correctAnswerPreservesAllRemainingHearts() {
+        var state = engine.start("c1")
+        state = engine.resolveMathAnswer(state, false).state
+        state = engine.resolveMathAnswer(state, true).state
+        assertEquals(2, state.heroHearts)
+        assertEquals(2, state.maxHeroHearts)
+        assertEquals(1, state.attemptsUsed)
+        assertFalse(state.active)
     }
 }
