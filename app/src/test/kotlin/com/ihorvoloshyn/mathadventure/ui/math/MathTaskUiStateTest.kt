@@ -68,6 +68,7 @@ class MathTaskUiStateTest {
             AttemptEvaluation(AnswerResult.SKIPPED)
         )
         assertTrue(state is MathTaskUiState.Skipped)
-        assertEquals(AnswerResult.SKIPPED, state.evaluation.result)
+        val skipped = state as MathTaskUiState.Skipped
+        assertEquals(AnswerResult.SKIPPED, skipped.evaluation.result)
     }
 }
