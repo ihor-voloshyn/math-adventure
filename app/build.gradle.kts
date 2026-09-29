@@ -17,10 +17,6 @@ android {
 
     buildFeatures { buildConfig = true }
 
-    testOptions {
-        unitTests.all { it.useJUnitPlatform() }
-    }
-
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
@@ -31,5 +27,5 @@ android {
 
 dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test:2.2.20")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:2.2.20")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:2.2.20")
 }
