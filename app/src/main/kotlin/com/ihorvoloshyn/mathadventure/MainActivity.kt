@@ -39,7 +39,6 @@ import com.mathadventure.core.mastery.ApprovedMasteryPolicy
 import com.mathadventure.core.mastery.MasteryStateStore
 import com.mathadventure.core.mastery.PolicyDrivenMasterySystem
 import com.mathadventure.core.math.BasicMathEngine
-import com.mathadventure.core.model.AnswerResult
 import com.mathadventure.core.model.InputType
 import com.mathadventure.core.model.SkillState
 import com.mathadventure.core.model.TaskMode
@@ -63,7 +62,6 @@ class MainActivity : Activity() {
     private lateinit var gameProgression: CoreGameProgressionFlow
     private lateinit var gameProgressionStore: AndroidGameProgressionInventoryStore
     private lateinit var gameProgressionLoot: GameProgressionLootCoordinator
-    private lateinit var itemEngine: com.mathadventure.core.items.ItemEngine
     private lateinit var questProgression: QuestProgressionCoordinator
     private lateinit var questStore: AndroidQuestStore
     private lateinit var questEngine: QuestEngine
@@ -73,8 +71,6 @@ class MainActivity : Activity() {
     private var combatState: CombatState? = null
     private var combatTaskIndex = 0
     private var combatInputLocked = false
-    private var sessionCorrect = 0
-    private var sessionIncorrect = 0
 
     private lateinit var renderer: AdventureRenderer
     private lateinit var title: TextView
@@ -97,7 +93,6 @@ class MainActivity : Activity() {
             unlockPolicy = PrototypeGameUnlockPolicy(),
             store = gameProgressionStore
         )
-        itemEngine = com.mathadventure.core.items.ItemEngine(PrototypeItemCatalog.definitions, gameProgressionStore)
         gameProgressionLoot = GameProgressionLootCoordinator(
             progression = gameProgression,
             store = gameProgressionStore,
@@ -402,6 +397,12 @@ class MainActivity : Activity() {
                 renderer.setVictory(true)
                 val questCommit = recordQuestObjective("story_first_battle", "win_first_battle")
                 val combatId = combatState!!.combatId
+                val attempts = combatState!!.attemptsUsed + 1
+                val masteryLabel = when (attempts) {
+                    1 -> "Максимум"
+                    2 -> "Среднее"
+                    else -> "Минимум"
+                }
                 val commit = gameProgressionLoot.record(
                     GameProgressionEvent(
                         eventId = "combat-victory-" + combatId,
@@ -420,7 +421,6 @@ class MainActivity : Activity() {
                 title.text = "Задача решена!"
                 message.text = buildString {
                     append(if (commit != null) {
-                        val attempts = combatState!!.attemptsUsed + 1
                         "Победа! Задача решена с " + attempts +
                             " попытки. Сердец осталось: " + combatState!!.heroHearts + "/" + combatState!!.maxHeroHearts +
                             ". +" + commit.reward.xpDelta + " XP, +" + commit.reward.coinsDelta + " монет."
