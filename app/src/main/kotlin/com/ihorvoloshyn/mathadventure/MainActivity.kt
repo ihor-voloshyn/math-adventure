@@ -460,7 +460,10 @@ class MainActivity : Activity() {
             }
             Stage.FOREST -> {
                 when (questEngine.availability(playerId, "story_first_battle")) {
-                    QuestState.COMPLETED -> renderStage()
+                    QuestState.COMPLETED -> {
+                        stage = Stage.RETURN_HOME
+                        renderStage()
+                    }
                     QuestState.AVAILABLE -> {
                         ensureQuestStarted("story_first_battle")
                         startCombat()
