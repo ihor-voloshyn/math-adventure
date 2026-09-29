@@ -102,6 +102,13 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             }
             previousHitFeedback = hitFeedback
 
+            when (stage) {
+                0, 4 -> GLES20.glClearColor(0.08f, 0.12f, 0.18f, 1f)
+                1 -> GLES20.glClearColor(0.15f, 0.24f, 0.20f, 1f)
+                2 -> GLES20.glClearColor(0.07f, 0.20f, 0.13f, 1f)
+                3 -> GLES20.glClearColor(0.05f, 0.10f, 0.16f, 1f)
+                else -> GLES20.glClearColor(0.12f, 0.18f, 0.28f, 1f)
+            }
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
 
             val horizontalDistance = 12f
