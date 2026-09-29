@@ -46,7 +46,7 @@ class MathBattleFlowCoordinatorTest {
     @Test
     fun correctAnswerProducesHitAndRewardableBattleState() {
         val coordinator = MathBattleFlowCoordinator(flow, CombatEngine())
-        val combat = CombatEngine().start("test", heroHearts = 3, enemyHp = 3)
+        val combat = CombatEngine().start("test")
         coordinator.startCombat(combat)
         val generated = flow.generateNext(
             playerId = "player",
@@ -56,20 +56,19 @@ class MathBattleFlowCoordinatorTest {
             generationContext = mapOf("taskIndex" to "0")
         )
         coordinator.presentTask(generated, 1, 3)
-        val resolution = coordinator.evaluate("player", generated, "attempt-1", generated.task.answerSpec, 1L, emptyMap(), 1)
-        assertEquals(CombatResolution.HIT, resolution)
+        val resolution = coordinator.evaluate("player", generated, "attempt-1", generated.task.answerSpec, 1L, emptyMap())
+        assertEquals(CombatResolution.VICTORY, resolution)
         assertIs<com.ihorvoloshyn.mathadventure.ui.math.MathTaskUiState.Correct>(coordinator.mathState)
-        assertIs<com.ihorvoloshyn.mathadventure.ui.battle.BattleUiState.AttackStarted>(coordinator.battleState)
-        assertEquals(CombatResolution.HIT, coordinator.resolvePendingAttack())
-        assertIs<com.ihorvoloshyn.mathadventure.ui.battle.BattleUiState.AttackResolved>(coordinator.battleState)
+        assertIs<com.ihorvoloshyn.mathadventure.ui.battle.BattleUiState.AnswerResolved>(coordinator.battleState)
+        assertEquals(CombatResolution.VICTORY, (coordinator.battleState as com.ihorvoloshyn.mathadventure.ui.battle.BattleUiState.AnswerResolved).resolution)
         coordinator.rewardCurrentBattle()
         assertIs<com.ihorvoloshyn.mathadventure.ui.battle.BattleUiState.Rewarded>(coordinator.battleState)
     }
 
     @Test
-    fun pendingAttackCanBeResolvedOnlyOnce() {
+    fun incorrectAnswerConsumesOneHeartAndKeepsTaskActive() {
         val coordinator = MathBattleFlowCoordinator(flow, CombatEngine())
-        val combat = CombatEngine().start("test", heroHearts = 3, enemyHp = 3)
+        val combat = CombatEngine().start("test")
         coordinator.startCombat(combat)
         val generated = flow.generateNext(
             playerId = "player",
@@ -78,19 +77,18 @@ class MathBattleFlowCoordinatorTest {
             inputType = InputType.NUMERIC,
             generationContext = mapOf("taskIndex" to "0")
         )
-        coordinator.presentTask(generated, 1, 3)
-        coordinator.evaluate("player", generated, "attempt-once", generated.task.answerSpec, 1L, emptyMap(), 1)
-
-        assertEquals(CombatResolution.HIT, coordinator.resolvePendingAttack())
-        assertFailsWith<IllegalStateException> {
-            coordinator.resolvePendingAttack()
-        }
+        coordinator.presentTask(generated, 1, 1)
+        val wrong = (generated.task.answerSpec.toInt() + 1).toString()
+        val resolution = coordinator.evaluate("player", generated, "attempt-2", wrong, 2L, emptyMap())
+        assertEquals(CombatResolution.INCORRECT, resolution)
+        assertEquals(2, coordinator.battleState!!.combat.heroHearts)
+        assertIs<com.ihorvoloshyn.mathadventure.ui.math.MathTaskUiState.Incorrect>(coordinator.mathState)
     }
 
     @Test
     fun incorrectAnswerDoesNotProduceHit() {
         val coordinator = MathBattleFlowCoordinator(flow, CombatEngine())
-        val combat = CombatEngine().start("test", heroHearts = 3, enemyHp = 3)
+        val combat = CombatEngine().start("test")
         coordinator.startCombat(combat)
         val generated = flow.generateNext(
             playerId = "player",
@@ -101,8 +99,8 @@ class MathBattleFlowCoordinatorTest {
         )
         coordinator.presentTask(generated, 1, 3)
         val wrong = (generated.task.answerSpec.toInt() + 1).toString()
-        val resolution = coordinator.evaluate("player", generated, "attempt-2", wrong, 2L, emptyMap(), 1)
-        assertEquals(CombatResolution.MISS, resolution)
+        val resolution = coordinator.evaluate("player", generated, "attempt-2", wrong, 2L, emptyMap())
+        assertEquals(CombatResolution.INCORRECT, resolution)
         assertIs<com.ihorvoloshyn.mathadventure.ui.math.MathTaskUiState.Incorrect>(coordinator.mathState)
     }
 }
