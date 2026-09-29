@@ -7,14 +7,12 @@ sealed interface BattleUiState {
     val combat: CombatState
 
     data class Ready(override val combat: CombatState) : BattleUiState
-    data class AttackStarted(
-        override val combat: CombatState,
-        val damage: Int
-    ) : BattleUiState
-    data class AttackResolved(
+
+    data class AnswerResolved(
         override val combat: CombatState,
         val resolution: CombatResolution
     ) : BattleUiState
+
     data class Rewarded(
         override val combat: CombatState,
         val resolution: CombatResolution
@@ -24,14 +22,13 @@ sealed interface BattleUiState {
 class BattleStateMachine {
     fun ready(combat: CombatState): BattleUiState = BattleUiState.Ready(combat)
 
-    fun attackStarted(state: BattleUiState, damage: Int): BattleUiState.AttackStarted {
-        require(damage > 0) { "damage must be positive" }
-        return BattleUiState.AttackStarted(state.combat, damage)
-    }
+    fun resolve(
+        state: BattleUiState,
+        combat: CombatState,
+        resolution: CombatResolution
+    ): BattleUiState.AnswerResolved =
+        BattleUiState.AnswerResolved(combat, resolution)
 
-    fun resolve(state: BattleUiState.AttackStarted, combat: CombatState, resolution: CombatResolution): BattleUiState =
-        BattleUiState.AttackResolved(combat, resolution)
-
-    fun reward(state: BattleUiState.AttackResolved): BattleUiState.Rewarded =
+    fun reward(state: BattleUiState.AnswerResolved): BattleUiState.Rewarded =
         BattleUiState.Rewarded(state.combat, state.resolution)
 }
