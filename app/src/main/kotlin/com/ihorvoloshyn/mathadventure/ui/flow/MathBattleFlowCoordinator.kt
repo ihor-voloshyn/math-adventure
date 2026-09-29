@@ -4,15 +4,17 @@ import com.ihorvoloshyn.mathadventure.ui.battle.BattleStateMachine
 import com.ihorvoloshyn.mathadventure.ui.battle.BattleUiState
 import com.ihorvoloshyn.mathadventure.ui.math.MathTaskStateMachine
 import com.ihorvoloshyn.mathadventure.ui.math.MathTaskUiState
-import com.mathadventure.core.combat.CombatAction
 import com.mathadventure.core.combat.CombatEngine
 import com.mathadventure.core.combat.CombatResolution
 import com.mathadventure.core.combat.CombatState
 import com.mathadventure.core.flow.CoreLearningFlow
 import com.mathadventure.core.flow.GeneratedTask
-import com.mathadventure.core.math.AttemptEvaluation
 import com.mathadventure.core.model.AnswerResult
 
+/**
+ * Coordinates one quest = one math task.
+ * There is no attack/defense/flee phase: every answer is the encounter action.
+ */
 class MathBattleFlowCoordinator(
     private val learningFlow: CoreLearningFlow,
     private val combatEngine: CombatEngine = CombatEngine(),
@@ -21,13 +23,11 @@ class MathBattleFlowCoordinator(
 ) {
     var mathState: MathTaskUiState? = null
         private set
+
     var battleState: BattleUiState? = null
         private set
 
-    private var pendingOutcome: com.mathadventure.core.combat.CombatOutcome? = null
-
     fun startCombat(combat: CombatState) {
-        pendingOutcome = null
         battleState = battleStateMachine.ready(combat)
         mathState = null
     }
@@ -37,7 +37,10 @@ class MathBattleFlowCoordinator(
     }
 
     fun selectAnswer(answer: String) {
-        mathState = mathStateMachine.select(mathState ?: error("No math task is presented"), answer)
+        mathState = mathStateMachine.select(
+            mathState ?: error("No math task is presented"),
+            answer
+        )
     }
 
     fun evaluate(
@@ -46,8 +49,7 @@ class MathBattleFlowCoordinator(
         attemptId: String,
         answer: String,
         timestampEpochMillis: Long,
-        evidenceMetadata: Map<String, String>,
-        attackDamage: Int
+        evidenceMetadata: Map<String, String>
     ): CombatResolution {
         selectAnswer(answer)
         val selected = mathState as MathTaskUiState.Selected
@@ -59,36 +61,24 @@ class MathBattleFlowCoordinator(
             timestampEpochMillis = timestampEpochMillis,
             evidenceMetadata = evidenceMetadata
         ).evaluation
+
         mathState = mathStateMachine.resolve(selected, evaluation)
 
-        val battle = battleState ?: error("Combat has not started")
-        val started = battleStateMachine.attackStarted(battle, attackDamage)
-        battleState = started
-        val outcome = combatEngine.resolveMathAction(
-            battle.combat,
-            CombatAction.ATTACK,
-            evaluation.result == AnswerResult.CORRECT,
-            attackDamage
+        val currentBattle = battleState ?: error("Encounter has not started")
+        val outcome = combatEngine.resolveMathAnswer(
+            currentBattle.combat,
+            evaluation.result == AnswerResult.CORRECT
         )
-        if (evaluation.result == AnswerResult.CORRECT) {
-            pendingOutcome = outcome
-        } else {
-            battleState = battleStateMachine.resolve(started, outcome.state, outcome.resolution)
-        }
-        return outcome.resolution
-    }
-
-    fun resolvePendingAttack(): CombatResolution {
-        val started = battleState as? BattleUiState.AttackStarted
-            ?: error("No pending attack")
-        val outcome = pendingOutcome ?: error("No pending combat outcome")
-        battleState = battleStateMachine.resolve(started, outcome.state, outcome.resolution)
-        pendingOutcome = null
+        battleState = battleStateMachine.resolve(
+            currentBattle,
+            outcome.state,
+            outcome.resolution
+        )
         return outcome.resolution
     }
 
     fun rewardCurrentBattle() {
-        val resolved = battleState as? BattleUiState.AttackResolved ?: return
+        val resolved = battleState as? BattleUiState.AnswerResolved ?: return
         battleState = battleStateMachine.reward(resolved)
     }
 }
