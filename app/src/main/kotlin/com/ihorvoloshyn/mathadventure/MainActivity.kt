@@ -255,7 +255,7 @@ class MainActivity : Activity() {
         listOf("ADD_BASIC", "ADD_CROSS_TEN").map { masterySystem.getSkillState(playerId, it) }
 
     private fun startCombat() {
-        combatState = combatEngine.start("forest-encounter-01", heroHearts = 3)
+        combatState = combatEngine.start("forest-encounter-01")
         combatTaskIndex = 0
         combatInputLocked = false
         stage = Stage.COMBAT
@@ -405,8 +405,10 @@ class MainActivity : Activity() {
                 title.text = "Задача решена!"
                 message.text = buildString {
                     append(if (commit != null) {
-                        "Победа! Задача решена с " + combatState!!.attemptsUsed.coerceAtLeast(1) +
-                            " попытки. +" + commit.reward.xpDelta + " XP, +" + commit.reward.coinsDelta + " монет."
+                        val attempts = combatState!!.attemptsUsed + 1
+                        "Победа! Задача решена с " + attempts +
+                            " попытки. Сердец осталось: " + combatState!!.heroHearts + "/" + combatState!!.maxHeroHearts +
+                            ". +" + commit.reward.xpDelta + " XP, +" + commit.reward.coinsDelta + " монет."
                     } else {
                         "Задача уже была завершена. Награда за неё уже получена."
                     })
@@ -500,7 +502,6 @@ class MainActivity : Activity() {
                 title.text = "🧠 Задача • Сердца " + state.heroHearts + "/" + state.maxHeroHearts
                 message.text = "Реши задачу. Правильный ответ сразу завершает квест. Ошибка снимает одно сердце."
                 action.text = ""
-                equipmentButton.visibility = View.GONE
                 answers.visibility = View.VISIBLE
             }
             Stage.RETURN_HOME -> {
