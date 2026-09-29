@@ -26,8 +26,8 @@ android {
 }
 
 dependencies {
-    // Explicitly attach JUnit to both Android host-test variants.
-    // AGP 8.13 creates separate debug/release unit-test configurations.
+    // JUnit is needed by the shared app/src/test source set and by both variants.
+    testImplementation("junit:junit:4.13.2")
     debugUnitTestImplementation("junit:junit:4.13.2")
     releaseUnitTestImplementation("junit:junit:4.13.2")
 }
