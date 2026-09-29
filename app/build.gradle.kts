@@ -26,8 +26,7 @@ android {
 }
 
 dependencies {
-    // JUnit is needed by the shared app/src/test source set and by both variants.
-    testImplementation("junit:junit:4.13.2")
-    debugUnitTestImplementation("junit:junit:4.13.2")
-    releaseUnitTestImplementation("junit:junit:4.13.2")
+    // Android's local unit-test Kotlin compilation must inherit JUnit from the app compile classpath.
+    // Keep the dependency explicit here while the test-variant wiring is stabilized.
+    implementation("junit:junit:4.13.2")
 }
