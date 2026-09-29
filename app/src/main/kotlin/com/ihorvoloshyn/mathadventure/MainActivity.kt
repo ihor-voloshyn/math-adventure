@@ -263,6 +263,12 @@ class MainActivity : Activity() {
         flowCoordinator.startCombat(combatState!!)
         generateMathTask()
         renderStage()
+        heroImage.alpha = 0f
+        enemyImage.alpha = 0f
+        heroImage.translationX = -28f
+        enemyImage.translationX = 28f
+        heroImage.animate().alpha(0.98f).translationX(0f).setDuration(300L).start()
+        enemyImage.animate().alpha(0.98f).translationX(0f).setDuration(360L).start()
     }
 
     private fun generateMathTask() {
@@ -294,7 +300,7 @@ class MainActivity : Activity() {
         }
         ordered.forEach { value ->
             answers.addView(gameButton().apply {
-                text = "⚔ $value"
+                text = value.toString()
                 setTextSize(18f)
                 setOnClickListener {
                     if (combatInputLocked) return@setOnClickListener
@@ -400,8 +406,8 @@ class MainActivity : Activity() {
                 )
                 val progression = gameProgressionStore.get(playerId)
                 flowCoordinator.rewardCurrentBattle()
-                stage = Stage.RETURN_HOME
                 answers.visibility = View.GONE
+                taskPanel.visibility = View.GONE
                 title.text = "Задача решена!"
                 message.text = buildString {
                     append(if (commit != null) {
@@ -424,6 +430,19 @@ class MainActivity : Activity() {
                     append(".")
                 }
                 action.text = "↩ Вернуться домой"
+                enemyImage.animate()
+                    .alpha(0f)
+                    .scaleX(0.55f)
+                    .scaleY(0.55f)
+                    .setDuration(450L)
+                    .withEndAction {
+                        stage = Stage.RETURN_HOME
+                        renderStage()
+                        enemyImage.alpha = 0.98f
+                        enemyImage.scaleX = 1f
+                        enemyImage.scaleY = 1f
+                    }
+                    .start()
             }
             CombatResolution.DEFEAT -> {
                 stage = Stage.RETURN_HOME
