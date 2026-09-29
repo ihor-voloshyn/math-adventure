@@ -11,23 +11,22 @@ class BattleUiStateTest {
     private val machine = BattleStateMachine()
 
     @Test
-    fun successfulAttackProducesResolvedState() {
-        val combat = engine.start("combat-1", heroHearts = 3, enemyHp = 3)
-        val started = machine.attackStarted(machine.ready(combat), damage = 1)
-        val outcome = engine.resolveMathAction(combat, com.mathadventure.core.combat.CombatAction.ATTACK, true, 1)
-        val resolved = machine.resolve(started, outcome.state, outcome.resolution)
+    fun answerProducesResolvedState() {
+        val combat = engine.start("combat-1")
+        val ready = machine.ready(combat)
+        val outcome = engine.resolveMathAnswer(combat, true)
+        val resolved = machine.resolve(ready, outcome.state, outcome.resolution)
 
-        assertIs<BattleUiState.AttackResolved>(resolved)
-        assertEquals(CombatResolution.HIT, resolved.resolution)
-        assertEquals(2, resolved.combat.enemyHp)
+        assertIs<BattleUiState.AnswerResolved>(resolved)
+        assertEquals(CombatResolution.VICTORY, resolved.resolution)
     }
 
     @Test
-    fun victoryCanTransitionToRewarded() {
-        val combat = engine.start("combat-1", heroHearts = 3, enemyHp = 1)
-        val started = machine.attackStarted(machine.ready(combat), damage = 1)
-        val outcome = engine.resolveMathAction(combat, com.mathadventure.core.combat.CombatAction.ATTACK, true, 1)
-        val rewarded = machine.reward(machine.resolve(started, outcome.state, outcome.resolution))
+    fun resolvedStateCanBeRewarded() {
+        val combat = engine.start("combat-1")
+        val ready = machine.ready(combat)
+        val outcome = engine.resolveMathAnswer(combat, true)
+        val rewarded = machine.reward(machine.resolve(ready, outcome.state, outcome.resolution))
 
         assertIs<BattleUiState.Rewarded>(rewarded)
         assertEquals(CombatResolution.VICTORY, rewarded.resolution)
