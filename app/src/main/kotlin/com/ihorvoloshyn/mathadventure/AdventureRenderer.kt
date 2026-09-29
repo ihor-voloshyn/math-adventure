@@ -20,8 +20,6 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
     fun setStage(stage: Int) { scene.stage = stage }
     fun setVictory(value: Boolean) { scene.victory = value }
     fun setEquippedWeapon(visualId: String?) { scene.equippedWeaponVisualId = visualId }
-    fun setAttackActive(value: Boolean) { scene.attackActive = value }
-    fun setHitFeedback(value: Boolean) { scene.hitFeedback = value }
     fun setHeroClass(value: String) { scene.heroClass = if (value.equals("MAGE", ignoreCase = true)) SceneRenderer.HeroClass.MAGE else SceneRenderer.HeroClass.KNIGHT }
 
     override fun onTouchEvent(event: MotionEvent): Boolean = scene.handleTouch(event)
@@ -30,8 +28,6 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
         var stage = 0
         var victory = false
         var equippedWeaponVisualId: String? = null
-        @Volatile var attackActive = false
-        @Volatile var hitFeedback = false
         var heroClass = HeroClass.KNIGHT
 
         private var program = 0
@@ -40,10 +36,6 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
         private val model = FloatArray(16)
         private val mvp = FloatArray(16)
         private var angle = 0f
-        private var attackClock = 0f
-        private var hitClock = 0f
-        private var previousAttackActive = false
-        private var previousHitFeedback = false
         private var cameraYaw = 0f
         private var cameraPitch = 0.62f
         private var lastTouchX = 0f
@@ -85,22 +77,6 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
 
         override fun onDrawFrame(gl: javax.microedition.khronos.opengles.GL10?) {
             angle += 0.08f
-
-            if (attackActive) {
-                if (!previousAttackActive) attackClock = 0f
-                attackClock = (attackClock + 0.055f).coerceAtMost(1f)
-            } else {
-                attackClock = 0f
-            }
-            previousAttackActive = attackActive
-
-            if (hitFeedback) {
-                if (!previousHitFeedback) hitClock = 0f
-                hitClock = (hitClock + 0.085f).coerceAtMost(1f)
-            } else {
-                hitClock = 0f
-            }
-            previousHitFeedback = hitFeedback
 
             when (stage) {
                 0, 4 -> GLES20.glClearColor(0.08f, 0.12f, 0.18f, 1f)
@@ -157,8 +133,7 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             }
 
             characterYaw = if (stage == 3) Math.PI.toFloat() else 0f
-            val attackProgress = if (attackActive && stage == 3) attackClock else 0f
-            drawHero(-0.9f + attackLunge(attackProgress), 0f, 1.7f, attackProgress)
+            drawHero(-0.9f, 0f, 1.7f)
             drawPet(0.65f, 0f, 1.85f)
             characterYaw = 0f
 
@@ -166,74 +141,9 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
                 1 -> drawNpc(1.8f, 0f, -1.2f)
                 2 -> drawEnemy(2.2f, 0f, -1.0f)
                 3 -> {
-                    drawCombatEnemy(2.5f + hitKnockback(hitClock), 0f, -1.4f)
-                    drawAttackVfx(-0.9f + attackLunge(attackProgress), 1.35f, 1.62f, attackProgress, hitClock)
+                    drawCombatEnemy(2.5f, 0f, -1.4f)
                 }
             }
-        }
-
-        private fun drawAttackVfx(heroX: Float, heroY: Float, heroZ: Float, attackProgress: Float, hitProgress: Float) {
-            if (heroClass == HeroClass.MAGE && attackProgress > 0.18f) {
-                // Mage: readable magical projectile travelling from staff toward the enemy.
-                val t = ((attackProgress - 0.18f) / 0.82f).coerceIn(0f, 1f)
-                val eased = t * t * (3f - 2f * t)
-                val x = heroX + 0.85f + eased * 1.85f
-                val y = heroY + 0.10f + sin(t * Math.PI.toFloat()) * 0.28f
-                val z = heroZ - 0.03f
-                val pulse = 0.09f + sin(t * Math.PI.toFloat()) * 0.035f
-                sphere(x, y, z, pulse, pulse, pulse, 0.30f, 0.78f, 1.0f)
-                sphere(x, y, z + 0.025f, pulse * 0.48f, pulse * 0.48f, pulse * 0.48f, 0.82f, 0.96f, 1.0f)
-                if (t > 0.18f) {
-                    sphere(x - 0.14f, y + 0.08f, z, pulse * 0.35f, pulse * 0.35f, pulse * 0.35f, 0.50f, 0.86f, 1.0f)
-                    sphere(x - 0.22f, y - 0.06f, z, pulse * 0.25f, pulse * 0.25f, pulse * 0.25f, 0.72f, 0.92f, 1.0f)
-                }
-            } else if (heroClass == HeroClass.KNIGHT && attackProgress > 0.58f && attackProgress < 0.88f) {
-                // Knight: short physical impact burst at the enemy.
-                val t = ((attackProgress - 0.58f) / 0.30f).coerceIn(0f, 1f)
-                val radius = 0.10f + t * 0.38f
-                val y = 1.28f + t * 0.18f
-                sphere(2.35f, y, -1.42f, radius, radius * 0.42f, radius * 0.22f, 0.95f, 0.78f, 0.26f)
-                sphere(2.35f - radius * 0.8f, y + radius * 0.45f, -1.40f, radius * 0.16f, radius * 0.16f, radius * 0.16f, 1.0f, 0.92f, 0.50f)
-                sphere(2.35f + radius * 0.7f, y - radius * 0.25f, -1.44f, radius * 0.12f, radius * 0.12f, radius * 0.12f, 1.0f, 0.84f, 0.34f)
-            }
-
-            if (hitProgress > 0f && hitProgress < 0.82f) {
-                // Shared hit feedback: brief impact ring/particles; presentation only.
-                val t = (hitProgress / 0.82f).coerceIn(0f, 1f)
-                val radius = 0.10f + t * 0.48f
-                val y = 1.22f + t * 0.22f
-                if (heroClass == HeroClass.MAGE) {
-                    sphere(2.48f, y, -1.44f, radius, radius, radius, 0.38f, 0.82f, 1.0f)
-                    sphere(2.48f - radius * 0.85f, y + radius * 0.30f, -1.42f, radius * 0.14f, radius * 0.14f, radius * 0.14f, 0.72f, 0.94f, 1.0f)
-                    sphere(2.48f + radius * 0.75f, y - radius * 0.20f, -1.46f, radius * 0.11f, radius * 0.11f, radius * 0.11f, 0.56f, 0.88f, 1.0f)
-                } else {
-                    sphere(2.48f, y, -1.44f, radius, radius * 0.30f, radius * 0.18f, 0.96f, 0.72f, 0.22f)
-                    sphere(2.48f - radius * 0.80f, y + radius * 0.40f, -1.42f, radius * 0.13f, radius * 0.13f, radius * 0.13f, 1.0f, 0.92f, 0.48f)
-                    sphere(2.48f + radius * 0.72f, y - radius * 0.25f, -1.46f, radius * 0.10f, radius * 0.10f, radius * 0.10f, 1.0f, 0.82f, 0.30f)
-                }
-            }
-        }
-
-        private fun attackLunge(progress: Float): Float {
-            if (progress <= 0f) return 0f
-            // Anticipation -> forward strike -> recoil. The impact is near 70% of the timeline.
-            return when {
-                progress < 0.22f -> -0.08f * (progress / 0.22f)
-                progress < 0.72f -> {
-                    val t = (progress - 0.22f) / 0.50f
-                    -0.08f + 0.64f * (t * t * (3f - 2f * t))
-                }
-                else -> {
-                    val t = ((progress - 0.72f) / 0.28f).coerceIn(0f, 1f)
-                    0.56f * (1f - t)
-                }
-            }
-        }
-
-        private fun hitKnockback(progress: Float): Float {
-            if (progress <= 0f) return 0f
-            // Fast impact displacement followed by recovery.
-            return 0.18f * sin(progress * Math.PI.toFloat())
         }
 
         private fun drawHome() {
@@ -281,24 +191,15 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             }
         }
 
-        private fun drawHero(x: Float, y: Float, z: Float, attackProgress: Float = 0f) {
+        private fun drawHero(x: Float, y: Float, z: Float) {
             val bob = sin(angle) * 0.025f
             val furR = if (heroKind == HeroKind.CAT) 0.68f else 0.50f
             val furG = if (heroKind == HeroKind.CAT) 0.48f else 0.32f
             val furB = if (heroKind == HeroKind.CAT) 0.30f else 0.18f
 
-            val anticipation = if (attackProgress in 0.01f..0.22f) {
-                sin((attackProgress / 0.22f) * Math.PI.toFloat()) * 0.10f
-            } else 0f
-            val strikeLean = when {
-                attackProgress < 0.22f -> 0f
-                attackProgress < 0.72f -> (attackProgress - 0.22f) / 0.50f
-                else -> (1f - attackProgress) / 0.28f
-            }.coerceIn(0f, 1f)
-
-            sphere(x, y + 0.92f + bob - anticipation * 0.15f, z, 0.56f, 0.78f, 0.46f, furR, furG, furB)
-            sphere(x, y + 1.66f + bob - anticipation * 0.10f, z + 0.02f, 0.50f, 0.48f, 0.46f, furR, furG, furB)
-            sphere(x, y + 1.56f + bob + anticipation * 0.10f, z + 0.40f, 0.30f, 0.24f, 0.24f, 0.82f, 0.62f, 0.46f)
+            sphere(x, y + 0.92f + bob, z, 0.56f, 0.78f, 0.46f, furR, furG, furB)
+            sphere(x, y + 1.66f + bob, z + 0.02f, 0.50f, 0.48f, 0.46f, furR, furG, furB)
+            sphere(x, y + 1.56f + bob, z + 0.40f, 0.30f, 0.24f, 0.24f, 0.82f, 0.62f, 0.46f)
             if (heroKind == HeroKind.CAT) {
                 cone(x - 0.30f, y + 2.10f + bob, z, 0.22f, 0.52f, furR, furG, furB)
                 cone(x + 0.30f, y + 2.10f + bob, z, 0.22f, 0.52f, furR, furG, furB)
@@ -337,14 +238,13 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             sphere(x + 0.24f, y + 0.42f + bob, z - 0.01f, 0.18f, 0.16f, 0.18f, 0.26f, 0.32f, 0.40f)
             if (heroClass == HeroClass.MAGE) {
                 drawMageRobe(x, y + bob, z)
-                drawMagicStaff(x + 0.68f, y + 0.72f + bob, z - 0.05f, attackProgress)
+                drawMagicStaff(x + 0.68f, y + 0.72f + bob, z - 0.05f)
             } else if (equippedWeaponVisualId != null) {
                 drawSword(
-                    x + 0.67f + strikeLean * 0.16f,
-                    y + 0.96f + bob + anticipation * 0.18f,
+                    x + 0.67f,
+                    y + 0.96f + bob,
                     z - 0.05f,
-                    equippedWeaponVisualId == "weapon_sword_sparks",
-                    strikeLean
+                    equippedWeaponVisualId == "weapon_sword_sparks"
                 )
             }
         }
@@ -355,20 +255,15 @@ class AdventureRenderer(context: Context) : GLSurfaceView(context) {
             cylinder(x, y + 1.10f, z + 0.02f, 0.34f, 0.08f, 0.72f, 0.52f, 0.16f)
         }
 
-        private fun drawMagicStaff(x: Float, y: Float, z: Float, progress: Float) {
-            val cast = if (progress > 0f) sin(progress * Math.PI.toFloat()) else 0f
-            val staffLean = 0.18f + cast * 0.12f
+        private fun drawMagicStaff(x: Float, y: Float, z: Float) {
+            val cast = 0f
+            val staffLean = 0.18f
             cylinder(x, y + 0.02f, z, 0.055f, 1.55f, 0.36f, 0.20f, 0.08f)
             sphere(x, y + 0.88f + cast * 0.18f, z, 0.14f, 0.14f, 0.14f, 0.42f, 0.78f, 1.0f)
-            if (progress > 0.25f && progress < 0.85f) {
-                sphere(x + staffLean, y + 0.96f + cast * 0.18f, z + 0.02f, 0.07f, 0.07f, 0.07f, 0.55f, 0.88f, 1.0f)
-                sphere(x + staffLean * 1.7f, y + 0.96f + cast * 0.18f, z + 0.02f, 0.045f, 0.045f, 0.045f, 0.75f, 0.94f, 1.0f)
-            }
         }
 
-        private fun drawSword(x: Float, y: Float, z: Float, enchanted: Boolean, strikeLean: Float = 0f) {
+        private fun drawSword(x: Float, y: Float, z: Float, enchanted: Boolean) {
             // Readable weapon silhouette: grip + guard + blade + pommel.
-            val swing = -32f * strikeLean
             cylinder(x, y - 0.36f, z, 0.065f, 0.42f, 0.24f, 0.12f, 0.06f)
             cylinder(x, y - 0.10f, z, 0.16f, 0.09f, 0.76f, 0.58f, 0.16f)
             cone(x, y + 0.50f, z, 0.12f, 0.95f, 0.72f, 0.76f, 0.82f)
