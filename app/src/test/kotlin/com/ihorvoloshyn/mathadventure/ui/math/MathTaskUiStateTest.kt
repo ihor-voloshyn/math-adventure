@@ -46,7 +46,8 @@ class MathTaskUiStateTest {
             AttemptEvaluation(AnswerResult.CORRECT)
         )
         assertTrue(state is MathTaskUiState.Correct)
-        assertEquals("12", state.selectedAnswer)
+        val correct = state as MathTaskUiState.Correct
+        assertEquals("12", correct.selectedAnswer)
     }
 
     @Test
@@ -57,7 +58,8 @@ class MathTaskUiStateTest {
             AttemptEvaluation(AnswerResult.INCORRECT)
         )
         assertTrue(state is MathTaskUiState.Incorrect)
-        assertEquals("11", state.selectedAnswer)
+        val incorrect = state as MathTaskUiState.Incorrect
+        assertEquals("11", incorrect.selectedAnswer)
     }
 
     @Test
