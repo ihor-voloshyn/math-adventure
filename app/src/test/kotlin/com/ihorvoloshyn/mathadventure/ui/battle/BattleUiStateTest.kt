@@ -2,9 +2,9 @@ package com.ihorvoloshyn.mathadventure.ui.battle
 
 import com.mathadventure.core.combat.CombatEngine
 import com.mathadventure.core.combat.CombatResolution
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertIs
+import org.junit.Test
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 
 class BattleUiStateTest {
     private val engine = CombatEngine()
@@ -17,7 +17,7 @@ class BattleUiStateTest {
         val outcome = engine.resolveMathAnswer(combat, true)
         val resolved = machine.resolve(ready, outcome.state, outcome.resolution)
 
-        assertIs<BattleUiState.AnswerResolved>(resolved)
+        assertTrue(resolved is BattleUiState.AnswerResolved)
         assertEquals(CombatResolution.VICTORY, resolved.resolution)
     }
 
@@ -28,7 +28,7 @@ class BattleUiStateTest {
         val outcome = engine.resolveMathAnswer(combat, true)
         val rewarded = machine.reward(machine.resolve(ready, outcome.state, outcome.resolution))
 
-        assertIs<BattleUiState.Rewarded>(rewarded)
+        assertTrue(rewarded is BattleUiState.Rewarded)
         assertEquals(CombatResolution.VICTORY, rewarded.resolution)
     }
 }
