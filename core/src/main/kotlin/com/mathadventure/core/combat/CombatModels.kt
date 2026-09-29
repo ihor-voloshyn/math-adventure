@@ -1,23 +1,29 @@
 package com.mathadventure.core.combat
 
-enum class CombatAction { ATTACK, DEFEND, FLEE }
-
-enum class CombatResolution { HIT, MISS, BLOCKED, FLED, VICTORY, DEFEAT }
-
+/**
+ * A math encounter is intentionally not a traditional RPG combat system.
+ * The player has up to three attempts (hearts) to solve one math task.
+ */
 data class CombatState(
     val combatId: String,
     val heroHearts: Int = 3,
     val maxHeroHearts: Int = 3,
-    val enemyHp: Int = 3,
-    val playerTurn: Boolean = true,
     val active: Boolean = true
 ) {
     init {
         require(heroHearts >= 0) { "heroHearts must be non-negative" }
         require(maxHeroHearts > 0) { "maxHeroHearts must be positive" }
         require(heroHearts <= maxHeroHearts) { "heroHearts must not exceed maxHeroHearts" }
-        require(enemyHp >= 0) { "enemyHp must be non-negative" }
     }
+
+    val attemptsUsed: Int get() = maxHeroHearts - heroHearts
+}
+
+enum class CombatResolution {
+    CORRECT,
+    INCORRECT,
+    VICTORY,
+    DEFEAT
 }
 
 data class CombatOutcome(
@@ -27,64 +33,37 @@ data class CombatOutcome(
 )
 
 class CombatEngine {
-    fun start(combatId: String, heroHearts: Int = 3, enemyHp: Int = 3): CombatState =
-        CombatState(combatId = combatId, heroHearts = heroHearts, maxHeroHearts = heroHearts, enemyHp = enemyHp)
+    fun start(combatId: String, heroHearts: Int = 3): CombatState =
+        CombatState(combatId = combatId, heroHearts = heroHearts, maxHeroHearts = heroHearts)
 
-    fun resolveMathAction(
-        state: CombatState,
-        action: CombatAction,
-        correct: Boolean,
-        attackDamage: Int = 1
-    ): CombatOutcome {
-        require(state.active) { "combat is not active" }
-        require(state.playerTurn) { "it is not the player's turn" }
-        require(attackDamage > 0) { "attackDamage must be positive" }
+    /**
+     * Resolves exactly one answer to the single math task of this encounter.
+     * Correct = quest completed immediately.
+     * Incorrect = one heart is consumed; after the third wrong answer the quest is lost.
+     */
+    fun resolveMathAnswer(state: CombatState, correct: Boolean): CombatOutcome {
+        require(state.active) { "encounter is not active" }
 
-        if (action == CombatAction.FLEE) {
-            return CombatOutcome(state.copy(active = false, playerTurn = false), CombatResolution.FLED)
-        }
-
-        if (action == CombatAction.DEFEND) {
-            // Defense is an explicit combat action, so it blocks the enemy
-            // regardless of the math-answer flag supplied by the caller.
+        if (correct) {
             return CombatOutcome(
-                state.copy(playerTurn = true),
-                CombatResolution.BLOCKED
+                state = state.copy(active = false),
+                resolution = CombatResolution.VICTORY,
+                gameEventType = "COMBAT_VICTORY"
             )
         }
 
-        if (!correct) {
-            val next = state.copy(playerTurn = false)
-            return enemyTurn(next, CombatResolution.MISS)
-        }
-
-        return when (action) {
-            CombatAction.ATTACK -> {
-                val hp = (state.enemyHp - attackDamage).coerceAtLeast(0)
-                if (hp == 0) {
-                    CombatOutcome(
-                        state.copy(enemyHp = 0, active = false, playerTurn = false),
-                        CombatResolution.VICTORY,
-                        "COMBAT_VICTORY"
-                    )
-                } else {
-                    CombatOutcome(
-                        state.copy(enemyHp = hp, playerTurn = true),
-                        CombatResolution.HIT
-                    )
-                }
-            }
-            CombatAction.DEFEND -> error("handled above")
-            CombatAction.FLEE -> error("handled above")
-        }
-    }
-
-    private fun enemyTurn(state: CombatState, playerResolution: CombatResolution): CombatOutcome {
         val hearts = (state.heroHearts - 1).coerceAtLeast(0)
         return if (hearts == 0) {
-            CombatOutcome(state.copy(heroHearts = 0, active = false, playerTurn = false), CombatResolution.DEFEAT)
+            CombatOutcome(
+                state = state.copy(heroHearts = 0, active = false),
+                resolution = CombatResolution.DEFEAT,
+                gameEventType = "COMBAT_DEFEAT"
+            )
         } else {
-            CombatOutcome(state.copy(heroHearts = hearts, playerTurn = true), playerResolution)
+            CombatOutcome(
+                state = state.copy(heroHearts = hearts),
+                resolution = CombatResolution.INCORRECT
+            )
         }
     }
 }
