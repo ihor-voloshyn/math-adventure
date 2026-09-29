@@ -26,7 +26,8 @@ android {
 }
 
 dependencies {
-    // Android's local unit-test Kotlin compilation must inherit JUnit from the app compile classpath.
-    // Keep the dependency explicit here while the test-variant wiring is stabilized.
-    implementation("junit:junit:4.13.2")
+    // Keep JUnit on the Android local-unit-test variants explicitly.
+    testImplementation("junit:junit:4.13.2")
+    debugUnitTestImplementation("junit:junit:4.13.2")
+    releaseUnitTestImplementation("junit:junit:4.13.2")
 }
