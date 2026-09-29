@@ -85,6 +85,7 @@ class MainActivity : Activity() {
     private lateinit var taskText: TextView
     private lateinit var heroImage: ImageView
     private lateinit var enemyImage: ImageView
+    private lateinit var houseImage: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -130,6 +131,14 @@ class MainActivity : Activity() {
         val root = FrameLayout(this)
         renderer = AdventureRenderer(this)
         root.addView(renderer)
+
+        houseImage = ImageView(this).apply {
+            setImageBitmap(BitmapFactory.decodeResource(resources, R.drawable.house))
+            scaleType = ImageView.ScaleType.CENTER_CROP
+            alpha = 0.96f
+            visibility = View.GONE
+        }
+        root.addView(houseImage, FrameLayout.LayoutParams(-1, -1))
 
         heroImage = ImageView(this).apply {
             setImageBitmap(BitmapFactory.decodeResource(resources, R.drawable.hero_character))
@@ -507,6 +516,7 @@ class MainActivity : Activity() {
     private fun renderStage() {
         renderer.setStage(stage.ordinal)
         taskPanel.visibility = if (stage == Stage.COMBAT) View.VISIBLE else View.GONE
+        houseImage.visibility = if (stage == Stage.HOME) View.VISIBLE else View.GONE
         heroImage.visibility = if (stage == Stage.COMBAT) View.VISIBLE else View.GONE
         enemyImage.visibility = if (stage == Stage.COMBAT) View.VISIBLE else View.GONE
         renderer.setEquippedWeapon("weapon_sword_sparks")
