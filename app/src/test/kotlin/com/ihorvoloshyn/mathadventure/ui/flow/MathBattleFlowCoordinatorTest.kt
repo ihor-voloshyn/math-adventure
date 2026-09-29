@@ -85,6 +85,51 @@ class MathBattleFlowCoordinatorTest {
     }
 
     @Test
+    @Test
+    fun thirdIncorrectAnswerDefeatsEncounter() {
+        val coordinator = MathBattleFlowCoordinator(flow, CombatEngine())
+        val combat = CombatEngine().start("test")
+        coordinator.startCombat(combat)
+        val generated = flow.generateNext(
+            playerId = "player",
+            skillStates = listOf(SkillState("ADD_BASIC", 0)),
+            availableSkills = setOf("ADD_BASIC"),
+            inputType = InputType.NUMERIC,
+            generationContext = mapOf("taskIndex" to "0")
+        )
+        coordinator.presentTask(generated, 1, 1)
+        val wrong = (generated.task.answerSpec.toInt() + 1).toString()
+        coordinator.evaluate("player", generated, "attempt-1", wrong, 1L, emptyMap())
+        coordinator.evaluate("player", generated, "attempt-2", wrong, 2L, emptyMap())
+        val resolution = coordinator.evaluate("player", generated, "attempt-3", wrong, 3L, emptyMap())
+        assertEquals(CombatResolution.DEFEAT, resolution)
+        assertEquals(0, coordinator.battleState!!.combat.heroHearts)
+        assertTrue(!coordinator.battleState!!.combat.active)
+    }
+
+    @Test
+    fun correctAfterTwoMistakesWinsWithOneHeartRemaining() {
+        val coordinator = MathBattleFlowCoordinator(flow, CombatEngine())
+        val combat = CombatEngine().start("test")
+        coordinator.startCombat(combat)
+        val generated = flow.generateNext(
+            playerId = "player",
+            skillStates = listOf(SkillState("ADD_BASIC", 0)),
+            availableSkills = setOf("ADD_BASIC"),
+            inputType = InputType.NUMERIC,
+            generationContext = mapOf("taskIndex" to "0")
+        )
+        coordinator.presentTask(generated, 1, 1)
+        val wrong = (generated.task.answerSpec.toInt() + 1).toString()
+        coordinator.evaluate("player", generated, "attempt-1", wrong, 1L, emptyMap())
+        coordinator.evaluate("player", generated, "attempt-2", wrong, 2L, emptyMap())
+        val resolution = coordinator.evaluate("player", generated, "attempt-3", generated.task.answerSpec, 3L, emptyMap())
+        assertEquals(CombatResolution.VICTORY, resolution)
+        assertEquals(1, coordinator.battleState!!.combat.heroHearts)
+        assertTrue(!coordinator.battleState!!.combat.active)
+    }
+
+    @Test
     fun incorrectAnswerDoesNotProduceHit() {
         val coordinator = MathBattleFlowCoordinator(flow, CombatEngine())
         val combat = CombatEngine().start("test")
