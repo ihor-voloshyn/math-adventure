@@ -33,13 +33,14 @@ data class CombatOutcome(
 )
 
 class CombatEngine {
-    fun start(combatId: String, heroHearts: Int = 3): CombatState =
-        CombatState(combatId = combatId, heroHearts = heroHearts, maxHeroHearts = heroHearts)
+    fun start(combatId: String): CombatState =
+        CombatState(combatId = combatId, heroHearts = 3, maxHeroHearts = 3)
 
     /**
-     * Resolves exactly one answer to the single math task of this encounter.
-     * Correct = quest completed immediately.
-     * Incorrect = one heart is consumed; after the third wrong answer the quest is lost.
+     * Resolves one answer to the single math task.
+     * Every encounter starts with three hearts.
+     * Correct answers never consume a heart and complete the quest immediately.
+     * Incorrect answers consume one heart; after the third wrong answer the quest is lost.
      */
     fun resolveMathAnswer(state: CombatState, correct: Boolean): CombatOutcome {
         require(state.active) { "encounter is not active" }
