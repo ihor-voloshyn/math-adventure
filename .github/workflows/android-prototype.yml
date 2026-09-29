@@ -19,8 +19,19 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.13'
+      - name: Inspect unit-test classpath
+        run: |
+          echo '--- app/build.gradle.kts ---'
+          sed -n '1,220p' app/build.gradle.kts
+          echo '--- debugUnitTestCompileClasspath ---'
+          gradle :app:dependencies --configuration debugUnitTestCompileClasspath --no-build-cache
+          echo '--- releaseUnitTestCompileClasspath ---'
+          gradle :app:dependencies --configuration releaseUnitTestCompileClasspath --no-build-cache
+          echo '--- junit dependency insight ---'
+          gradle :app:dependencyInsight --dependency junit --configuration debugUnitTestCompileClasspath --no-build-cache
+
       - name: Build and test
-        run: gradle assembleDebug test
+        run: gradle assembleDebug test --no-build-cache
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
