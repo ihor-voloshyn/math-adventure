@@ -468,7 +468,6 @@ class MainActivity : Activity() {
                 title.text = "Лес"
                 message.text = "Впереди маленькое существо."
                 action.text = "Начать бой"
-                equipmentButton.visibility = View.GONE
                 answers.visibility = View.GONE
             }
             Stage.COMBAT -> {
