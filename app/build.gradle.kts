@@ -26,6 +26,8 @@ android {
 }
 
 dependencies {
+    // Keep JUnit visible to the Kotlin Android unit-test compiler while we work around the current variant classpath wiring issue.
+    implementation("junit:junit:4.13.2")
     testImplementation("junit:junit:4.13.2")
     debugUnitTestImplementation("junit:junit:4.13.2")
     releaseUnitTestImplementation("junit:junit:4.13.2")
