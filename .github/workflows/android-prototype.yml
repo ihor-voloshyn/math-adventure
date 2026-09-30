@@ -38,6 +38,9 @@ jobs:
           echo '--- junit dependency insight (debugUnitTestRuntimeClasspath) ---'
           gradle :app:dependencyInsight --dependency junit --configuration debugUnitTestRuntimeClasspath --no-build-cache
 
+      - name: Diagnose unit-test configuration wiring
+        run: gradle :app:diagnoseUnitTestConfigurations --no-build-cache
+
       - name: Build and test
         run: gradle assembleDebug test --no-build-cache
 
