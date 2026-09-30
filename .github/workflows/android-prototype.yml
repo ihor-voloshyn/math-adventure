@@ -24,12 +24,20 @@ jobs:
         run: |
           echo '--- app/build.gradle.kts ---'
           sed -n '1,220p' app/build.gradle.kts
+          echo '--- testCompileClasspath ---'
+          gradle :app:dependencies --configuration testCompileClasspath --no-build-cache
           echo '--- debugUnitTestCompileClasspath ---'
           gradle :app:dependencies --configuration debugUnitTestCompileClasspath --no-build-cache
+          echo '--- debugUnitTestRuntimeClasspath ---'
+          gradle :app:dependencies --configuration debugUnitTestRuntimeClasspath --no-build-cache
           echo '--- releaseUnitTestCompileClasspath ---'
           gradle :app:dependencies --configuration releaseUnitTestCompileClasspath --no-build-cache
-          echo '--- junit dependency insight ---'
+          echo '--- junit dependency insight (testCompileClasspath) ---'
+          gradle :app:dependencyInsight --dependency junit --configuration testCompileClasspath --no-build-cache
+          echo '--- junit dependency insight (debugUnitTestCompileClasspath) ---'
           gradle :app:dependencyInsight --dependency junit --configuration debugUnitTestCompileClasspath --no-build-cache
+          echo '--- junit dependency insight (debugUnitTestRuntimeClasspath) ---'
+          gradle :app:dependencyInsight --dependency junit --configuration debugUnitTestRuntimeClasspath --no-build-cache
 
       - name: Build and test
         run: gradle assembleDebug test --no-build-cache
