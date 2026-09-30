@@ -34,3 +34,16 @@ dependencies {
     debugUnitTestCompileOnly("junit:junit:4.13.2")
     releaseUnitTestCompileOnly("junit:junit:4.13.2")
 }
+
+tasks.register("diagnoseUnitTestConfigurations") {
+    doLast {
+        listOf("implementation", "testImplementation", "debugUnitTestImplementation", "debugUnitTestCompileOnly", "debugUnitTestCompileClasspath", "debugUnitTestRuntimeClasspath").forEach { name ->
+            val configuration = configurations.findByName(name)
+            println("CONFIG $name exists=${configuration != null} canBeResolved=${configuration?.isCanBeResolved} canBeConsumed=${configuration?.isCanBeConsumed}")
+            if (configuration != null) {
+                println("  extendsFrom=${configuration.extendsFrom.map { it.name }}")
+                println("  declaredDependencies=${configuration.dependencies.map { it.group + ":" + it.name + ":" + it.version }}")
+            }
+        }
+    }
+}
