@@ -27,4 +27,6 @@ android {
 
 dependencies {
     testImplementation("junit:junit:4.13.2")
+    debugUnitTestImplementation("junit:junit:4.13.2")
+    releaseUnitTestImplementation("junit:junit:4.13.2")
 }
