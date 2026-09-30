@@ -26,7 +26,8 @@ android {
 }
 
 dependencies {
+    // Android local-unit-test variant classpaths in this prototype do not inherit the
+    // variant test configurations reliably, so keep JUnit on the app compile classpath.
+    implementation("junit:junit:4.13.2")
     testImplementation("junit:junit:4.13.2")
-    debugUnitTestImplementation("junit:junit:4.13.2")
-    releaseUnitTestImplementation("junit:junit:4.13.2")
 }
