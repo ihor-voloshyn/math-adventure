@@ -26,10 +26,8 @@ android {
 }
 
 dependencies {
-    // JUnit is wired directly to the Android local-unit-test variants.
-    // This keeps the compiler and test runtime classpaths explicit.
-    debugUnitTestCompileOnly("junit:junit:4.13.2")
-    debugUnitTestRuntimeOnly("junit:junit:4.13.2")
-    releaseUnitTestCompileOnly("junit:junit:4.13.2")
-    releaseUnitTestRuntimeOnly("junit:junit:4.13.2")
+    // JUnit is needed for unit tests
+    testImplementation("junit:junit:4.13.2")
+    debugUnitTestImplementation("junit:junit:4.13.2")
+    releaseUnitTestImplementation("junit:junit:4.13.2")
 }
