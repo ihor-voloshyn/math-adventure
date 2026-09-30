@@ -19,31 +19,8 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.13'
-      - name: Inspect unit-test classpath
-        run: |
-          echo '--- app/build.gradle.kts ---'
-          sed -n '1,220p' app/build.gradle.kts
-          echo '--- implementation ---'
-          gradle :app:dependencies --configuration implementation --no-build-cache
-          echo '--- testImplementation ---'
-          gradle :app:dependencies --configuration testImplementation --no-build-cache
-          echo '--- debugUnitTestImplementation ---'
-          gradle :app:dependencies --configuration debugUnitTestImplementation --no-build-cache
-          echo '--- debugUnitTestCompileClasspath ---'
-          gradle :app:dependencies --configuration debugUnitTestCompileClasspath --no-build-cache
-          echo '--- debugUnitTestRuntimeClasspath ---'
-          gradle :app:dependencies --configuration debugUnitTestRuntimeClasspath --no-build-cache
-          echo '--- junit dependency insight (debugUnitTestCompileClasspath) ---'
-          gradle :app:dependencyInsight --dependency junit --configuration debugUnitTestCompileClasspath --no-build-cache
-          echo '--- junit dependency insight (debugUnitTestRuntimeClasspath) ---'
-          gradle :app:dependencyInsight --dependency junit --configuration debugUnitTestRuntimeClasspath --no-build-cache
-
-      - name: Diagnose unit-test configuration wiring
-        run: gradle :app:diagnoseUnitTestConfigurations --no-build-cache
-
       - name: Build and test
         run: gradle assembleDebug test --no-build-cache
-
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
