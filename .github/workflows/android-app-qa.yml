@@ -33,4 +33,12 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.13'
+      - name: Inspect unit-test classpaths
+        run: |
+          echo '--- debugUnitTestCompileClasspath ---'
+          gradle :app:dependencies --configuration debugUnitTestCompileClasspath --no-build-cache
+          echo '--- releaseUnitTestCompileClasspath ---'
+          gradle :app:dependencies --configuration releaseUnitTestCompileClasspath --no-build-cache
+          echo '--- junit dependency insight ---'
+          gradle :app:dependencyInsight --dependency junit --configuration debugUnitTestCompileClasspath --no-build-cache
       - run: gradle :app:test :app:assembleDebug
