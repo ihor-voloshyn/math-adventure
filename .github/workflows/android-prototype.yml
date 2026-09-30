@@ -1,5 +1,4 @@
 name: Android Prototype
-# CI diagnostic run follows current main
 
 on:
   pull_request:
@@ -19,25 +18,23 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '8.13'
+          gradle-version: '8.11.1'
       - name: Inspect unit-test classpath
         run: |
           echo '--- app/build.gradle.kts ---'
           sed -n '1,220p' app/build.gradle.kts
+          echo '--- implementation ---'
+          gradle :app:dependencies --configuration implementation --no-build-cache
+          echo '--- testImplementation ---'
+          gradle :app:dependencies --configuration testImplementation --no-build-cache
           echo '--- debugUnitTestImplementation ---'
           gradle :app:dependencies --configuration debugUnitTestImplementation --no-build-cache
           echo '--- debugUnitTestCompileClasspath ---'
           gradle :app:dependencies --configuration debugUnitTestCompileClasspath --no-build-cache
           echo '--- debugUnitTestRuntimeClasspath ---'
           gradle :app:dependencies --configuration debugUnitTestRuntimeClasspath --no-build-cache
-          echo '--- releaseUnitTestCompileClasspath ---'
-          gradle :app:dependencies --configuration releaseUnitTestCompileClasspath --no-build-cache
-          echo '--- junit dependency insight (debugUnitTestImplementation) ---'
-          gradle :app:dependencyInsight --dependency junit --configuration debugUnitTestImplementation --no-build-cache
           echo '--- junit dependency insight (debugUnitTestCompileClasspath) ---'
           gradle :app:dependencyInsight --dependency junit --configuration debugUnitTestCompileClasspath --no-build-cache
-          echo '--- configuration hierarchy ---'
-          gradle :app:dependencies --configuration debugUnitTestCompileOnly --no-build-cache
           echo '--- junit dependency insight (debugUnitTestRuntimeClasspath) ---'
           gradle :app:dependencyInsight --dependency junit --configuration debugUnitTestRuntimeClasspath --no-build-cache
 
