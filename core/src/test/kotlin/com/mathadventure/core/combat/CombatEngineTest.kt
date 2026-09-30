@@ -53,7 +53,7 @@ class CombatEngineTest {
         state = engine.resolveMathAnswer(state, false).state
         state = engine.resolveMathAnswer(state, true).state
         assertEquals(2, state.heroHearts)
-        assertEquals(2, state.maxHeroHearts)
+        assertEquals(3, state.maxHeroHearts)
         assertEquals(1, state.attemptsUsed)
         assertFalse(state.active)
     }
