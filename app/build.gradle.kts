@@ -26,18 +26,19 @@ android {
 }
 
 dependencies {
-    // Keep JUnit visible to the Kotlin Android unit-test compiler while we work around the current variant classpath wiring issue.
-    implementation("junit:junit:4.13.2")
+    implementation(project(":core"))
     testImplementation("junit:junit:4.13.2")
-    debugUnitTestImplementation("junit:junit:4.13.2")
-    releaseUnitTestImplementation("junit:junit:4.13.2")
-    debugUnitTestCompileOnly("junit:junit:4.13.2")
-    releaseUnitTestCompileOnly("junit:junit:4.13.2")
 }
 
 tasks.register("diagnoseUnitTestConfigurations") {
     doLast {
-        listOf("implementation", "testImplementation", "debugUnitTestImplementation", "debugUnitTestCompileOnly", "debugUnitTestCompileClasspath", "debugUnitTestRuntimeClasspath").forEach { name ->
+        listOf(
+            "implementation",
+            "testImplementation",
+            "debugUnitTestImplementation",
+            "debugUnitTestCompileClasspath",
+            "debugUnitTestRuntimeClasspath"
+        ).forEach { name ->
             val configuration = configurations.findByName(name)
             println("CONFIG $name exists=${configuration != null} canBeResolved=${configuration?.isCanBeResolved} canBeConsumed=${configuration?.isCanBeConsumed}")
             if (configuration != null) {
