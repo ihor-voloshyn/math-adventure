@@ -79,6 +79,7 @@ class MainActivity : Activity() {
     private lateinit var answers: LinearLayout
     private lateinit var taskPanel: LinearLayout
     private lateinit var taskText: TextView
+    private lateinit var heartsText: TextView
     private lateinit var heroImage: ImageView
     private lateinit var enemyImage: ImageView
     private lateinit var houseImage: ImageView
@@ -185,13 +186,19 @@ class MainActivity : Activity() {
             background = panelBackground(0xD9162034.toInt(), 22f)
             visibility = View.GONE
         }
-        taskText = textView(23f).apply {
+        heartsText = textView(17f).apply {
             gravity = Gravity.CENTER
             setTypeface(typeface, android.graphics.Typeface.BOLD)
-            setPadding(8, 0, 8, 10)
+            setPadding(8, 2, 8, 6)
         }
+        taskText = textView(30f).apply {
+            gravity = Gravity.CENTER
+            setTypeface(typeface, android.graphics.Typeface.BOLD)
+            setPadding(8, 2, 8, 12)
+        }
+        taskPanel.addView(heartsText, LinearLayout.LayoutParams(-1, -2))
         taskPanel.addView(taskText, LinearLayout.LayoutParams(-1, -2))
-        taskPanel.addView(answers, LinearLayout.LayoutParams(-1, 58))
+        taskPanel.addView(answers, LinearLayout.LayoutParams(-1, 64))
         val taskParams = FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM).apply {
             setMargins(18, 0, 18, 132)
         }
@@ -286,6 +293,7 @@ class MainActivity : Activity() {
         flowCoordinator.presentTask(generated!!, combatTaskIndex + 1, 0)
         showAnswerOptions(generated!!.task.answerSpec)
         taskText.text = generated!!.task.prompt
+        updateCombatHud(combatState!!)
         taskPanel.visibility = View.VISIBLE
         combatInputLocked = false
         combatTaskIndex++
@@ -305,18 +313,31 @@ class MainActivity : Activity() {
         ordered.forEach { value ->
             answers.addView(gameButton().apply {
                 text = value.toString()
-                setTextSize(18f)
+                setTextSize(20f)
+                typeface = android.graphics.Typeface.DEFAULT_BOLD
+                background = panelBackground(0xF03B4B63.toInt(), 18f)
                 setOnClickListener {
                     if (combatInputLocked) return@setOnClickListener
                     combatInputLocked = true
                     isEnabled = false
-                    submitAnswer(value.toString())
+                    animate().scaleX(0.94f).scaleY(0.94f).setDuration(70L).withEndAction {
+                        submitAnswer(value.toString())
+                    }.start()
                 }
             }, LinearLayout.LayoutParams(0, 56, 1f).apply {
                 marginStart = 4
                 marginEnd = 4
             })
         }
+    }
+
+    private fun updateCombatHud(state: CombatState) {
+        val hearts = buildString {
+            repeat(state.heroHearts) { append("♥ ") }
+            repeat(state.maxHeroHearts - state.heroHearts) { append("♡ ") }
+        }.trim()
+        heartsText.text = "СЕРДЦА  $hearts"
+        title.text = "🧠 Математическая битва"
     }
 
     private fun textView(size: Float) = TextView(this).apply {
@@ -380,8 +401,8 @@ class MainActivity : Activity() {
                 progressStore.recordIncorrect()
                 combatInputLocked = false
                 showAnswerOptions(current.task.answerSpec)
-                title.text = "🧠 Задача • Сердца " + combatState!!.heroHearts + "/" + combatState!!.maxHeroHearts
-                message.text = "Неверно. Попробуй ещё раз — эта же задача остаётся активной."
+                updateCombatHud(combatState!!)
+                message.text = "❌ Неверно. Осталось сердец: ${combatState!!.heroHearts}. Реши ту же задачу ещё раз."
             }
             CombatResolution.DEFEAT -> {
                 progressStore.recordIncorrect()
@@ -546,7 +567,7 @@ class MainActivity : Activity() {
             }
             Stage.COMBAT -> {
                 val state = combatState ?: return
-                title.text = "🧠 Задача • Сердца " + state.heroHearts + "/" + state.maxHeroHearts
+                updateCombatHud(state)
                 message.text = "Реши задачу. Правильный ответ сразу завершает квест. Ошибка снимает одно сердце."
                 action.text = ""
                 answers.visibility = View.VISIBLE
