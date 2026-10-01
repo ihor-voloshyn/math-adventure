@@ -28,3 +28,5 @@ jobs:
           name: math-adventure-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+
+# Triggered for APK validation on main.
