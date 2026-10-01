@@ -71,6 +71,8 @@ class MainActivity : Activity() {
     private var combatState: CombatState? = null
     private var combatTaskIndex = 0
     private var combatInputLocked = false
+    private val disabledCombatAnswers = mutableSetOf<String>()
+    private var combatOriginStage = Stage.FOREST
 
     private lateinit var renderer: AdventureRenderer
     private lateinit var title: TextView
@@ -274,6 +276,8 @@ class MainActivity : Activity() {
         combatState = combatEngine.start("forest-encounter-01")
         combatTaskIndex = 0
         combatInputLocked = false
+        disabledCombatAnswers.clear()
+        combatOriginStage = stage
         stage = Stage.COMBAT
         renderer.setVictory(false)
         flowCoordinator.startCombat(combatState!!)
@@ -296,7 +300,7 @@ class MainActivity : Activity() {
             generationContext = mapOf("taskIndex" to combatTaskIndex.toString())
         )
         flowCoordinator.presentTask(generated!!, combatTaskIndex + 1, 0)
-        showAnswerOptions(generated!!.task.answerSpec)
+        showAnswerOptions(generated!!.task.answerSpec, disabledCombatAnswers)
         taskText.text = generated!!.task.prompt
         updateCombatHud(combatState!!)
         taskPanel.visibility = View.VISIBLE
@@ -304,7 +308,7 @@ class MainActivity : Activity() {
         combatTaskIndex++
     }
 
-    private fun showAnswerOptions(answerSpec: String) {
+    private fun showAnswerOptions(answerSpec: String, disabledValues: Set<String> = emptySet()) {
         answers.removeAllViews()
         val correct = answerSpec.toIntOrNull() ?: return
         val offsets = listOf(-1, 0, 1, 10)
@@ -318,6 +322,8 @@ class MainActivity : Activity() {
         ordered.forEach { value ->
             answers.addView(gameButton().apply {
                 text = value.toString()
+                isEnabled = value.toString() !in disabledValues
+                alpha = if (isEnabled) 1f else 0.38f
                 setTextSize(20f)
                 typeface = android.graphics.Typeface.DEFAULT_BOLD
                 background = panelBackground(0xF03B4B63.toInt(), 18f)
@@ -325,6 +331,7 @@ class MainActivity : Activity() {
                     if (combatInputLocked) return@setOnClickListener
                     combatInputLocked = true
                     isEnabled = false
+                    alpha = 0.38f
                     animate().scaleX(0.94f).scaleY(0.94f).setDuration(70L).withEndAction {
                         submitAnswer(value.toString())
                     }.start()
@@ -431,8 +438,9 @@ class MainActivity : Activity() {
             }
             CombatResolution.INCORRECT -> {
                 progressStore.recordIncorrect()
+                disabledCombatAnswers.add(value)
                 combatInputLocked = false
-                showAnswerOptions(current.task.answerSpec)
+                showAnswerOptions(current.task.answerSpec, disabledCombatAnswers)
                 updateCombatHud(combatState!!)
                 showIncorrectFeedback()
             }
@@ -505,7 +513,7 @@ class MainActivity : Activity() {
                     append(progression.rpgLevel)
                     append(".")
                 }
-                action.text = "↩ Вернуться домой"
+                action.text = "↩ Вернуться в локацию"
                 taskPanel.animate()
                     .alpha(1f)
                     .scaleX(1f)
@@ -518,7 +526,7 @@ class MainActivity : Activity() {
                     .scaleY(0.55f)
                     .setDuration(450L)
                     .withEndAction {
-                        stage = Stage.RETURN_HOME
+                        stage = combatOriginStage
                         renderStage()
                         enemyImage.alpha = 0.98f
                         enemyImage.scaleX = 1f
@@ -527,7 +535,7 @@ class MainActivity : Activity() {
                     .start()
             }
             CombatResolution.DEFEAT -> {
-                stage = Stage.RETURN_HOME
+                stage = combatOriginStage
                 answers.visibility = View.GONE
                 taskPanel.visibility = View.VISIBLE
                 taskPanel.alpha = 1f
@@ -537,7 +545,7 @@ class MainActivity : Activity() {
                 taskText.text = "КВЕСТ НЕ РЕШЁН\n0 / 3 попыток"
                 title.text = "Квест не решён"
                 message.text = "Все 3 попытки использованы. Квест можно повторить позже."
-                action.text = "Вернуться домой"
+                action.text = "Вернуться в локацию"
             }
             CombatResolution.INCORRECT -> Unit
         }
