@@ -266,6 +266,11 @@ class MainActivity : Activity() {
         listOf("ADD_BASIC", "ADD_CROSS_TEN").map { masterySystem.getSkillState(playerId, it) }
 
     private fun startCombat() {
+        if (questEngine.availability(playerId, "story_first_battle") == QuestState.COMPLETED) {
+            stage = Stage.RETURN_HOME
+            renderStage()
+            return
+        }
         combatState = combatEngine.start("forest-encounter-01")
         combatTaskIndex = 0
         combatInputLocked = false
@@ -465,7 +470,19 @@ class MainActivity : Activity() {
                 val progression = gameProgressionStore.get(playerId)
                 flowCoordinator.rewardCurrentBattle()
                 answers.visibility = View.GONE
-                taskPanel.visibility = View.GONE
+                taskPanel.visibility = View.VISIBLE
+                taskPanel.alpha = 0f
+                taskPanel.scaleX = 0.88f
+                taskPanel.scaleY = 0.88f
+                heartsText.text = "СЕРДЦА  " + buildString {
+                    repeat(combatState!!.heroHearts) { append("♥ ") }
+                    repeat(combatState!!.maxHeroHearts - combatState!!.heroHearts) { append("♡ ") }
+                }.trim()
+                taskText.text = when (attempts) {
+                    1 -> "★★★  МАСТЕРСТВО\nМаксимум"
+                    2 -> "★★☆  МАСТЕРСТВО\nСреднее"
+                    else -> "★☆☆  МАСТЕРСТВО\nМинимум"
+                }
                 title.text = "Задача решена!"
                 message.text = buildString {
                     append(if (commit != null) {
@@ -489,6 +506,12 @@ class MainActivity : Activity() {
                     append(".")
                 }
                 action.text = "↩ Вернуться домой"
+                taskPanel.animate()
+                    .alpha(1f)
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(220L)
+                    .start()
                 enemyImage.animate()
                     .alpha(0f)
                     .scaleX(0.55f)
@@ -506,7 +529,12 @@ class MainActivity : Activity() {
             CombatResolution.DEFEAT -> {
                 stage = Stage.RETURN_HOME
                 answers.visibility = View.GONE
-                taskPanel.visibility = View.GONE
+                taskPanel.visibility = View.VISIBLE
+                taskPanel.alpha = 1f
+                taskPanel.scaleX = 1f
+                taskPanel.scaleY = 1f
+                heartsText.text = "СЕРДЦА  ♡ ♡ ♡"
+                taskText.text = "КВЕСТ НЕ РЕШЁН\n0 / 3 попыток"
                 title.text = "Квест не решён"
                 message.text = "Все 3 попытки использованы. Квест можно повторить позже."
                 action.text = "Вернуться домой"
