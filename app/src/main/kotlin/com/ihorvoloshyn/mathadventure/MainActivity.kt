@@ -331,6 +331,33 @@ class MainActivity : Activity() {
         }
     }
 
+    private fun showIncorrectFeedback() {
+        val state = combatState ?: return
+        title.text = "💡 Попробуй ещё раз"
+        message.text = "❌ Неверный ответ. Осталось сердец: ${state.heroHearts}. Та же задача остаётся."
+        heartsText.animate()
+            .scaleX(1.18f)
+            .scaleY(1.18f)
+            .setDuration(110L)
+            .withEndAction {
+                heartsText.animate().scaleX(1f).scaleY(1f).setDuration(150L).start()
+            }
+            .start()
+        taskPanel.animate()
+            .translationX(10f)
+            .setDuration(45L)
+            .withEndAction {
+                taskPanel.animate()
+                    .translationX(-10f)
+                    .setDuration(45L)
+                    .withEndAction {
+                        taskPanel.animate().translationX(0f).setDuration(45L).start()
+                    }
+                    .start()
+            }
+            .start()
+    }
+
     private fun updateCombatHud(state: CombatState) {
         val hearts = buildString {
             repeat(state.heroHearts) { append("♥ ") }
@@ -402,7 +429,7 @@ class MainActivity : Activity() {
                 combatInputLocked = false
                 showAnswerOptions(current.task.answerSpec)
                 updateCombatHud(combatState!!)
-                message.text = "❌ Неверно. Осталось сердец: ${combatState!!.heroHearts}. Реши ту же задачу ещё раз."
+                showIncorrectFeedback()
             }
             CombatResolution.DEFEAT -> {
                 progressStore.recordIncorrect()
