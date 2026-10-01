@@ -200,7 +200,7 @@ class MainActivity : Activity() {
         }
         taskPanel.addView(heartsText, LinearLayout.LayoutParams(-1, -2))
         taskPanel.addView(taskText, LinearLayout.LayoutParams(-1, -2))
-        taskPanel.addView(answers, LinearLayout.LayoutParams(-1, 64))
+        taskPanel.addView(answers, LinearLayout.LayoutParams(-1, 122))
         val taskParams = FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM).apply {
             setMargins(18, 0, 18, 132)
         }
@@ -402,17 +402,6 @@ class MainActivity : Activity() {
         stateListAnimator = null
     }
 
-    private fun advance() {
-        stage = when (stage) {
-            Stage.HOME -> Stage.VILLAGE
-            Stage.VILLAGE -> Stage.FOREST
-            Stage.FOREST -> Stage.COMBAT
-            Stage.COMBAT -> Stage.COMBAT
-            Stage.RETURN_HOME -> Stage.HOME
-        }
-        renderStage()
-    }
-
     private fun submitAnswer(value: String) {
         if (stage != Stage.COMBAT || combatState?.active != true) {
             combatInputLocked = false
@@ -545,7 +534,7 @@ class MainActivity : Activity() {
                 taskText.text = "КВЕСТ НЕ РЕШЁН\n0 / 3 попыток"
                 title.text = "Квест не решён"
                 message.text = "Все 3 попытки использованы. Квест можно повторить позже."
-                action.text = "Вернуться в локацию"
+                renderStage()
             }
             CombatResolution.INCORRECT -> Unit
         }
