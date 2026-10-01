@@ -455,7 +455,9 @@ class MainActivity : Activity() {
                         append(questCommit.reward.coinsDelta)
                         append(" монет.")
                     }
-                    append(" RPG Level ")
+                    append(" Мастерство: ")
+                    append(masteryLabel)
+                    append(". RPG Level ")
                     append(progression.rpgLevel)
                     append(".")
                 }
