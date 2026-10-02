@@ -179,7 +179,7 @@ class MainActivity : Activity() {
         backAction = gameButton().apply { setOnClickListener { onBackAction() } }
         bottom.addView(backAction, LinearLayout.LayoutParams(-1, 48).apply { bottomMargin = 4 })
         answers = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
+            orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER
             visibility = View.GONE
         }
@@ -211,7 +211,6 @@ class MainActivity : Activity() {
         root.addView(bottom, FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM))
         setContentView(root)
         questProgression.recover(playerId)
-        ensureQuestStarted("story_home_to_village")
         renderStage()
     }
 
@@ -325,27 +324,34 @@ class MainActivity : Activity() {
             4 -> listOf(values[4], values[1], values[3], values[0], values[5], values[2])
             else -> listOf(values[5], values[2], values[0], values[4], values[1], values[3])
         }
-        ordered.forEach { value ->
-            answers.addView(gameButton().apply {
-                text = value.toString()
-                isEnabled = value.toString() !in disabledValues
-                alpha = if (isEnabled) 1f else 0.38f
-                setTextSize(20f)
-                typeface = android.graphics.Typeface.DEFAULT_BOLD
-                background = panelBackground(0xF03B4B63.toInt(), 18f)
-                setOnClickListener {
-                    if (combatInputLocked) return@setOnClickListener
-                    combatInputLocked = true
-                    isEnabled = false
-                    alpha = 0.38f
-                    animate().scaleX(0.94f).scaleY(0.94f).setDuration(70L).withEndAction {
-                        submitAnswer(value.toString())
-                    }.start()
-                }
-            }, LinearLayout.LayoutParams(0, 56, 1f).apply {
-                marginStart = 4
-                marginEnd = 4
-            })
+        ordered.chunked(3).forEach { rowValues ->
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER
+            }
+            rowValues.forEach { value ->
+                row.addView(gameButton().apply {
+                    text = value.toString()
+                    isEnabled = value.toString() !in disabledValues
+                    alpha = if (isEnabled) 1f else 0.38f
+                    setTextSize(20f)
+                    typeface = android.graphics.Typeface.DEFAULT_BOLD
+                    background = panelBackground(0xF03B4B63.toInt(), 18f)
+                    setOnClickListener {
+                        if (combatInputLocked) return@setOnClickListener
+                        combatInputLocked = true
+                        isEnabled = false
+                        alpha = 0.38f
+                        animate().scaleX(0.94f).scaleY(0.94f).setDuration(70L).withEndAction {
+                            submitAnswer(value.toString())
+                        }.start()
+                    }
+                }, LinearLayout.LayoutParams(0, 56, 1f).apply {
+                    marginStart = 4
+                    marginEnd = 4
+                })
+            }
+            answers.addView(row, LinearLayout.LayoutParams(-1, 58))
         }
     }
 
@@ -382,7 +388,7 @@ class MainActivity : Activity() {
             repeat(state.maxHeroHearts - state.heroHearts) { append("♡ ") }
         }.trim()
         heartsText.text = "СЕРДЦА  $hearts"
-        title.text = "🧠 Математическая битва"
+        title.text = "Поляна с монстром"
     }
 
     private fun textView(size: Float) = TextView(this).apply {
