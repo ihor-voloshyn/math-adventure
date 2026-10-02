@@ -35,7 +35,7 @@ class AdventureRenderer(context: Context) : View(context) {
             2 -> forest(c,w,h)
             3 -> clearing(c,w,h)
         }
-        p.color = 0x10000000
+        p.color = 0x10000000.toInt()
         c.drawRect(0f,h*.43f,w,h,p)
     }
 
@@ -52,8 +52,8 @@ class AdventureRenderer(context: Context) : View(context) {
     }
 
     private fun home(c:Canvas,w:Float,h:Float) {
-        ground(c,w,h,0xFF7B9D5C)
-        polyN(c,0xFFD2B47A, .42f,1f,.58f,1f,.55f,.62f,.45f,.62f)
+        ground(c,w,h,0xFF7B9D5C.toInt())
+        polyN(c,0xFFD2B47A.toInt(), .42f,1f,.58f,1f,.55f,.62f,.45f,.62f)
         fence(c,.08f,.70f,.92f,.82f)
         house(c,w*.50f,h*.45f,1.15f)
         tree(c,w*.10f,h*.53f,1.15f); tree(c,w*.90f,h*.54f,1.0f)
@@ -62,9 +62,9 @@ class AdventureRenderer(context: Context) : View(context) {
     }
 
     private fun village(c:Canvas,w:Float,h:Float) {
-        ground(c,w,h,0xFF759958)
-        polyN(c,0xFFB68A55,.0f,.94f,1f,.94f,.63f,.55f,.37f,.55f)
-        for(i in 0..6){p.color=0x24FFFFFF; val y=h*(.60f+i*.047f); c.drawRect(w*.31f-i*7,y,w*.69f+i*7,y+2,p)}
+        ground(c,w,h,0xFF759958.toInt())
+        polyN(c,0xFFB68A55.toInt(),.0f,.94f,1f,.94f,.63f,.55f,.37f,.55f)
+        for(i in 0..6){p.color=0x24FFFFFF.toInt(); val y=h*(.60f+i*.047f); c.drawRect(w*.31f-i*7,y,w*.69f+i*7,y+2,p)}
         house(c,w*.23f,h*.47f,.75f); house(c,w*.76f,h*.49f,.67f)
         tree(c,w*.07f,h*.53f,.95f); tree(c,w*.93f,h*.54f,.95f); tree(c,w*.50f,h*.40f,.52f)
         well(c,w*.51f,h*.69f)
@@ -73,9 +73,9 @@ class AdventureRenderer(context: Context) : View(context) {
     }
 
     private fun forest(c:Canvas,w:Float,h:Float) {
-        ground(c,w,h,0xFF315B3C)
-        polyN(c,0xFFA58A5B,.40f,1f,.60f,1f,.55f,.56f,.45f,.56f)
-        polyN(c,0xFFC5A96F,.47f,1f,.53f,1f,.515f,.58f,.485f,.58f)
+        ground(c,w,h,0xFF315B3C.toInt())
+        polyN(c,0xFFA58A5B.toInt(),.40f,1f,.60f,1f,.55f,.56f,.45f,.56f)
+        polyN(c,0xFFC5A96F.toInt(),.47f,1f,.53f,1f,.515f,.58f,.485f,.58f)
         tree(c,w*.04f,h*.38f,1.45f); tree(c,w*.18f,h*.40f,1.18f); tree(c,w*.32f,h*.42f,.92f)
         tree(c,w*.68f,h*.42f,1.0f); tree(c,w*.83f,h*.39f,1.25f); tree(c,w*.97f,h*.37f,1.48f)
         tree(c,w*.23f,h*.59f,.70f); tree(c,w*.77f,h*.59f,.72f); tree(c,w*.50f,h*.50f,.60f)
@@ -85,7 +85,7 @@ class AdventureRenderer(context: Context) : View(context) {
     }
 
     private fun clearing(c:Canvas,w:Float,h:Float) {
-        ground(c,w,h,0xFF667F4F)
+        ground(c,w,h,0xFF667F4F.toInt())
         // A clearly defined circular encounter arena.
         p.color=if(victory)0xFFB8D68A.toInt() else 0xFFD0B373.toInt()
         c.drawOval(w*.24f,h*.55f,w*.76f,h*.92f,p)
@@ -103,7 +103,7 @@ class AdventureRenderer(context: Context) : View(context) {
     private fun house(c:Canvas,cx:Float,cy:Float,s:Float){
         val bw=150f*s; val bh=95f*s
         p.color=0xFFE1A060.toInt(); c.drawRect(cx-bw/2,cy,cx+bw/2,cy+bh,p)
-        polyAbs(c,0xFF754638,cx-bw*.58f,cy,cx,cy-65*s,cx+bw*.58f,cy,cx,cy+34*s)
+        polyAbs(c,0xFF754638.toInt(),cx-bw*.58f,cy,cx,cy-65*s,cx+bw*.58f,cy,cx,cy+34*s)
         p.color=0xFFB9D4D5.toInt()
         c.drawRect(cx-bw*.31f,cy+29*s,cx-bw*.15f,cy+57*s,p)
         c.drawRect(cx+bw*.15f,cy+29*s,cx+bw*.31f,cy+57*s,p)
@@ -128,7 +128,7 @@ class AdventureRenderer(context: Context) : View(context) {
     private fun mushroom(c:Canvas,x:Float,y:Float){p.color=0xFFE4D1A5.toInt();c.drawRect(x-4,y,x+4,y+18,p);p.color=0xFFC75B4B.toInt();c.drawOval(x-13,y-10,x+13,y+6,p)}
     private fun stone(c:Canvas,x:Float,y:Float,r:Float){p.color=0xFF817C70.toInt();c.drawOval(x-r,y-r*.55f,x+r,y+r*.55f,p)}
     private fun torch(c:Canvas,x:Float,y:Float){p.color=0xFF67452C.toInt();c.drawRect(x-4,y,x+4,y+42,p);p.color=0xFFFFA23A.toInt();c.drawCircle(x,y-5,12,p);p.color=0xFFFFE58A.toInt();c.drawCircle(x,y-6,6,p)}
-    private fun sparkle(c:Canvas,x:Float,y:Float){p.color=0xFFFFE28A.toInt();for(i in 0 until 8){val a=i*.78f;c.drawCircle(x+cos(a)*wScale(78f),y+sin(a)*28f,4f,p)}}
+    private fun sparkle(c:Canvas,x:Float,y:Float){p.color=0xFFFFE28A.toInt();for(i in 0 until 8){val a=i*.78f;c.drawCircle(x+cos(a).toFloat()*wScale(78f),y+sin(a).toFloat()*28f,4f,p)}}
     private fun wScale(v:Float)=v*width/1080f
     private fun sign(c:Canvas,text:String,x:Float,y:Float,size:Float){p.color=0xFFE0B66E.toInt();c.drawRoundRect(x-150,y-25,x+150,y+25,13f,13f,p);p.color=0xFF3D2B20.toInt();p.textAlign=Paint.Align.CENTER;p.textSize=size;p.isFakeBoldText=true;c.drawText(text,x,y+6,p);p.isFakeBoldText=false}
     private fun polyN(c:Canvas,color:Int,vararg q:Float){p.color=color;path.reset();path.moveTo(q[0]*width,q[1]*height);var i=2;while(i<q.size){path.lineTo(q[i]*width,q[i+1]*height);i+=2};path.close();c.drawPath(path,p)}
