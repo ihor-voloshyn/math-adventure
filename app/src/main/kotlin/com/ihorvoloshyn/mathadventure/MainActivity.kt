@@ -170,11 +170,11 @@ class MainActivity : Activity() {
             setMargins(18, 0, 18, 132)
         }
         root.addView(taskPanel, taskParams)
+        heartsText.setPadding(16, 8, 16, 8)
+        heartsText.background = panelBackground(0xD91B2638.toInt(), 22f)
+        heartsText.visibility = View.GONE
         root.addView(heartsText, FrameLayout.LayoutParams(-2, -2, Gravity.TOP or Gravity.RIGHT).apply {
             setMargins(0, 18, 18, 0)
-            visibility = View.GONE
-            setPadding(16, 8, 16, 8)
-            background = panelBackground(0xD91B2638.toInt(), 22f)
         })
         root.addView(bottom, FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM))
         setContentView(root)
