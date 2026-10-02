@@ -483,7 +483,9 @@ class MainActivity : Activity() {
                     .scaleY(1f)
                     .setDuration(220L)
                     .start()
-                stage = combatOriginStage\n                renderStage()\n
+                stage = combatOriginStage
+                renderStage()
+
             }
             CombatResolution.DEFEAT -> {
                 // Defeat returns to the exact location from which the battle was entered.
