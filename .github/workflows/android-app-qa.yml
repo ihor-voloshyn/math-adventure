@@ -41,4 +41,12 @@ jobs:
           gradle :app:dependencies --configuration releaseUnitTestCompileClasspath --no-build-cache
           echo '--- junit dependency insight ---'
           gradle :app:dependencyInsight --dependency junit --configuration debugUnitTestCompileClasspath --no-build-cache
-      - run: gradle :app:test :app:assembleDebug
+      - name: Build debug APK
+        run: gradle :app:test :app:assembleDebug
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: math-adventure-dev10-apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+          retention-days: 14
