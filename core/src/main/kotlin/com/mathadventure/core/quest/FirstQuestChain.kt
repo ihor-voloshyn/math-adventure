@@ -25,8 +25,7 @@ object FirstQuestChain {
             titleKey = "quest.first_battle.title",
             descriptionKey = "quest.first_battle.description",
             type = QuestType.COMBAT,
-            objectives = listOf(QuestObjectiveDefinition("win_first_battle", "quest.objective.win_first_battle")),
-            prerequisites = setOf("story_village_to_forest")
+            objectives = listOf(QuestObjectiveDefinition("win_first_battle", "quest.objective.win_first_battle"))
         ),
         QuestDefinition(
             id = "story_return_home",
