@@ -60,7 +60,6 @@ class MainActivity : Activity() {
     private lateinit var gameProgression: CoreGameProgressionFlow
     private lateinit var gameProgressionStore: AndroidGameProgressionInventoryStore
     private lateinit var gameProgressionLoot: GameProgressionLootCoordinator
-    private lateinit var questProgression: QuestProgressionCoordinator
     private lateinit var questStore: AndroidQuestStore
     private lateinit var questEngine: QuestEngine
 
@@ -96,10 +95,6 @@ class MainActivity : Activity() {
             progression = gameProgression,
             store = gameProgressionStore,
             lootFactory = com.mathadventure.core.items.DeterministicLootItemFactory(PrototypeItemCatalog.definitions)
-        )
-        questProgression = QuestProgressionCoordinator(
-            outbox = AndroidQuestProgressionOutbox(this),
-            progression = gameProgression
         )
         questStore = AndroidQuestStore(this)
         questEngine = QuestEngine(
@@ -169,16 +164,20 @@ class MainActivity : Activity() {
             setTypeface(typeface, android.graphics.Typeface.BOLD)
             setPadding(8, 2, 8, 12)
         }
-        taskPanel.addView(heartsText, LinearLayout.LayoutParams(-1, -2))
         taskPanel.addView(taskText, LinearLayout.LayoutParams(-1, -2))
         taskPanel.addView(answers, LinearLayout.LayoutParams(-1, 122))
         val taskParams = FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM).apply {
             setMargins(18, 0, 18, 132)
         }
         root.addView(taskPanel, taskParams)
+        root.addView(heartsText, FrameLayout.LayoutParams(-2, -2, Gravity.TOP or Gravity.RIGHT).apply {
+            setMargins(0, 18, 18, 0)
+            visibility = View.GONE
+            setPadding(16, 8, 16, 8)
+            background = panelBackground(0xD91B2638.toInt(), 22f)
+        })
         root.addView(bottom, FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM))
         setContentView(root)
-        questProgression.recover(playerId)
         renderStage()
     }
 
@@ -192,23 +191,16 @@ class MainActivity : Activity() {
         )
     }
 
-    private fun recordQuestObjective(questId: String, objectiveId: String): ProgressionCommit? {
+    private fun recordQuestObjective(questId: String, objectiveId: String): Boolean {
         val current = questStore.get(playerId, questId)
-        if (current?.state != QuestState.ACTIVE) return null
+        if (current?.state != QuestState.ACTIVE) return false
         val updated = questEngine.recordObjectiveProgress(
             playerId = playerId,
             questId = questId,
             objectiveId = objectiveId,
             nowEpochMillis = System.currentTimeMillis()
         )
-        if (updated.state != QuestState.COMPLETED) return null
-        val definition = FirstQuestChain.definitions.first { it.id == questId }
-        val completion = questEngine.completion(
-            playerId = playerId,
-            questId = questId,
-            instanceId = updated.sessionId ?: error("completed quest has no session id")
-        ) ?: return null
-        return questProgression.record(QuestProgressionEventMapper.map(completion, definition.repeatability))
+        return updated.state == QuestState.COMPLETED
     }
 
     private fun adaptivePolicy(): AdaptivePolicy = object : AdaptivePolicy {
@@ -418,27 +410,13 @@ class MainActivity : Activity() {
         when (resolution) {
             CombatResolution.VICTORY, CombatResolution.CORRECT -> {
                 renderer.setVictory(true)
-                val questCommit = recordQuestObjective("story_first_battle", "win_first_battle")
-                val combatId = combatState!!.combatId
+                recordQuestObjective("story_first_battle", "win_first_battle")
                 val attempts = combatState!!.attemptsUsed + 1
                 val masteryLabel = when (attempts) {
                     1 -> "Максимум"
                     2 -> "Среднее"
                     else -> "Минимум"
                 }
-                val commit = gameProgressionLoot.record(
-                    GameProgressionEvent(
-                        eventId = "combat-victory-" + combatId,
-                        playerId = playerId,
-                        eventType = GameEventType.COMBAT_VICTORY,
-                        sourceId = combatId,
-                        sessionId = combatId,
-                        outcome = "VICTORY",
-                        timestampEpochMillis = System.currentTimeMillis()
-                    )
-                )
-                val progression = gameProgressionStore.get(playerId)
-                flowCoordinator.rewardCurrentBattle()
                 answers.visibility = View.GONE
                 taskPanel.visibility = View.VISIBLE
                 taskPanel.alpha = 0f
@@ -449,32 +427,12 @@ class MainActivity : Activity() {
                     repeat(combatState!!.maxHeroHearts - combatState!!.heroHearts) { append("♡ ") }
                 }.trim()
                 taskText.text = when (attempts) {
-                    1 -> "★★★  МАСТЕРСТВО\nМаксимум"
-                    2 -> "★★☆  МАСТЕРСТВО\nСреднее"
-                    else -> "★☆☆  МАСТЕРСТВО\nМинимум"
+                    1 -> "★★★  ЗАДАЧА РЕШЕНА\nМаксимум"
+                    2 -> "★★☆  ЗАДАЧА РЕШЕНА\nСреднее"
+                    else -> "★☆☆  ЗАДАЧА РЕШЕНА\nМинимум"
                 }
-                title.text = "Задача решена!"
-                message.text = buildString {
-                    append(if (commit != null) {
-                        "Победа! Задача решена с " + attempts +
-                            " попытки. Сердец осталось: " + combatState!!.heroHearts + "/" + combatState!!.maxHeroHearts +
-                            ". +" + commit.reward.xpDelta + " XP, +" + commit.reward.coinsDelta + " монет."
-                    } else {
-                        "Задача уже была завершена. Награда за неё уже получена."
-                    })
-                    if (questCommit != null) {
-                        append(" Квест завершён: +")
-                        append(questCommit.reward.xpDelta)
-                        append(" XP, +")
-                        append(questCommit.reward.coinsDelta)
-                        append(" монет.")
-                    }
-                    append(" Мастерство: ")
-                    append(masteryLabel)
-                    append(". RPG Level ")
-                    append(progression.rpgLevel)
-                    append(".")
-                }
+                title.text = "Победа!"
+                message.text = "Задача решена с $attempts попытки. Мастерство: $masteryLabel."
                 action.text = "↩ Вернуться в локацию"
                 backAction.visibility = View.GONE
                 taskPanel.animate()
@@ -545,17 +503,20 @@ class MainActivity : Activity() {
     private fun renderStage() {
         renderer.setStage(stage.ordinal)
         taskPanel.visibility = if (stage == Stage.COMBAT) View.VISIBLE else View.GONE
-        renderer.setEquippedWeapon("weapon_sword_sparks")
+        heartsText.visibility = if (stage == Stage.COMBAT) View.VISIBLE else View.GONE
+        action.visibility = View.VISIBLE
         backAction.visibility = if (stage == Stage.COMBAT || stage == Stage.HOME) View.GONE else View.VISIBLE
 
         when (stage) {
             Stage.HOME -> {
+                action.visibility = View.VISIBLE
                 title.text = "Дом"
                 message.text = "Задание: Отправиться в деревню."
                 action.text = "→ Деревня"
                 answers.visibility = View.GONE
             }
             Stage.VILLAGE -> {
+                action.visibility = View.VISIBLE
                 title.text = "Деревня"
                 message.text = "Задание: Пройти из деревни в Дремучий лес."
                 action.text = "→ Дремучий лес"
@@ -566,9 +527,10 @@ class MainActivity : Activity() {
                 title.text = "Дремучий лес"
                 val defeated = questEngine.availability(playerId, "story_first_battle") == QuestState.COMPLETED
                 if (defeated) {
-                    message.text = "Задание: Исследовать Дремучий лес."
-                    action.text = "Монстр побеждён"
+                    message.text = "Монстр побеждён. Лес открыт для исследования."
+                    action.visibility = View.GONE
                 } else {
+                    action.visibility = View.VISIBLE
                     message.text = "Задание: Сразиться с монстром в Дремучем лесу."
                     action.text = "→ Поляна с монстром"
                 }
