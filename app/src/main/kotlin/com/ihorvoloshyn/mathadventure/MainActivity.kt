@@ -50,7 +50,7 @@ import com.ihorvoloshyn.mathadventure.ui.flow.MathBattleFlowCoordinator
 import com.ihorvoloshyn.mathadventure.ui.math.MathTaskUiState
 
 class MainActivity : Activity() {
-    private enum class Stage { HOME, VILLAGE, FOREST, COMBAT, RETURN_HOME }
+    private enum class Stage { HOME, VILLAGE, FOREST, COMBAT }
     private val playerId = "prototype-player"
     private val mathEngine = BasicMathEngine()
     private val combatEngine = CombatEngine()
@@ -78,6 +78,7 @@ class MainActivity : Activity() {
     private lateinit var title: TextView
     private lateinit var message: TextView
     private lateinit var action: Button
+    private lateinit var backAction: Button
     private lateinit var answers: LinearLayout
     private lateinit var taskPanel: LinearLayout
     private lateinit var taskText: TextView
@@ -175,8 +176,10 @@ class MainActivity : Activity() {
         }
         action = gameButton().apply { setOnClickListener { onPrimaryAction() } }
         bottom.addView(action, LinearLayout.LayoutParams(-1, 56).apply { bottomMargin = 8 })
+        backAction = gameButton().apply { setOnClickListener { onBackAction() } }
+        bottom.addView(backAction, LinearLayout.LayoutParams(-1, 48).apply { bottomMargin = 4 })
         answers = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
+            orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER
             visibility = View.GONE
         }
@@ -208,7 +211,6 @@ class MainActivity : Activity() {
         root.addView(bottom, FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM))
         setContentView(root)
         questProgression.recover(playerId)
-        ensureQuestStarted("story_home_to_village")
         renderStage()
     }
 
@@ -269,7 +271,6 @@ class MainActivity : Activity() {
 
     private fun startCombat() {
         if (questEngine.availability(playerId, "story_first_battle") == QuestState.COMPLETED) {
-            stage = Stage.RETURN_HOME
             renderStage()
             return
         }
@@ -311,35 +312,45 @@ class MainActivity : Activity() {
     private fun showAnswerOptions(answerSpec: String, disabledValues: Set<String> = emptySet()) {
         answers.removeAllViews()
         val correct = answerSpec.toIntOrNull() ?: return
-        val offsets = listOf(-1, 0, 1, 10)
+        // Every battle always has exactly six answer choices.
+        val offsets = listOf(-10, -1, 0, 1, 2, 10)
         val values = offsets.map { correct + it }.distinct()
-        val ordered = when (correct % 4) {
+        val ordered = when (correct % 6) {
             0 -> values
             1 -> values.reversed()
-            2 -> listOf(values[1], values[0], values[3], values[2])
-            else -> listOf(values[2], values[3], values[0], values[1])
+            2 -> listOf(values[2], values[0], values[4], values[1], values[5], values[3])
+            3 -> listOf(values[3], values[5], values[1], values[4], values[0], values[2])
+            4 -> listOf(values[4], values[1], values[3], values[0], values[5], values[2])
+            else -> listOf(values[5], values[2], values[0], values[4], values[1], values[3])
         }
-        ordered.forEach { value ->
-            answers.addView(gameButton().apply {
-                text = value.toString()
-                isEnabled = value.toString() !in disabledValues
-                alpha = if (isEnabled) 1f else 0.38f
-                setTextSize(20f)
-                typeface = android.graphics.Typeface.DEFAULT_BOLD
-                background = panelBackground(0xF03B4B63.toInt(), 18f)
-                setOnClickListener {
-                    if (combatInputLocked) return@setOnClickListener
-                    combatInputLocked = true
-                    isEnabled = false
-                    alpha = 0.38f
-                    animate().scaleX(0.94f).scaleY(0.94f).setDuration(70L).withEndAction {
-                        submitAnswer(value.toString())
-                    }.start()
-                }
-            }, LinearLayout.LayoutParams(0, 56, 1f).apply {
-                marginStart = 4
-                marginEnd = 4
-            })
+        ordered.chunked(3).forEach { rowValues ->
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER
+            }
+            rowValues.forEach { value ->
+                row.addView(gameButton().apply {
+                    text = value.toString()
+                    isEnabled = value.toString() !in disabledValues
+                    alpha = if (isEnabled) 1f else 0.38f
+                    setTextSize(20f)
+                    typeface = android.graphics.Typeface.DEFAULT_BOLD
+                    background = panelBackground(0xF03B4B63.toInt(), 18f)
+                    setOnClickListener {
+                        if (combatInputLocked) return@setOnClickListener
+                        combatInputLocked = true
+                        isEnabled = false
+                        alpha = 0.38f
+                        animate().scaleX(0.94f).scaleY(0.94f).setDuration(70L).withEndAction {
+                            submitAnswer(value.toString())
+                        }.start()
+                    }
+                }, LinearLayout.LayoutParams(0, 56, 1f).apply {
+                    marginStart = 4
+                    marginEnd = 4
+                })
+            }
+            answers.addView(row, LinearLayout.LayoutParams(-1, 58))
         }
     }
 
@@ -376,7 +387,7 @@ class MainActivity : Activity() {
             repeat(state.maxHeroHearts - state.heroHearts) { append("♡ ") }
         }.trim()
         heartsText.text = "СЕРДЦА  $hearts"
-        title.text = "🧠 Математическая битва"
+        title.text = "Поляна с монстром"
     }
 
     private fun textView(size: Float) = TextView(this).apply {
@@ -503,6 +514,7 @@ class MainActivity : Activity() {
                     append(".")
                 }
                 action.text = "↩ Вернуться в локацию"
+                backAction.visibility = View.GONE
                 taskPanel.animate()
                     .alpha(1f)
                     .scaleX(1f)
@@ -524,16 +536,16 @@ class MainActivity : Activity() {
                     .start()
             }
             CombatResolution.DEFEAT -> {
+                // Defeat returns to the exact location from which the battle was entered.
+                // The quest remains active, so the battle transition is still available.
                 stage = combatOriginStage
                 answers.visibility = View.GONE
-                taskPanel.visibility = View.VISIBLE
+                taskPanel.visibility = View.GONE
                 taskPanel.alpha = 1f
                 taskPanel.scaleX = 1f
                 taskPanel.scaleY = 1f
-                heartsText.text = "СЕРДЦА  ♡ ♡ ♡"
-                taskText.text = "КВЕСТ НЕ РЕШЁН\n0 / 3 попыток"
-                title.text = "Квест не решён"
-                message.text = "Все 3 попытки использованы. Квест можно повторить позже."
+                title.text = "Бой проигран"
+                message.text = "Все 3 сердца потеряны. Задание не выполнено — можно снова пойти на поляну."
                 renderStage()
             }
             CombatResolution.INCORRECT -> Unit
@@ -543,48 +555,38 @@ class MainActivity : Activity() {
     private fun onPrimaryAction() {
         when (stage) {
             Stage.HOME -> {
-                val questCommit = recordQuestObjective("story_home_to_village", "visit_village")
-                ensureQuestStarted("story_village_to_forest")
                 stage = Stage.VILLAGE
                 renderStage()
-                if (questCommit != null) {
-                    message.text = "Квест завершён: +" + questCommit.reward.xpDelta + " XP, +" + questCommit.reward.coinsDelta + " монет. Новый путь открыт."
-                }
             }
             Stage.VILLAGE -> {
-                recordQuestObjective("story_village_to_forest", "talk_to_npc")
-                val questCommit = recordQuestObjective("story_village_to_forest", "reach_forest")
-                ensureQuestStarted("story_first_battle")
                 stage = Stage.FOREST
+                ensureQuestStarted("story_first_battle")
                 renderStage()
-                if (questCommit != null) {
-                    message.text = "Квест завершён: +" + questCommit.reward.xpDelta + " XP, +" + questCommit.reward.coinsDelta + " монет."
-                }
             }
             Stage.FOREST -> {
-                when (questEngine.availability(playerId, "story_first_battle")) {
-                    QuestState.COMPLETED -> {
-                        stage = Stage.RETURN_HOME
-                        renderStage()
-                    }
-                    QuestState.AVAILABLE -> {
-                        ensureQuestStarted("story_first_battle")
-                        startCombat()
-                    }
-                    QuestState.ACTIVE -> startCombat()
-                    else -> renderStage()
+                if (questEngine.availability(playerId, "story_first_battle") == QuestState.COMPLETED) {
+                    renderStage()
+                } else {
+                    ensureQuestStarted("story_first_battle")
+                    startCombat()
                 }
             }
             Stage.COMBAT -> Unit
-            Stage.RETURN_HOME -> {
-                ensureQuestStarted("story_return_home")
-                val questCommit = recordQuestObjective("story_return_home", "return_home")
+        }
+    }
+
+    private fun onBackAction() {
+        when (stage) {
+            Stage.HOME -> Unit
+            Stage.VILLAGE -> {
                 stage = Stage.HOME
                 renderStage()
-                if (questCommit != null) {
-                    message.text = "Квест завершён: +" + questCommit.reward.xpDelta + " XP, +" + questCommit.reward.coinsDelta + " монет."
-                }
             }
+            Stage.FOREST -> {
+                stage = Stage.VILLAGE
+                renderStage()
+            }
+            Stage.COMBAT -> Unit
         }
     }
 
@@ -595,42 +597,42 @@ class MainActivity : Activity() {
         heroImage.visibility = if (stage == Stage.COMBAT) View.VISIBLE else View.GONE
         enemyImage.visibility = if (stage == Stage.COMBAT) View.VISIBLE else View.GONE
         renderer.setEquippedWeapon("weapon_sword_sparks")
+        backAction.visibility = if (stage == Stage.COMBAT || stage == Stage.HOME) View.GONE else View.VISIBLE
+
         when (stage) {
             Stage.HOME -> {
-                title.text = "Дом героя"
-                message.text = "Рыцарь готов к приключению. Оружие и броня уже экипированы."
-                action.text = "Идти в деревню"
+                title.text = "Дом"
+                message.text = "Задание: Отправиться в деревню."
+                action.text = "→ Деревня"
                 answers.visibility = View.GONE
             }
             Stage.VILLAGE -> {
-                title.text = "Деревенская площадь"
-                message.text = "NPC просит проверить дорогу в лес."
-                action.text = "Идти в лес"
+                title.text = "Деревня"
+                message.text = "Задание: Пройти из деревни в Дремучий лес."
+                action.text = "→ Дремучий лес"
+                backAction.text = "← Дом"
                 answers.visibility = View.GONE
             }
             Stage.FOREST -> {
-                title.text = "Лес"
-                if (questEngine.availability(playerId, "story_first_battle") == QuestState.COMPLETED) {
-                    message.text = "Квест уже завершён. Существо больше не появляется."
-                    action.text = "Вернуться домой"
+                title.text = "Дремучий лес"
+                val defeated = questEngine.availability(playerId, "story_first_battle") == QuestState.COMPLETED
+                if (defeated) {
+                    message.text = "Задание: Исследовать Дремучий лес."
+                    action.text = "Монстр побеждён"
                 } else {
-                    message.text = "Впереди маленькое существо."
-                    action.text = "Решить задачу"
+                    message.text = "Задание: Сразиться с монстром в Дремучем лесу."
+                    action.text = "→ Поляна с монстром"
                 }
+                backAction.text = "← Деревня"
                 answers.visibility = View.GONE
             }
             Stage.COMBAT -> {
                 val state = combatState ?: return
                 updateCombatHud(state)
-                message.text = "Реши задачу. Правильный ответ сразу завершает квест. Ошибка снимает одно сердце."
+                message.text = "Задание: Сразиться с монстром в Дремучем лесу."
                 action.text = ""
+                backAction.visibility = View.GONE
                 answers.visibility = View.VISIBLE
-            }
-            Stage.RETURN_HOME -> {
-                title.text = "Возвращение"
-                message.text = "Игровой цикл завершён. Правильных ответов в сохранении: ${progressStore.totalCorrect}."
-                action.text = "Вернуться домой"
-                answers.visibility = View.GONE
             }
         }
     }
