@@ -127,7 +127,7 @@ class AdventureRenderer(context: Context) : View(context) {
     private fun well(c:Canvas,x:Float,y:Float){p.color=0xFF77736A.toInt();c.drawOval(x-38,y-16,x+38,y+18,p);p.color=0xFF4E4A45.toInt();c.drawOval(x-25,y-8,x+25,y+9,p);p.color=0xFF754D31.toInt();c.drawRect(x-4,y-65,x+4,y-15,p);c.drawRect(x-48,y-63,x+48,y-57,p)}
     private fun mushroom(c:Canvas,x:Float,y:Float){p.color=0xFFE4D1A5.toInt();c.drawRect(x-4,y,x+4,y+18,p);p.color=0xFFC75B4B.toInt();c.drawOval(x-13,y-10,x+13,y+6,p)}
     private fun stone(c:Canvas,x:Float,y:Float,r:Float){p.color=0xFF817C70.toInt();c.drawOval(x-r,y-r*.55f,x+r,y+r*.55f,p)}
-    private fun torch(c:Canvas,x:Float,y:Float){p.color=0xFF67452C.toInt();c.drawRect(x-4,y,x+4,y+42,p);p.color=0xFFFFA23A.toInt();c.drawCircle(x,y-5,12,p);p.color=0xFFFFE58A.toInt();c.drawCircle(x,y-6,6,p)}
+    private fun torch(c:Canvas,x:Float,y:Float){p.color=0xFF67452C.toInt();c.drawRect(x-4,y,x+4,y+42,p);p.color=0xFFFFA23A.toInt();c.drawCircle(x,y-5,12f,p);p.color=0xFFFFE58A.toInt();c.drawCircle(x,y-6,6f,p)}
     private fun sparkle(c:Canvas,x:Float,y:Float){p.color=0xFFFFE28A.toInt();for(i in 0 until 8){val a=i*.78f;c.drawCircle(x+cos(a).toFloat()*wScale(78f),y+sin(a).toFloat()*28f,4f,p)}}
     private fun wScale(v:Float)=v*width/1080f
     private fun sign(c:Canvas,text:String,x:Float,y:Float,size:Float){p.color=0xFFE0B66E.toInt();c.drawRoundRect(x-150,y-25,x+150,y+25,13f,13f,p);p.color=0xFF3D2B20.toInt();p.textAlign=Paint.Align.CENTER;p.textSize=size;p.isFakeBoldText=true;c.drawText(text,x,y+6,p);p.isFakeBoldText=false}
