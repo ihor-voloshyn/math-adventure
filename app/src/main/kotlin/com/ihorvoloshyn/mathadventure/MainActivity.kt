@@ -271,7 +271,6 @@ class MainActivity : Activity() {
 
     private fun startCombat() {
         if (questEngine.availability(playerId, "story_first_battle") == QuestState.COMPLETED) {
-            stage = Stage.RETURN_HOME
             renderStage()
             return
         }
